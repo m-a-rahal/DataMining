@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Dataset {
-	double data [][] = null;
-	int n,m; // dataset dimentions, lines and columns repectively
+	public double data [][] = null;
+	public int n; // dataset dimentions, lines and columns repectively
+	public int m;
 	HashMap<String, Integer> col_index; // used to get column index by column name
 	String col_names [];
 	
