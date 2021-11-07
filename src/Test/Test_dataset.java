@@ -1,12 +1,14 @@
 package Test;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import data.Dataset;
-import data.FileManager;
+import input_sources.FileManager;
+import input_sources.URLManager;
 
 public class Test_dataset {
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws IOException {
 		Dataset dataset = FileManager.extract_dataset(null);
-		dataset.show();
+		Dataset dataset2 = URLManager.extract_dataset(null);
+		dataset2.show();
 	}
 }

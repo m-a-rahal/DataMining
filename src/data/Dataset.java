@@ -7,6 +7,7 @@ public class Dataset {
 	double data [][] = null;
 	int n,m; // dataset dimentions, lines and columns repectively
 	HashMap<String, Integer> col_index; // used to get column index by column name
+	String col_names [];
 	
 	public Dataset(String[] names, List<String> data_lines) {
 		// extract data from string lines
@@ -14,6 +15,7 @@ public class Dataset {
 		// init col_index
 		int col = 0;
 		col_index = new HashMap<>();
+		col_names = names;
 		for (String col_name : names) {
 			col_index.put(col_name, col++);
 		}
@@ -49,11 +51,15 @@ public class Dataset {
 	}
 
 	public void show() {
+		for (String name : col_names) {
+			System.out.print(name + "\t");
+		}
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				System.out.print(data[i][j] + "\t");
 			}
-			System.out.println(""); // linebreak
+			System.out.println(""); // line break
 		}
 	}
+
 }
