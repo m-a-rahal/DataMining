@@ -2,6 +2,7 @@ package data;
 
 import java.util.HashMap;
 import java.util.List;
+import mesures.Mesures;
 
 public class Dataset {
 	public double data [][] = null;
@@ -9,6 +10,7 @@ public class Dataset {
 	public int m;
 	HashMap<String, Integer> col_index; // used to get column index by column name
 	String col_names [];
+	Mesures mesures; // // ATTENTION: une fois la base de donné changée, il faut associer un nouveau objet mesures a la base de données!
 	
 	public Dataset(String[] names, List<String> data_lines) {
 		// extract data from string lines
@@ -39,7 +41,9 @@ public class Dataset {
 				data[i][j++] = Double.parseDouble(str_value);
 			}i++;
 		}
-		
+
+		// dataset changée => associer un nouveau objet Mesures à la base de données
+		this.mesures = new Mesures(this);
 	}
 
 	public double get(int line, String col_name) {
@@ -49,6 +53,22 @@ public class Dataset {
 	
 	public double get(int line, int col) {
 		return data[line][col];
+	}
+	
+	public void changer_ligne() {
+
+		// dataset changée => associer un nouveau objet Mesures à la base de données
+		this.mesures = new Mesures(this);
+	}
+	public void supprimer_ligne() {
+
+		// dataset changée => associer un nouveau objet Mesures à la base de données
+		this.mesures = new Mesures(this);
+	}
+	public void ajouter_ligne() {
+
+		// dataset changée => associer un nouveau objet Mesures à la base de données
+		this.mesures = new Mesures(this);
 	}
 
 	public void show() {

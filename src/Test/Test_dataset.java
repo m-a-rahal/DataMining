@@ -1,4 +1,5 @@
 package Test;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import data.Dataset;
@@ -9,6 +10,10 @@ import mesures.Mesures;
 
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
+		test_dispersion_diag();
+	}
+	
+	private static void test_dispersion_diag() throws FileNotFoundException {
 		Dataset dataset = FileManager.extract_dataset(null);
 		Diagrammes diag = new Diagrammes(dataset);
 		diag.diagramme_disperssion(5, 6);
