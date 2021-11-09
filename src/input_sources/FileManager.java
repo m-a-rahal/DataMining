@@ -3,6 +3,7 @@ package input_sources;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class FileManager {
 	public static Dataset extract_dataset(String dataset_file) throws FileNotFoundException {
 		if (dataset_file==null) dataset_file = default_dataset_file;
 		
-		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(dataset_file)));
+		BufferedReader reader = new BufferedReader(new FileReader(dataset_file));
 		
 			String line;
 			try {
@@ -25,9 +26,15 @@ public class FileManager {
 					line = reader.readLine();if (line == null) break;
 					datalines.add(line);
 				}
+				reader.close();
 				return new Dataset(names, datalines);
 				
 			} catch (IOException e) {
+				try {
+					reader.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 				e.printStackTrace();
 			}
 			return null;
