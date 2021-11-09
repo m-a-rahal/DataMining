@@ -9,21 +9,28 @@ public class Dataset {
 	public int n; // dataset dimentions, lines and columns repectively
 	public int m;
 	HashMap<String, Integer> col_index; // used to get column index by column name
-	String col_names [];
+	public String col_names [];
 	Mesures mesures; // // ATTENTION: une fois la base de donné changée, il faut associer un nouveau objet mesures a la base de données!
+	private static final String default_names = "area,perimeter,compactness,length of kernel,width of kernel,asymmetry coefficient,length of kernel groove,class";
 	
 	public Dataset(String[] names, List<String> data_lines) {
 		// extract data from string lines
+		extract_names(names);
 		extract_data(data_lines);
+	}
+	
+	private void extract_names(String[] names) {
+		if (names == null) {
+			col_names = default_names.split(",");
+		}
 		// init col_index
 		int col = 0;
 		col_index = new HashMap<>();
-		col_names = names;
-		for (String col_name : names) {
+		for (String col_name : col_names) {
 			col_index.put(col_name, col++);
 		}
 	}
-	
+
 	private void extract_data(List<String> data_lines) {
 		/** extracts rows from space-separated lines (Strings)
 		 * eg: 1.5 1.45 156.2 --> [1.5, 1.45, 156.2]

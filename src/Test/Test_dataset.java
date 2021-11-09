@@ -10,7 +10,7 @@ import mesures.Mesures;
 
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
-		test_dispersion_diag();
+		testMesures();
 	}
 	
 	private static void test_dispersion_diag() throws FileNotFoundException {
@@ -22,9 +22,7 @@ public class Test_dataset {
 	public static void testMesures() throws Exception {
 		Dataset dataset = FileManager.extract_dataset(null);
 		Mesures mesures = new Mesures(dataset);
-		System.out.println(mesures.moyenne(0));
-		System.out.println(mesures.ecartType(0));
-		System.out.println(mesures.mediane(0));
+		System.out.println(mesures);
 	}
 	
 	public static void testFile_extraction() throws IOException {

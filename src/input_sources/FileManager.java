@@ -20,14 +20,13 @@ public class FileManager {
 		
 			String line;
 			try {
-				String names[] = "area,perimeter,compactness,length of kernel,width of kernel,asymmetry coefficient,length of kernel groove".split(",");
 				ArrayList<String> datalines = new ArrayList<>();
 				while (true) {
 					line = reader.readLine();if (line == null) break;
 					datalines.add(line);
 				}
 				reader.close();
-				return new Dataset(names, datalines);
+				return new Dataset(null, datalines);
 				
 			} catch (IOException e) {
 				try {
