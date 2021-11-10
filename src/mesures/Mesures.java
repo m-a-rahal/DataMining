@@ -1,30 +1,29 @@
 package mesures;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 
 import data.Dataset;
 
-public class Mesures {
+public class Mesures extends ArrayList<Mesures_attribut> {
+	/** c'est juste un arrayliste de la Classe Mesure_attribut 
+	 * */
+	private static final long serialVersionUID = 1L;
+	
 	Dataset dataset;
-	Mesures_attribut attribut[]; 
 
 	public Mesures(Dataset dataset) {
+		super(dataset.m);
 		this.dataset = dataset;
-		attribut = new Mesures_attribut[dataset.m];
 		for (int att = 0; att < dataset.m; att++) {
-			attribut[att] = new Mesures_attribut(dataset, att);
+			this.add(new Mesures_attribut(dataset, att));
 		}
-	}
-	
-	public Mesures_attribut getAttribut(int i) {
-		return attribut[i];
 	}
 	
 	@Override
 	public String toString() {
 		String text = "";
 		for (int i = 0; i < dataset.m; i++) {
-			text += attribut[i].toString() + "\n";
+			text += get(i).toString() + "\n";
 		}
 		return text;
 	}

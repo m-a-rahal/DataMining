@@ -2,6 +2,7 @@ package mesures;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 
 import data.Dataset;
 
@@ -26,7 +27,7 @@ public class Mesures_attribut {
 		this.nom_attribut = dataset.col_names[indice_attribut];
 	}
 	
-	// calculer la moyenne d'un attribut (avec indice)
+	// calculer la moyenne de l'attribut 
 	public double moyenne() {
 		if (moy != null)
 			return moy;
@@ -37,8 +38,45 @@ public class Mesures_attribut {
 		moy /= dataset.n;
 		return moy;
 	}
+	
+	// calculer la moyenne tronquée de l'attribut 
+		public double moyenne_tronqee(double quantile) {
+			if (quantile >= 0.5) {
+				throw new IllegalArgumentException("ne peut pas tronquer plus que 50% des deux côtés de la liste des valeurs");
+			}
+			double sup = quantile(1-quantile);
+			double inf = quantile(quantile);
+			
+			double somme = 0;
+			int count = 0;
+			for (int i = 0; i < dataset.n; i++) {
+				double x = dataset.data[i][indice_attribut];
+				if (x >= inf && x <= sup) {
+					somme += x;
+					count++;
+				}
+			}
+			
+			return somme / count;
+		}
+	
+	// calculer le quantile q de l'attribut
+	public double quantile(double q) {
+		/** caculate quantile using R-2 approximation (averaging the two neighbors in case of conflict) (src = 'https://en.wikipedia.org/wiki/Quantile#:~:text=empirical%20distribution%20function.-,R%E2%80%912,-%2C%20SAS%E2%80%915%2C%20Maple')*/
+		if (q < 0 || q > 1)
+			throw new IllegalArgumentException("Le quantile doit être compris entre 0 et 1");
+		if (q == 0)
+			return min();
+		if (q == 1)
+			return max();
+		ArrayList<Double> valeurs = getSortedValues();
+		double h = dataset.n * q + 0.5;
+		int left = (int) Math.ceil(h - 0.5);
+		int right = (int) Math.floor(h + 0.5);
+		return (valeurs.get(left) + valeurs.get(right)) / 2;
+	}
 
-	// calculer la variance d'un attribut (avec indice)
+	// calculer la variance de l'attribut 
 	public double variance() {
 		if (var != null)
 			return var;
@@ -51,17 +89,17 @@ public class Mesures_attribut {
 		return var;
 	}
 
-	// calculer l'écart type d'un attribut (avec indice)
+	// calculer l'écart type de l'attribut 
 	public double ecartType() {
 		return Math.sqrt(variance());
 	}
 
-	// calculer le milieu de l'étendu d'un attribut
+	// calculer le milieu de l'étendu de l'attribut
 	public double milieu() {
 		return (max()+min())/2;
 	}
 
-	// calculer le mode d'un attribut (avec indice)
+	// calculer le mode de l'attribut 
 	public double mode() throws Exception {
 		/** fait une discrétization des donnés avec des intervales de longeure = w
 		 * tel que w = (max-min)/k
@@ -90,16 +128,12 @@ public class Mesures_attribut {
 		return mod;
 	}
 
-	// calculer la médiane d'un attribut (avec indice)
+	// calculer la médiane de l'attribut 
 	public double mediane() throws Exception {
 		if (med != null)
 			return med;
 		double med;
-		ArrayList<Double> vecteur = new ArrayList<>(dataset.n);
-		for (int i = 0; i < dataset.n; i++) {
-			vecteur.add(dataset.data[i][indice_attribut]);
-		}
-		Collections.sort(vecteur);
+		ArrayList<Double> vecteur = getSortedValues();
 		// si la taile de la liste est pair, retourner l'élement x(n/2), sinon la moyenne des deux élements au milieu
 		int n = vecteur.size();
 		if (n % 2 == 1) {
@@ -108,6 +142,16 @@ public class Mesures_attribut {
 			med =  vecteur.get(n/2);
 		}
 		return med;
+	}
+
+	private ArrayList<Double> getSortedValues() {
+		new ArrayList<>(dataset.n);
+		ArrayList<Double> vecteur = new ArrayList<Double>();
+		for (int i = 0; i < dataset.n; i++) {
+			vecteur.add(dataset.data[i][indice_attribut]);
+		}
+		Collections.sort(vecteur);
+		return vecteur;
 	}
 
 	public double min() {
