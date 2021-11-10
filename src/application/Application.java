@@ -4,11 +4,13 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,6 +19,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Application {
 
@@ -93,6 +96,24 @@ public class Application {
 		chckbxUrl.setToolTipText("spécifier si vous voulez récupérer votre dataset depuis un url sur internet ou localement avec son chemin d'emplacement");
 		
 		JButton btnCharger = new JButton("charger");
+		btnCharger.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(! chckbxUrl.isSelected()) {
+					JFileChooser fileChooser = new JFileChooser();
+		            fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+		            fileChooser.setAcceptAllFileFilterUsed(false);
+		            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("ficher texte (.txt)", new String[] { "txt" }));
+		            fileChooser.showOpenDialog(null);
+		            try {
+		            	text_dataset_src.setText(fileChooser.getSelectedFile().getAbsolutePath());
+		              
+		            } catch (NullPointerException nullPointerException) {}
+				}else {
+					// when url is checked
+				}
+		
+			}
+		});
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new LineBorder(Color.GRAY));
