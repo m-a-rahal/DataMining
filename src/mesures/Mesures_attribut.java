@@ -178,6 +178,50 @@ public class Mesures_attribut {
 		return max;
 	}
 	
+	public double etendu() {
+		return max()-min();
+	}
+	
+	public double milieu_etendu() {
+		return etendu()/2;
+	}
+	
+	public double quartile(int q) {
+		if(q>3 | q<1) {
+			throw new IllegalArgumentException("Le quartile doit être compris entre 1 et 3");
+		}
+		ArrayList<Double> vecteur = new ArrayList<Double>();
+		vecteur = getSortedValues();
+		if(q==1) {
+			return vecteur.get(dataset.n/4);
+		}else if(q==2) {
+			return vecteur.get(dataset.n/2);
+		}else {
+			return vecteur.get(3*dataset.n/4);
+		}
+		
+	}
+	
+	public double IQR() {
+		return quartile(3)-quartile(1);
+	}
+	
+	public ArrayList<Double> outliers() {
+		ArrayList<Double> vecteur = new ArrayList<Double>();
+		ArrayList<Double> outlier = new ArrayList<Double>();
+		int i;
+		vecteur = getSortedValues();
+			for(i=0;i<dataset.n;i++) {
+				if(vecteur.get(i)<=quartile(1)-1.5*IQR() | vecteur.get(i)>=quartile(3)+1.5*IQR()) {
+				outlier.add(vecteur.get(i));
+				}
+			}
+
+		return outlier;
+	}
+	
+	
+	
 	@Override
 	public String toString() {
 		String text = nom_attribut + ":\n";
@@ -189,6 +233,13 @@ public class Mesures_attribut {
 			text += "\t - mode      = " + mode() + "\n";
 			text += "\t - max       = " + max() + "\n";
 			text += "\t - min       = " + min() + "\n";
+			text += "\t - etendu    = " + etendu() + "\n";
+			text += "\t - Q1        = " + quartile(1) + "\n";
+			text += "\t - Q2        = " + quartile(2) + "\n";
+			text += "\t - Q3        = " + quartile(3) + "\n";
+			text += "\t - IQR       = " + IQR() + "\n";
+			text += "\t - outliers  = " + outliers() + "\n";
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
