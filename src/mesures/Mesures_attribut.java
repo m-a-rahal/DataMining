@@ -182,7 +182,7 @@ public class Mesures_attribut {
 	}
 	
 	public double milieu_etendu() {
-		return etendu()/2;
+		return (min()+max())/2;
 	}
 	
 	public double quartile(int q) {
@@ -219,26 +219,30 @@ public class Mesures_attribut {
 		return outlier;
 	}
 	
+	public double arrondi(double val) {
+		return Math.round(val * 10000.0)/10000.0;
+	}
 	
 	
 	@Override
 	public String toString() {
 		String text = nom_attribut + ":\n";
 		try {
-			text += "\t - moyenne   = " + moyenne() + "\n";
-			text += "\t - ecartType = " + ecartType() + "\n";
-			text += "\t - variance  = " + variance() + "\n";
-			text += "\t - mediane   = " + mediane() + "\n";
-			text += "\t - mode      = " + mode() + "\n";
-			text += "\t - mode_disc = " + mode_discret() + "\n";
+			text += "\t - moyenne   = " + arrondi(moyenne()) + "\n";
+			text += "\t - ecartType = " + arrondi(ecartType()) + "\n";
+			text += "\t - variance  = " + arrondi(variance()) + "\n";
+			text += "\t - mediane   = " + arrondi(mediane()) + "\n";
+			text += "\t - mode      = " + arrondi(mode()) + "\n";
+			text += "\t - mode_disc = " + arrondi(mode_discret()) + "\n";
 			text += "\t - max       = " + max() + "\n";
 			text += "\t - min       = " + min() + "\n";
-			text += "\t - etendu    = " + etendu() + "\n";
-			text += "\t - skewness  = " + skewness() + "\n";
+			text += "\t - etendu    = " + arrondi(etendu()) + "\n";
+			text += "\t - mi_etendu = " + arrondi(milieu_etendu()) + "\n";
+			text += "\t - skewness  = " + arrondi(skewness()) + "\n";
 			text += "\t - Q1        = " + quartile(1) + "\n";
 			text += "\t - Q2        = " + quartile(2) + "\n";
 			text += "\t - Q3        = " + quartile(3) + "\n";
-			text += "\t - IQR       = " + IQR() + "\n";
+			text += "\t - IQR       = " + arrondi(IQR()) + "\n";
 			text += "\t - outliers  = " + outliers() + "\n";
 			
 		} catch (Exception e) {
