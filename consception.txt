@@ -1,0 +1,16 @@
+- interace
+- med mod méd (3 cas?!) normalement 3 cas (define what is med ≈ mod ≈ moy) :
+    . med ≈ mod ≈ moy
+    . see cours
+    .
+
+DESCRIPTION + MESURES:
+    - information (text area):
+        . file name = dataset name
+        . nbr instances
+        . nbr attributs
+        . attributs :
+            . noms attributs
+                - short name
+                - long name (real name)
+            . type : entier, float, ...
