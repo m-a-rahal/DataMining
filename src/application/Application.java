@@ -22,6 +22,7 @@ import javax.swing.JSlider;
 import java.awt.Choice;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Application {
 
@@ -99,6 +100,24 @@ public class Application {
 		chckbxUrl.setToolTipText("spécifier si vous voulez récupérer votre dataset depuis un url sur internet ou localement avec son chemin d'emplacement");
 		
 		JButton btnCharger = new JButton("charger");
+		btnCharger.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(! chckbxUrl.isSelected()) {
+					JFileChooser fileChooser = new JFileChooser();
+		            fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+		            fileChooser.setAcceptAllFileFilterUsed(false);
+		            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("ficher texte (.txt)", new String[] { "txt" }));
+		            fileChooser.showOpenDialog(null);
+		            try {
+		            	text_dataset_src.setText(fileChooser.getSelectedFile().getAbsolutePath());
+		              
+		            } catch (NullPointerException nullPointerException) {}
+				}else {
+					// when url is checked
+				}
+		
+			}
+		});
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new LineBorder(Color.GRAY));
