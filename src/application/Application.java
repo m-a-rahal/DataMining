@@ -1,7 +1,9 @@
 package application;
 
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -26,7 +28,11 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.jfree.chart.ChartPanel;
+
 import data.Dataset;
+import diagrammes.Diagrammes;
 import input_sources.FileManager;
 import input_sources.URLManager;
 
@@ -37,6 +43,7 @@ public class Application {
 	private JTextField text_dataset_src;
 	private JTextField text_selected_data;
 	private JTable table_mesures;
+	private ChartPanel panel_diagrammes;
 
 	/**
 	 * Launch the application.
@@ -58,13 +65,6 @@ public class Application {
 	 * Create the application.
 	 */
 	public Application() {
-		initialize();
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 629, 482);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -275,16 +275,35 @@ public class Application {
 		
 		JLabel lblNewLabel_4 = new JLabel("Type du diagramme");
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"Histogramme", "Boite à moustache", "Q-Q Plot", "ScatterPlot"}));
+		JComboBox comboBox_type_diagramme = new JComboBox();
+		comboBox_type_diagramme.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Diagrammes diagrammes = new Diagrammes(dataset);
+				switch(comboBox_type_diagramme.getSelectedIndex()) {
+					case 0 : // Histogramme
+						panel_diagrammes.setChart(diagrammes.histogram(0));
+						break;
+					case 3 : // scatterplot
+						panel_diagrammes.setChart(diagrammes.diagramme_disperssion(0,1));
+						break;
+				}
+			}
+		});
+		comboBox_type_diagramme.setModel(new DefaultComboBoxModel(new String[] {"Histogramme", "Boite à moustache", "Q-Q Plot", "ScatterPlot"}));
+		
+		panel_diagrammes = new ChartPanel(null);
+		panel_diagrammes.setBorder(new LineBorder(new Color(0, 0, 0)));
 		GroupLayout gl_panel_plots = new GroupLayout(panel_plots);
 		gl_panel_plots.setHorizontalGroup(
 			gl_panel_plots.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_plots.createSequentialGroup()
+				.addGroup(Alignment.TRAILING, gl_panel_plots.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblNewLabel_4)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(comboBox, 0, 484, Short.MAX_VALUE)
+					.addGroup(gl_panel_plots.createParallelGroup(Alignment.TRAILING)
+						.addComponent(panel_diagrammes, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+						.addGroup(gl_panel_plots.createSequentialGroup()
+							.addComponent(lblNewLabel_4)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(comboBox_type_diagramme, 0, 484, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		gl_panel_plots.setVerticalGroup(
@@ -293,8 +312,10 @@ public class Application {
 					.addContainerGap()
 					.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel_4)
-						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(390, Short.MAX_VALUE))
+						.addComponent(comboBox_type_diagramme, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
+					.addContainerGap())
 		);
 		panel_plots.setLayout(gl_panel_plots);
 		panel.setLayout(gl_panel);

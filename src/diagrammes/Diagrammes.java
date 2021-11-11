@@ -23,20 +23,21 @@ public class Diagrammes {
 
 
 
-	public void diagramme_disperssion(int col1, int col2) {
+	public JFreeChart diagramme_disperssion(int col1, int col2) {
 		XYSeries couple = new XYSeries("");
 		for (int i = 0; i < dataset.n; i++) {
 			couple.add(dataset.data[i][col1], dataset.data[i][col2]);
 		}
 		data.addSeries(couple);
 		JFreeChart scatterplot = ChartFactory.createScatterPlot("scatter", "x", "y", data);
-		ChartPanel panel = new ChartPanel(scatterplot);
-		JFrame frame = new JFrame();
-		frame.add(panel);
-		frame.setVisible(true);
+		//ChartPanel panel = new ChartPanel(scatterplot);
+		//JFrame frame = new JFrame();
+		//frame.add(panel);
+		//frame.setVisible(true);
+		return scatterplot;
 		
 	}
-		public void histogram(int col) {
+		public JFreeChart histogram(int col) {
 			double[] d = new double[dataset.n];
 			HistogramDataset histdata = new HistogramDataset();
 			histdata.setType(HistogramType.FREQUENCY);
@@ -45,9 +46,11 @@ public class Diagrammes {
 			}
 			histdata.addSeries("", d, dataset.n);
 			JFreeChart hist = ChartFactory.createHistogram("histogram", dataset.col_names[col], "frequence", histdata);
-			ChartPanel panel = new ChartPanel(hist);
-			JFrame frame = new JFrame();
-			frame.add(panel);
-			frame.setVisible(true);
+			//ChartPanel panel = new ChartPanel(hist);
+			//panel.setChart(hist);
+			//JFrame frame = new JFrame();
+			//frame.add(panel);
+			//frame.setVisible(true);
+			return hist;
 	}
 }
