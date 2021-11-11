@@ -5,6 +5,8 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -24,9 +26,12 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import data.Dataset;
+import input_sources.FileManager;
+import input_sources.URLManager;
 
 public class Application {
-
+	private Dataset dataset;
 	private JFrame frame;
 	private JTable table;
 	private JTextField text_dataset_src;
@@ -111,10 +116,14 @@ public class Application {
 		            fileChooser.showOpenDialog(null);
 		            try {
 		            	text_dataset_src.setText(fileChooser.getSelectedFile().getAbsolutePath());
-		              
-		            } catch (NullPointerException nullPointerException) {}
+		            	dataset = FileManager.extract_dataset(text_dataset_src.getText());
+		            } catch (NullPointerException nullPointerException) {} catch (FileNotFoundException e1) {e1.printStackTrace();}
 				}else {
-					// when url is checked
+					try {
+						dataset = URLManager.extract_dataset(text_dataset_src.getText());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 				}
 		
 			}

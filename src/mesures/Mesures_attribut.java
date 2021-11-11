@@ -234,6 +234,7 @@ public class Mesures_attribut {
 			text += "\t - max       = " + max() + "\n";
 			text += "\t - min       = " + min() + "\n";
 			text += "\t - etendu    = " + etendu() + "\n";
+			text += "\t - skewness  = " + skewness() + "\n";
 			text += "\t - Q1        = " + quartile(1) + "\n";
 			text += "\t - Q2        = " + quartile(2) + "\n";
 			text += "\t - Q3        = " + quartile(3) + "\n";
@@ -244,5 +245,22 @@ public class Mesures_attribut {
 			e.printStackTrace();
 		}
 		return text;
+	}
+	
+	private double m(int k) {
+		/** used to calulate skewness(), ref = "https://pyshark.com/skewness-in-python/"
+		 * */
+		double m = 0;
+		double moyenne = moyenne();
+		for (int i = 0; i < dataset.n; i++) {
+			m += Math.pow(dataset.data[i][indice_attribut] - moyenne, k);
+		}
+		return m / dataset.n;
+	}
+	
+	public double skewness() {
+		/** using Fisher-Pearson coefficient of skewness, ref = "https://pyshark.com/skewness-in-python/"
+		 * skewness = m3 / (m2 ^ (1.5))*/
+		return m(3) / Math.pow(m(2), 1.5);
 	}
 }
