@@ -10,7 +10,6 @@ public class Dataset {
 	public int m;
 	HashMap<String, Integer> col_index; // used to get column index by column name
 	public String col_names [];
-	Mesures mesures; // // ATTENTION: une fois la base de donné changée, il faut associer un nouveau objet mesures a la base de données!
 	private static final String default_names = "area,perimeter,compactness,length of kernel,width of kernel,asymmetry coefficient,length of kernel groove,class";
 	
 	public Dataset(String[] names, List<String> data_lines) {
@@ -49,8 +48,6 @@ public class Dataset {
 			}i++;
 		}
 
-		// dataset changée => associer un nouveau objet Mesures à la base de données
-		this.mesures = new Mesures(this);
 	}
 
 	public double get(int line, String col_name) {
@@ -64,18 +61,11 @@ public class Dataset {
 	
 	public void changer_ligne() {
 
-		// dataset changée => associer un nouveau objet Mesures à la base de données
-		this.mesures = new Mesures(this);
 	}
 	public void supprimer_ligne() {
 
-		// dataset changée => associer un nouveau objet Mesures à la base de données
-		this.mesures = new Mesures(this);
 	}
 	public void ajouter_ligne() {
-
-		// dataset changée => associer un nouveau objet Mesures à la base de données
-		this.mesures = new Mesures(this);
 	}
 
 	public void show() {

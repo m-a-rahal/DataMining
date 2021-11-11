@@ -44,7 +44,7 @@ public class Diagrammes {
 				d[i]=dataset.data[i][col];
 			}
 			histdata.addSeries("", d, dataset.n);
-			JFreeChart hist = ChartFactory.createHistogram("histogram", "attribut", "frequence", histdata);
+			JFreeChart hist = ChartFactory.createHistogram("histogram", dataset.col_names[col], "frequence", histdata);
 			ChartPanel panel = new ChartPanel(hist);
 			JFrame frame = new JFrame();
 			frame.add(panel);

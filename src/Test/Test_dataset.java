@@ -11,6 +11,13 @@ import mesures.Mesures;
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
 		testMesures();
+		test_histogram();
+	}
+	
+	private static void test_histogram() throws FileNotFoundException {
+		Dataset dataset = FileManager.extract_dataset(null);
+		Diagrammes diag = new Diagrammes(dataset);
+		diag.histogram(0);
 	}
 	
 	private static void test_dispersion_diag() throws FileNotFoundException {

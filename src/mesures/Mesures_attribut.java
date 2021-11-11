@@ -2,7 +2,7 @@ package mesures;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.TreeMap;
 
 import data.Dataset;
 
@@ -11,15 +11,6 @@ public class Mesures_attribut {
 	Dataset dataset;
 	int indice_attribut;
 	String nom_attribut;
-	// valeurs précalculés — utilisés pour ne pas refaire les calcules à chaque fois
-	// ATTENTION: une fois la base de donné changée, il faut associer un nouveau objet mesures a la base de données!
-	private Double max = null;
-	private Double min = null;
-	private Double med = null;
-	private Double mod = null;
-	private Double moy = null;
-	private Double var = null;
-	//--------------------------------------------------------------------------------------------------------------
 
 	public Mesures_attribut(Dataset dataset, int indice_attribut) {
 		this.dataset = dataset;
@@ -29,9 +20,7 @@ public class Mesures_attribut {
 	
 	// calculer la moyenne de l'attribut 
 	public double moyenne() {
-		if (moy != null)
-			return moy;
-		moy = 0.0;
+		double moy = 0.0;
 		for (int i = 0; i < dataset.n; i++) {
 			moy += dataset.data[i][indice_attribut];
 		}
@@ -78,8 +67,7 @@ public class Mesures_attribut {
 
 	// calculer la variance de l'attribut 
 	public double variance() {
-		if (var != null)
-			return var;
+		double var;
 		double moyenne = moyenne();
 		var = 0.0;
 		for (int i = 0; i < dataset.n; i++) {
@@ -98,16 +86,33 @@ public class Mesures_attribut {
 	public double milieu() {
 		return (max()+min())/2;
 	}
-
-	// calculer le mode de l'attribut 
+	
 	public double mode() throws Exception {
+		Double mod = null;
+		Integer mod_freq = null;
+		TreeMap<Double, Integer> frequences = new TreeMap<>();
+		for (int i = 0; i < dataset.n; i++) {
+			double val = dataset.get(i, indice_attribut);
+			Integer freq = frequences.get(val);
+			freq = freq != null ? freq+1 : 1;
+			frequences.put(val, freq);
+			if (mod == null || mod_freq < freq) {
+				mod = val;
+				mod_freq = freq;
+				continue;
+			}
+		}
+		return mod;
+	}
+
+	// calculer le mode de l'attribut avec discrétization 
+	public double mode_discret() throws Exception {
 		/** fait une discrétization des donnés avec des intervales de longeure = w
 		 * tel que w = (max-min)/k
 		 * k = round(   5*log10(nombre de valeurs)  )
 		 * le mode est donc le milieu de l'intervale ayant la plus grande frequence
 		*/
-		if (mod != null)
-			return mod;
+		double mod_discret;
 
 		int k = (int) Math.round(5 * Math.log10(dataset.n));
 		double max = max();
@@ -124,14 +129,12 @@ public class Mesures_attribut {
 				indice_max = i;
 			}
 		}
-		mod = min + (indice_max + 0.5) * w;
-		return mod;
+		mod_discret = min + (indice_max + 0.5) * w;
+		return mod_discret;
 	}
 
 	// calculer la médiane de l'attribut 
 	public double mediane() throws Exception {
-		if (med != null)
-			return med;
 		double med;
 		ArrayList<Double> vecteur = getSortedValues();
 		// si la taile de la liste est pair, retourner l'élement x(n/2), sinon la moyenne des deux élements au milieu
@@ -155,9 +158,7 @@ public class Mesures_attribut {
 	}
 
 	public double min() {
-		if (min != null)
-			return min;
-		min = dataset.data[0][indice_attribut];
+		double min = dataset.data[0][indice_attribut];
 		for (int i = 1; i < dataset.n; i++) {
 			if (dataset.data[i][indice_attribut] < min) {
 				min = dataset.data[i][indice_attribut];
@@ -167,9 +168,7 @@ public class Mesures_attribut {
 	}
 
 	public double max() {
-		if (max != null)
-			return max;
-		max = dataset.data[0][indice_attribut];
+		double max = dataset.data[0][indice_attribut];
 		for (int i = 1; i < dataset.n; i++) {
 			if (dataset.data[i][indice_attribut] > max) {
 				max = dataset.data[i][indice_attribut];
@@ -231,6 +230,7 @@ public class Mesures_attribut {
 			text += "\t - variance  = " + variance() + "\n";
 			text += "\t - mediane   = " + mediane() + "\n";
 			text += "\t - mode      = " + mode() + "\n";
+			text += "\t - mode_disc = " + mode_discret() + "\n";
 			text += "\t - max       = " + max() + "\n";
 			text += "\t - min       = " + min() + "\n";
 			text += "\t - etendu    = " + etendu() + "\n";
