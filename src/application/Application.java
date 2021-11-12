@@ -40,15 +40,19 @@ import data.Dataset;
 import diagrammes.Diagrammes;
 import input_sources.FileManager;
 import input_sources.URLManager;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class Application {
 	private Dataset dataset;
 	private JFrame frame;
 	private JTable table;
 	private JTextField text_dataset_src;
-	private JTextField text_selected_data;
 	private JTable table_mesures;
 	private ChartPanel panel_diagrammes;
+	private JTextArea textArea_description;
+	private JSlider slider_moy_tronquee;
+	private JLabel label_pourcentage_moy_tronquee;
 
 	/**
 	 * Launch the application.
@@ -99,6 +103,53 @@ public class Application {
 		JPanel panel_dataset = new JPanel();
 		tabbedPane.addTab("Dataset", null, panel_dataset, null);
 		
+		JPanel panel_1 = new JPanel();
+		panel_1.setBorder(new LineBorder(Color.GRAY));
+		
+		JPanel panel_2 = new JPanel();
+		GroupLayout gl_panel_dataset = new GroupLayout(panel_dataset);
+		gl_panel_dataset.setHorizontalGroup(
+			gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_dataset.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
+						.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+						.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
+					.addContainerGap())
+		);
+		gl_panel_dataset.setVerticalGroup(
+			gl_panel_dataset.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_panel_dataset.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
+					.addGap(10))
+		);
+		
+		panel_2.setLayout(new BorderLayout(0,0));
+		table = new JTable();
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
+		//table.setEnabled(false);
+		//table.setRowSelectionAllowed(false);
+		panel_2.add(table, BorderLayout.CENTER);
+		panel_2.add(new JScrollPane(table));
+
+		
+		JButton btnNewButton = new JButton("ajouter ligne");
+		
+		JButton btn_appliquer_changements = new JButton("appliquer les modifications");
+		btn_appliquer_changements.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JButton btnSupprimerligne = new JButton("supprimer_ligne");
+		btnSupprimerligne.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
 		JLabel lblNewLabel = new JLabel("Dataset");
 		
 		text_dataset_src = new JTextField();
@@ -128,103 +179,48 @@ public class Application {
 						e1.printStackTrace();
 					}
 				}
-				TableModel tableModel = new DefaultTableModel(dataset.col_names, dataset.n);
-				for (int i = 0; i < dataset.n; i++) {
-					for (int j = 0; j < dataset.m; j++) {
-						tableModel.setValueAt(dataset.get(i, j), i, j);
-					}
-				}
-				table.setModel(tableModel);
+				load_dataset_on_table();
 			}
-		});
-		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new LineBorder(Color.GRAY));
-		
-		JPanel panel_2 = new JPanel();
-		GroupLayout gl_panel_dataset = new GroupLayout(panel_dataset);
-		gl_panel_dataset.setHorizontalGroup(
-			gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panel_dataset.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel_dataset.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-						.addGroup(gl_panel_dataset.createSequentialGroup()
-							.addComponent(lblNewLabel)
-							.addGap(6)
-							.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(chckbxUrl)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnCharger)
-							.addGap(81))
-						.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
-					.addContainerGap())
-		);
-		gl_panel_dataset.setVerticalGroup(
-			gl_panel_dataset.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_dataset.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel_dataset.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_dataset.createParallelGroup(Alignment.BASELINE)
-							.addComponent(text_dataset_src, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
-							.addComponent(chckbxUrl))
-						.addComponent(btnCharger))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
-					.addGap(10))
-		);
-		
-		panel_2.setLayout(new BorderLayout(0,0));
-		table = new JTable();
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
-		//table.setEnabled(false);
-		//table.setRowSelectionAllowed(false);
-		panel_2.add(table, BorderLayout.CENTER);
-		panel_2.add(new JScrollPane(table));
 
-		
-		JButton btnNewButton = new JButton("ajouter ligne");
-		
-		JButton btnNewButton_1 = new JButton("appliquer les modifications");
-		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
+			
 		});
-		
-		JLabel lblNewLabel_1 = new JLabel("Ligne séléctionnée");
-		
-		text_selected_data = new JTextField();
-		text_selected_data.setToolTipText("les donnés ici sont celles de la ligne séléctionnée séparés par des virgules");
-		text_selected_data.setColumns(10);
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
-			gl_panel_1.createParallelGroup(Alignment.LEADING)
+			gl_panel_1.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING, false)
-						.addComponent(lblNewLabel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnNewButton, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(text_selected_data, GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnNewButton_1)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addComponent(btnNewButton)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnSupprimerligne)
+							.addPreferredGap(ComponentPlacement.RELATED, 203, Short.MAX_VALUE)
+							.addComponent(btn_appliquer_changements))
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addComponent(lblNewLabel)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(chckbxUrl)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnCharger)))
 					.addContainerGap())
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(btnNewButton)
+					.addGap(15)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
+						.addComponent(text_dataset_src, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnCharger)
+						.addComponent(chckbxUrl))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
-						.addComponent(text_selected_data, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnNewButton_1))
-					.addContainerGap(22, Short.MAX_VALUE))
+						.addComponent(btn_appliquer_changements)
+						.addComponent(btnNewButton)
+						.addComponent(btnSupprimerligne))
+					.addContainerGap(21, Short.MAX_VALUE))
 		);
 		panel_1.setLayout(gl_panel_1);
 		panel_dataset.setLayout(gl_panel_dataset);
@@ -234,40 +230,47 @@ public class Application {
 		
 		JLabel lblNewLabel_2 = new JLabel("Description du dataset");
 		
-		JTextArea textArea_description = new JTextArea();
+		textArea_description = new JTextArea();
 		
 		JLabel lblNewLabel_2_1 = new JLabel("Mesures");
 		
 		table_mesures = new JTable();
 		
 		JLabel lblNewLabel_3 = new JLabel("Pourcentage à trouquer pour la moyenne tronquée (de 0% à 50%)");
+		label_pourcentage_moy_tronquee = new JLabel("50%");
 		
-		JSlider slider_moy_tronquee = new JSlider();
+		slider_moy_tronquee = new JSlider();
+		slider_moy_tronquee.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				int seuil = slider_moy_tronquee.getValue();
+				label_pourcentage_moy_tronquee.setText(seuil+"%");
+			}
+		});
 		slider_moy_tronquee.setMinorTickSpacing(1);
 		slider_moy_tronquee.setMaximum(50);
 		
-		JLabel label_pourcentage_moy_tronquee = new JLabel("50%");
+		
 		GroupLayout gl_panel_desc_mesures = new GroupLayout(panel_desc_mesures);
 		gl_panel_desc_mesures.setHorizontalGroup(
-			gl_panel_desc_mesures.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_desc_mesures.createSequentialGroup()
+			gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_desc_mesures.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
-						.addComponent(textArea_description, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-						.addComponent(table_mesures, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-						.addGroup(Alignment.LEADING, gl_panel_desc_mesures.createSequentialGroup()
+					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.LEADING)
+						.addComponent(textArea_description, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+						.addComponent(table_mesures, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+						.addGroup(gl_panel_desc_mesures.createSequentialGroup()
 							.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
 								.addComponent(lblNewLabel_2, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
 								.addComponent(lblNewLabel_2_1, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblNewLabel_3, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 348, GroupLayout.PREFERRED_SIZE)
-								.addComponent(slider_moy_tronquee, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE))
+								.addComponent(slider_moy_tronquee, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
+								.addComponent(lblNewLabel_3, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 366, GroupLayout.PREFERRED_SIZE))
 							.addGap(18)
 							.addComponent(label_pourcentage_moy_tronquee, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		gl_panel_desc_mesures.setVerticalGroup(
-			gl_panel_desc_mesures.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_desc_mesures.createSequentialGroup()
+			gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_desc_mesures.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -336,5 +339,21 @@ public class Application {
 		panel_plots.setLayout(gl_panel_plots);
 		panel.setLayout(gl_panel);
 		frame.getContentPane().setLayout(groupLayout);
+	}
+	
+	public void load_dataset_on_table() {
+		/** charger la dataset dans la table et afficher les mesures
+		 * */
+		// load table in Jtabel
+		TableModel tableModel = new DefaultTableModel(dataset.col_names, dataset.n);
+		for (int i = 0; i < dataset.n; i++) {
+			for (int j = 0; j < dataset.m; j++) {
+				tableModel.setValueAt(dataset.get(i, j), i, j);
+			}
+		}
+		table.setModel(tableModel);
+		
+		// load mesures and description
+		
 	}
 }
