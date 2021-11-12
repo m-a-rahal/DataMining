@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -63,6 +65,8 @@ public class Application {
 			public void run() {
 				try {
 					Application window = new Application();
+					// Maximizer la fenêtre et l'afficher
+					window.frame.setExtendedState(window.frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -174,6 +178,7 @@ public class Application {
 				}
 				try {
 					load_dataset_on_table();
+					update_description_text();
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -248,6 +253,9 @@ public class Application {
 		slider_moy_tronquee.setMinorTickSpacing(1);
 		slider_moy_tronquee.setMaximum(49);
 		
+		JPanel panel_4 = new JPanel();
+		textArea_description = add_textArea_to(panel_4);
+		
 		
 		
 		
@@ -259,19 +267,18 @@ public class Application {
 				.addGroup(gl_panel_desc_mesures.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
+						.addComponent(panel_4, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
 						.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-						.addComponent(textArea_description, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-						.addGroup(Alignment.LEADING, gl_panel_desc_mesures.createSequentialGroup()
-							.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
-								.addComponent(lblNewLabel_2, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblNewLabel_2_1, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
-								.addComponent(slider_moy_tronquee, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
-								.addGroup(Alignment.LEADING, gl_panel_desc_mesures.createSequentialGroup()
+						.addGroup(gl_panel_desc_mesures.createSequentialGroup()
+							.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
+								.addComponent(slider_moy_tronquee, GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
+								.addGroup(gl_panel_desc_mesures.createSequentialGroup()
 									.addComponent(lblNewLabel_3, GroupLayout.PREFERRED_SIZE, 366, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED)))
-									///.addComponent(table_mesures, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)))
 							.addGap(18)
-							.addComponent(label_pourcentage_moy_tronquee, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(label_pourcentage_moy_tronquee, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE))
+						.addComponent(lblNewLabel_2_1, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap())
 		);
 		gl_panel_desc_mesures.setVerticalGroup(
@@ -280,15 +287,13 @@ public class Application {
 					.addContainerGap()
 					.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textArea_description, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNewLabel_2_1, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+					.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel_3))
-						//.addComponent(table_mesures, GroupLayout.PREFERRED_SIZE, 18, GroupLayout.PREFERRED_SIZE))
+					.addComponent(lblNewLabel_3)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.LEADING)
 						.addComponent(label_pourcentage_moy_tronquee, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
@@ -357,6 +362,14 @@ public class Application {
 		panel.add(new JScrollPane(table));
 		return table;
 	}
+	
+	private JTextArea add_textArea_to(JPanel panel) {
+		panel.setLayout(new BorderLayout(0,0));
+		JTextArea area = new JTextArea();
+		panel.add(area, BorderLayout.CENTER);
+		panel.add(new JScrollPane(area));
+		return area;
+	}
 
 	public void load_dataset_on_table() throws Exception {
 		/** charger la dataset dans la table et afficher les mesures
@@ -382,7 +395,7 @@ public class Application {
 		model_mesures.setValueAt("moyenne",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne(j)), i, j+1); i++;
 		model_mesures.setValueAt("mediane",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mediane(j)), i, j+1); i++;
 		model_mesures.setValueAt("mode",i,0);      for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode(j)), i, j+1); i++;
-		model_mesures.setValueAt("mode_disc",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode_discret(j)), i, j+1); i++;
+		model_mesures.setValueAt("mode discrèt",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode_discret(j)), i, j+1); i++;
 		model_mesures.setValueAt("max",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.max(j), i, j+1); i++;
 		model_mesures.setValueAt("min",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.min(j), i, j+1); i++;
 		model_mesures.setValueAt("etendu",i,0);    for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.etendu(j)), i, j+1); i++;
@@ -414,4 +427,21 @@ public class Application {
 		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
 		table_mesures.setModel(model_mesures);
 	}
+	
+	public void update_description_text() {
+		String description = "dataset : \"" + getFilename() + "\" :\n";
+		description += "- nombre d'instances = " + dataset.n + "\n";
+		description += "- nombre d'attributs = " + dataset.m + "\n";
+		description += "- attributs :\n";
+		for (int i = 0; i < dataset.m; i++) {
+			description += "\t"+(i+1)+". "+ dataset.col_names[i]+ "  (type = " + (i==dataset.m-1 ? "entier" : "réel") + ")\n";
+		}
+		textArea_description.setText(description);
+	}
+	
+	// extra methods
+	private String getFilename() {
+		return Paths.get(text_dataset_src.getText()).getFileName().toString();
+	}
+	
 }
