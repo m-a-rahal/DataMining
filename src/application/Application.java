@@ -1,5 +1,6 @@
 package application;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -9,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -17,6 +19,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -28,6 +31,8 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import org.jfree.chart.ChartPanel;
 
@@ -94,8 +99,6 @@ public class Application {
 		JPanel panel_dataset = new JPanel();
 		tabbedPane.addTab("Dataset", null, panel_dataset, null);
 		
-		table = new JTable();
-		
 		JLabel lblNewLabel = new JLabel("Dataset");
 		
 		text_dataset_src = new JTextField();
@@ -125,22 +128,28 @@ public class Application {
 						e1.printStackTrace();
 					}
 				}
-		
+				TableModel tableModel = new DefaultTableModel(dataset.col_names, dataset.n);
+				for (int i = 0; i < dataset.n; i++) {
+					for (int j = 0; j < dataset.m; j++) {
+						tableModel.setValueAt(dataset.get(i, j), i, j);
+					}
+				}
+				table.setModel(tableModel);
 			}
 		});
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new LineBorder(Color.GRAY));
+		
+		JPanel panel_2 = new JPanel();
 		GroupLayout gl_panel_dataset = new GroupLayout(panel_dataset);
 		gl_panel_dataset.setHorizontalGroup(
-			gl_panel_dataset.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_dataset.createSequentialGroup()
-					.addGroup(gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
+			gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_dataset.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_dataset.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
 						.addGroup(gl_panel_dataset.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(table, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, gl_panel_dataset.createSequentialGroup()
-							.addContainerGap()
 							.addComponent(lblNewLabel)
 							.addGap(6)
 							.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
@@ -149,17 +158,15 @@ public class Application {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnCharger)
 							.addGap(81))
-						.addGroup(Alignment.LEADING, gl_panel_dataset.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)))
+						.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_panel_dataset.setVerticalGroup(
 			gl_panel_dataset.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_dataset.createSequentialGroup()
-					.addGap(8)
-					.addComponent(table, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addContainerGap()
+					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_dataset.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_dataset.createParallelGroup(Alignment.BASELINE)
 							.addComponent(text_dataset_src, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
@@ -167,9 +174,18 @@ public class Application {
 							.addComponent(chckbxUrl))
 						.addComponent(btnCharger))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 91, Short.MAX_VALUE)
+					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
 					.addGap(10))
 		);
+		
+		panel_2.setLayout(new BorderLayout(0,0));
+		table = new JTable();
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
+		//table.setEnabled(false);
+		//table.setRowSelectionAllowed(false);
+		panel_2.add(table, BorderLayout.CENTER);
+		panel_2.add(new JScrollPane(table));
+
 		
 		JButton btnNewButton = new JButton("ajouter ligne");
 		
