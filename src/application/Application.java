@@ -1,36 +1,36 @@
 package application;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
-import javax.swing.JTextArea;
-import javax.swing.JSlider;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.DefaultComboBoxModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -41,14 +41,6 @@ import data.Dataset;
 import diagrammes.Diagrammes;
 import input_sources.FileManager;
 import input_sources.URLManager;
-
-import javax.swing.event.ChangeListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
-import java.awt.event.HierarchyListener;
-import java.awt.event.HierarchyEvent;
 
 public class Application {
 	private Dataset dataset;
@@ -143,29 +135,48 @@ public class Application {
 			public void actionPerformed(ActionEvent e) {
 				DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
 				model.addRow(new Double[model.getColumnCount()]);
+				table_dataset.changeSelection(model.getRowCount()-1, 0, true, false);
 			}
 		});
 		
 		JButton btn_appliquer_changements = new JButton("appliquer les modifications");
 		btn_appliquer_changements.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				int i = 0,j = 0;
+				table_dataset.clearSelection(); // must use this to avoid some errors
 				try {
 					// recreate dataset from table
 					DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
-					
+					dataset.n = model.getRowCount();;
+					dataset.data = new Double[dataset.n][dataset.m];
+					for (i = 0; i < dataset.n; i++) {
+						for (j = 0; j < dataset.m; j++) {
+							dataset.data[i][j] = Double.parseDouble(table_dataset.getValueAt(i,j).toString());
+						}
+					}
+					System.out.println("new dataset has "+ dataset.n +" rows");
 					// update mesures and other stuff
 					updateMesures();
 					update_description_text();
-				} catch (Exception e1) {e1.printStackTrace();}
-				
+				} catch (Exception e1) {e1.printStackTrace();
+				JOptionPane.showMessageDialog(frame, "veillez corriger la valeure dans dans la position ("+i+", "+j+").\n(ou vérifier que vous avez déselectionné la case que vous êtes en train de remplir pour valider l'entrée)");
+				table_dataset.changeSelection(i, j, true, false);
+				Object old_value = table_dataset.getValueAt(i, j);
+				String value = old_value == null ? "*" : old_value + "*";
+				table_dataset.setValueAt(value, i, j);
+				System.out.println(i + " "+ j);}
 			}
 		});
 		
-		JButton btnSupprimerligne = new JButton("supprimer_ligne");
+		JButton btnSupprimerligne = new JButton("supprimer_lignes");
+		btnSupprimerligne.setToolTipText("supprimer les lignes sélectionnées");
 		btnSupprimerligne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
-				model.removeRow(table_dataset.getSelectedRow());
+				int[] rows = table_dataset.getSelectedRows();
+				for (int i = 0; i < rows.length; i++) {
+					model.removeRow(rows[rows.length-i-1]);
+				}
 			}
 		});
 		
@@ -289,8 +300,8 @@ public class Application {
 				.addGroup(gl_panel_desc_mesures.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel_4, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
 						.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+						.addComponent(panel_4, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
 						.addGroup(gl_panel_desc_mesures.createSequentialGroup()
 							.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
@@ -309,11 +320,11 @@ public class Application {
 					.addContainerGap()
 					.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
+					.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNewLabel_2_1, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+					.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNewLabel_3)
 					.addPreferredGap(ComponentPlacement.RELATED)

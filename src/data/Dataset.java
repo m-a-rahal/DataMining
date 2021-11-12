@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class Dataset {
-	public double data [][] = null;
+	public Double data [][] = null;
 	public int n; // dataset dimentions, lines and columns repectively
 	public int m;
 	HashMap<String, Integer> col_index; // used to get column index by column name
@@ -40,7 +40,7 @@ public class Dataset {
 		n = data_lines.size();
 		m = data_lines.get(0).split("[\s\t]+").length;
 		// allocate data matrix
-		this.data = new double[n][m];
+		this.data = new Double[n][m];
 		// fill data matrix with values
 		int i = 0;
 		for (String line : data_lines) {
@@ -125,8 +125,8 @@ public class Dataset {
 				return max(indice_attribut);
 			ArrayList<Double> valeurs = getSortedValues(indice_attribut);
 			double h = n * q + 0.5;
-			int left = (int) Math.ceil(h - 0.5);
-			int right = (int) Math.floor(h + 0.5);
+			int left = (int) Math.ceil(h - 0.5); left = Math.min(left, valeurs.size()-1);
+			int right = (int) Math.floor(h + 0.5); right = Math.min(right, valeurs.size()-1);
 			return (valeurs.get(left) + valeurs.get(right)) / 2;
 		}
 
