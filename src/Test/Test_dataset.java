@@ -19,12 +19,14 @@ public class Test_dataset {
 		diag.histogram(0);
 	}
 	
+	@SuppressWarnings("unused")
 	private static void test_dispersion_diag() throws FileNotFoundException {
 		Dataset dataset = FileManager.extract_dataset(null);
 		Diagrammes diag = new Diagrammes(dataset);
 		diag.diagramme_disperssion(5, 6);
 	}
 	
+	@SuppressWarnings("unused")
 	private static void testMoyenneTronquee() throws FileNotFoundException {
 		Dataset dataset = FileManager.extract_dataset(null);
 		for (int i = 0; i < 50; i++) {

@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -54,6 +53,7 @@ public class Application {
 	private JTextArea textArea_description;
 	private JSlider slider_moy_tronquee;
 	private JLabel label_pourcentage_moy_tronquee;
+	private Integer position_moy_tronquee = null;
 
 	/**
 	 * Launch the application.
@@ -234,17 +234,19 @@ public class Application {
 		table_mesures = add_table_to(panel_3);
 		
 		JLabel lblNewLabel_3 = new JLabel("Pourcentage à trouquer pour la moyenne tronquée (de 0% à 50%)");
-		label_pourcentage_moy_tronquee = new JLabel("50%");
+		label_pourcentage_moy_tronquee = new JLabel("10%");
 		
 		slider_moy_tronquee = new JSlider();
+		slider_moy_tronquee.setValue(10);
 		slider_moy_tronquee.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				int seuil = slider_moy_tronquee.getValue();
 				label_pourcentage_moy_tronquee.setText(seuil+"%");
+				update_moyenne_tronquee();
 			}
 		});
 		slider_moy_tronquee.setMinorTickSpacing(1);
-		slider_moy_tronquee.setMaximum(50);
+		slider_moy_tronquee.setMaximum(49);
 		
 		
 		
@@ -374,7 +376,7 @@ public class Application {
 		names[0] = "Mesures";
 		final int NOMBRE_DE_MESURES = 18; // 18 est le nombre de mesures a afficher ! il faut le mettre a jour
 		TableModel model_mesures = new DefaultTableModel(names, NOMBRE_DE_MESURES); 
-		int i = 0;
+		int i = 1;
 		model_mesures.setValueAt("moyenne",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne(j)), i, j+1); i++;
 		model_mesures.setValueAt("mediane",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mediane(j)), i, j+1); i++;
 		model_mesures.setValueAt("mode",i,0);      for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode(j)), i, j+1); i++;
@@ -391,7 +393,22 @@ public class Application {
 		model_mesures.setValueAt("outliers",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.outliers(j), i, j+1); i++;
 		model_mesures.setValueAt("ecartType",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.ecartType(j)), i, j+1); i++;
 		model_mesures.setValueAt("variance",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.variance(j)), i, j+1); i++;
-
+		//TODO: ajouter coéffitient de corélation ici add it here
+		// moyenne tronquée
+		position_moy_tronquee = i = 0; // save this position for later
+		double q = slider_moy_tronquee.getValue()/100.0;
+		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
+		table_mesures.setModel(model_mesures);
+	}
+	
+	public void update_moyenne_tronquee() {
+		if (position_moy_tronquee == null) {
+			return;
+		}
+		int i = position_moy_tronquee;
+		double q = slider_moy_tronquee.getValue()/100.0;
+		TableModel model_mesures = table_mesures.getModel();
+		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
 		table_mesures.setModel(model_mesures);
 	}
 }
