@@ -14,3 +14,15 @@ DESCRIPTION + MESURES:
                 - short name
                 - long name (real name)
             . type : entier, float, ...
+
+# TODO:
+- read from CSV
+desc:
+    Informations générales sur le dataset (file type, filename/url, ... source = url or file, file size, other?)
+    Nombre d'instances
+    Nombre d'attributs
+    Nombre de classes
+    Distribution des classes (nombre et pourcentage d'instances par classe)
+    Valeurs manquantes
+types il y'a beaucoup de types possibles O_o
+Mode: unimodale - multimodale

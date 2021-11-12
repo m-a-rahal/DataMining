@@ -469,6 +469,7 @@ public class Application {
 		String description = "dataset : \"" + getFilename() + "\" :\n";
 		description += "- nombre d'instances = " + dataset.n + "\n";
 		description += "- nombre d'attributs = " + dataset.m + "\n";
+		description += "- nombre de classes  = " + dataset.getClassCount() + "\n";
 		description += "- attributs :\n";
 		for (int i = 0; i < dataset.m; i++) {
 			description += "\t"+(i+1)+". "+ dataset.col_names[i]+ "  (type = " + (i==dataset.m-1 ? "entier" : "réel") + ")\n";

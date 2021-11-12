@@ -3,8 +3,10 @@ package data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class Dataset {
 	public Double data [][] = null;
@@ -83,7 +85,7 @@ public class Dataset {
 	}
 	
 	// ---- Mesures ---------------------------------------------------------------------
-	// calculer la moyenne de l'attribut 
+
 		public double moyenne(int indice_attribut) {
 			double moy = 0.0;
 			for (int i = 0; i < n; i++) {
@@ -93,8 +95,8 @@ public class Dataset {
 			return moy;
 		}
 		
-		// calculer la moyenne tronquée de l'attribut 
-			public double moyenne_tronqee(int indice_attribut, double quantile) {
+
+		public double moyenne_tronqee(int indice_attribut, double quantile) {
 				if (quantile >= 0.5) {
 					throw new IllegalArgumentException("ne peut pas tronquer plus que 50% des deux côtés de la liste des valeurs");
 				}
@@ -114,7 +116,6 @@ public class Dataset {
 				return somme / count;
 			}
 		
-		// calculer le quantile q de l'attribut
 		public double quantile(int indice_attribut, double q) {
 			/** caculate quantile using R-2 approximation (averaging the two neighbors in case of conflict) (src = 'https://en.wikipedia.org/wiki/Quantile#:~:text=empirical%20distribution%20function.-,R%E2%80%912,-%2C%20SAS%E2%80%915%2C%20Maple')*/
 			if (q < 0 || q > 1)
@@ -130,7 +131,6 @@ public class Dataset {
 			return (valeurs.get(left) + valeurs.get(right)) / 2;
 		}
 
-		// calculer la variance de l'attribut 
 		public double variance(int indice_attribut) {
 			double var;
 			double moyenne = moyenne(indice_attribut);
@@ -142,12 +142,23 @@ public class Dataset {
 			return var;
 		}
 
-		// calculer l'écart type de l'attribut 
 		public double ecartType(int indice_attribut) {
 			return Math.sqrt(variance(indice_attribut));
 		}
-
-		// calculer le milieu de l'étendu de l'attribut
+		
+		public double coeffitient_de_correlation(int attribut1, int attribut2) {
+			double moy1 = moyenne(attribut1);
+			double moy2 = moyenne(attribut2);
+			double var1 = variance(attribut1);
+			double var2 = variance(attribut2);
+			double cov = 0.0;
+			for (int i = 0; i < n; i++) {
+				cov += (data[i][attribut1] - moy1) * (data[i][attribut2] - moy2);
+			}
+			cov /= n;
+			return cov / (Math.sqrt(var1) * Math.sqrt(var2));
+		}
+		
 		public double milieu(int indice_attribut) {
 			return (max(indice_attribut)+min(indice_attribut))/2;
 		}
@@ -170,7 +181,6 @@ public class Dataset {
 			return mod;
 		}
 
-		// calculer le mode de l'attribut avec discrétization 
 		public double mode_discret(int indice_attribut) throws Exception {
 			/** fait une discrétization des donnés avec des intervales de longeure = w
 			 * tel que w = (max-min)/k
@@ -198,7 +208,6 @@ public class Dataset {
 			return mod_discret;
 		}
 
-		// calculer la médiane de l'attribut 
 		public double mediane(int indice_attribut) throws Exception {
 			double med;
 			ArrayList<Double> vecteur = getSortedValues(indice_attribut);
@@ -337,4 +346,15 @@ public class Dataset {
 	
 	// ----------------------------------------------------------------------------------
 
+	public int getClassCount() {
+		return uniqueValues(m-1).length;
+	}
+	
+	public Double [] uniqueValues(int indice_attribut) {
+		TreeSet<Double> unique_values = new TreeSet<>();
+		for (int i = 0; i < n; i++) {
+			unique_values.add(data[i][indice_attribut]);
+		}
+		return (Double[]) unique_values.toArray();
+	}
 }
