@@ -28,18 +28,16 @@ public class Test_dataset {
 	
 	private static void testMoyenneTronquee() throws FileNotFoundException {
 		Dataset dataset = FileManager.extract_dataset(null);
-		Mesures mesures = new Mesures(dataset);
 		for (int i = 0; i < 50; i++) {
-			System.out.println(mesures.get(0).moyenne_tronqee(i/100.0));
+			System.out.println(dataset.moyenne_tronqee(0,i/100.0));
 		}
 	}
 	
 	public static void testMesures() throws Exception {
 		Dataset dataset = FileManager.extract_dataset(null);
-		Mesures mesures = new Mesures(dataset);
-		System.out.println(mesures);
+		System.out.println(dataset.mesures_string());
 		// exemple d'utilisation
-		mesures.get(0).ecartType();
+		dataset.ecartType(0);
 	}
 	
 	public static void testFile_extraction() throws IOException {

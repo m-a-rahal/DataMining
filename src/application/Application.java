@@ -40,13 +40,14 @@ import data.Dataset;
 import diagrammes.Diagrammes;
 import input_sources.FileManager;
 import input_sources.URLManager;
+
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
 public class Application {
 	private Dataset dataset;
 	private JFrame frame;
-	private JTable table;
+	private JTable table_dataset;
 	private JTextField text_dataset_src;
 	private JTable table_mesures;
 	private ChartPanel panel_diagrammes;
@@ -127,15 +128,7 @@ public class Application {
 					.addGap(10))
 		);
 		
-		panel_2.setLayout(new BorderLayout(0,0));
-		table = new JTable();
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
-		//table.setEnabled(false);
-		//table.setRowSelectionAllowed(false);
-		panel_2.add(table, BorderLayout.CENTER);
-		panel_2.add(new JScrollPane(table));
-
-		
+		table_dataset = add_table_to(panel_2);
 		JButton btnNewButton = new JButton("ajouter ligne");
 		
 		JButton btn_appliquer_changements = new JButton("appliquer les modifications");
@@ -179,7 +172,11 @@ public class Application {
 						e1.printStackTrace();
 					}
 				}
-				load_dataset_on_table();
+				try {
+					load_dataset_on_table();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
 			}
 
 			
@@ -233,8 +230,8 @@ public class Application {
 		textArea_description = new JTextArea();
 		
 		JLabel lblNewLabel_2_1 = new JLabel("Mesures");
-		
-		table_mesures = new JTable();
+		JPanel panel_3 = new JPanel();
+		table_mesures = add_table_to(panel_3);
 		
 		JLabel lblNewLabel_3 = new JLabel("Pourcentage à trouquer pour la moyenne tronquée (de 0% à 50%)");
 		label_pourcentage_moy_tronquee = new JLabel("50%");
@@ -250,20 +247,25 @@ public class Application {
 		slider_moy_tronquee.setMaximum(50);
 		
 		
+		
+		
 		GroupLayout gl_panel_desc_mesures = new GroupLayout(panel_desc_mesures);
 		gl_panel_desc_mesures.setHorizontalGroup(
 			gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel_desc_mesures.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.LEADING)
-						.addComponent(textArea_description, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-						.addComponent(table_mesures, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-						.addGroup(gl_panel_desc_mesures.createSequentialGroup()
+					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
+						.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+						.addComponent(textArea_description, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+						.addGroup(Alignment.LEADING, gl_panel_desc_mesures.createSequentialGroup()
 							.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
 								.addComponent(lblNewLabel_2, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
 								.addComponent(lblNewLabel_2_1, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
 								.addComponent(slider_moy_tronquee, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
-								.addComponent(lblNewLabel_3, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 366, GroupLayout.PREFERRED_SIZE))
+								.addGroup(Alignment.LEADING, gl_panel_desc_mesures.createSequentialGroup()
+									.addComponent(lblNewLabel_3, GroupLayout.PREFERRED_SIZE, 366, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)))
+									///.addComponent(table_mesures, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)))
 							.addGap(18)
 							.addComponent(label_pourcentage_moy_tronquee, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
@@ -274,13 +276,15 @@ public class Application {
 					.addContainerGap()
 					.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textArea_description, GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+					.addComponent(textArea_description, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(lblNewLabel_2_1, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(table_mesures, GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(lblNewLabel_3)
+					.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_3))
+						//.addComponent(table_mesures, GroupLayout.PREFERRED_SIZE, 18, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.LEADING)
 						.addComponent(label_pourcentage_moy_tronquee, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
@@ -341,7 +345,16 @@ public class Application {
 		frame.getContentPane().setLayout(groupLayout);
 	}
 	
-	public void load_dataset_on_table() {
+	private JTable add_table_to(JPanel panel) {
+		panel.setLayout(new BorderLayout(0,0));
+		JTable table = new JTable();
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
+		panel.add(table, BorderLayout.CENTER);
+		panel.add(new JScrollPane(table));
+		return table;
+	}
+
+	public void load_dataset_on_table() throws Exception {
 		/** charger la dataset dans la table et afficher les mesures
 		 * */
 		// load table in Jtabel
@@ -351,9 +364,34 @@ public class Application {
 				tableModel.setValueAt(dataset.get(i, j), i, j);
 			}
 		}
-		table.setModel(tableModel);
+		table_dataset.setModel(tableModel);
 		
 		// load mesures and description
-		
+		String names [] = new String[dataset.m+1];
+		for (int i = 1; i <= dataset.m; i++) {
+			names[i] = dataset.col_names[i-1];
+		}
+		names[0] = "Mesures";
+		final int NOMBRE_DE_MESURES = 18; // 18 est le nombre de mesures a afficher ! il faut le mettre a jour
+		TableModel model_mesures = new DefaultTableModel(names, NOMBRE_DE_MESURES); 
+		int i = 0;
+		model_mesures.setValueAt("moyenne",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne(j)), i, j+1); i++;
+		model_mesures.setValueAt("mediane",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mediane(j)), i, j+1); i++;
+		model_mesures.setValueAt("mode",i,0);      for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode(j)), i, j+1); i++;
+		model_mesures.setValueAt("mode_disc",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode_discret(j)), i, j+1); i++;
+		model_mesures.setValueAt("max",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.max(j), i, j+1); i++;
+		model_mesures.setValueAt("min",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.min(j), i, j+1); i++;
+		model_mesures.setValueAt("etendu",i,0);    for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.etendu(j)), i, j+1); i++;
+		model_mesures.setValueAt("mi_etendu",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.milieu_etendu(j)), i, j+1); i++;
+		model_mesures.setValueAt("skewness",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.skewness(j)), i, j+1); i++;
+		model_mesures.setValueAt("Q1",i,0);        for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.quartile(j,1), i, j+1); i++;
+		model_mesures.setValueAt("Q2",i,0);        for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.quartile(j,2), i, j+1); i++;
+		model_mesures.setValueAt("Q3",i,0);        for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.quartile(j,3), i, j+1); i++;
+		model_mesures.setValueAt("IQR",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.IQR(j)), i, j+1); i++;
+		model_mesures.setValueAt("outliers",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.outliers(j), i, j+1); i++;
+		model_mesures.setValueAt("ecartType",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.ecartType(j)), i, j+1); i++;
+		model_mesures.setValueAt("variance",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.variance(j)), i, j+1); i++;
+
+		table_mesures.setModel(model_mesures);
 	}
 }
