@@ -251,6 +251,8 @@ public class Application {
 		
 		
 		
+		
+		
 		GroupLayout gl_panel_desc_mesures = new GroupLayout(panel_desc_mesures);
 		gl_panel_desc_mesures.setHorizontalGroup(
 			gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
@@ -393,6 +395,7 @@ public class Application {
 		model_mesures.setValueAt("outliers",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.outliers(j), i, j+1); i++;
 		model_mesures.setValueAt("ecartType",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.ecartType(j)), i, j+1); i++;
 		model_mesures.setValueAt("variance",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.variance(j)), i, j+1); i++;
+
 		//TODO: ajouter coéffitient de corélation ici add it here
 		// moyenne tronquée
 		position_moy_tronquee = i = 0; // save this position for later
