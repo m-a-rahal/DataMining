@@ -43,7 +43,12 @@ import input_sources.FileManager;
 import input_sources.URLManager;
 
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
+import java.awt.event.HierarchyListener;
+import java.awt.event.HierarchyEvent;
 
 public class Application {
 	private Dataset dataset;
@@ -134,16 +139,33 @@ public class Application {
 		
 		table_dataset = add_table_to(panel_2);
 		JButton btnNewButton = new JButton("ajouter ligne");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
+				model.addRow(new Double[model.getColumnCount()]);
+			}
+		});
 		
 		JButton btn_appliquer_changements = new JButton("appliquer les modifications");
 		btn_appliquer_changements.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				try {
+					// recreate dataset from table
+					DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
+					
+					// update mesures and other stuff
+					updateMesures();
+					update_description_text();
+				} catch (Exception e1) {e1.printStackTrace();}
+				
 			}
 		});
 		
 		JButton btnSupprimerligne = new JButton("supprimer_ligne");
 		btnSupprimerligne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
+				model.removeRow(table_dataset.getSelectedRow());
 			}
 		});
 		
@@ -384,6 +406,10 @@ public class Application {
 		table_dataset.setModel(tableModel);
 		
 		// load mesures and description
+		updateMesures();
+	}
+	
+	private void updateMesures() throws Exception {
 		String names [] = new String[dataset.m+1];
 		for (int i = 1; i <= dataset.m; i++) {
 			names[i] = dataset.col_names[i-1];
@@ -416,7 +442,7 @@ public class Application {
 		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
 		table_mesures.setModel(model_mesures);
 	}
-	
+
 	public void update_moyenne_tronquee() {
 		if (position_moy_tronquee == null) {
 			return;
