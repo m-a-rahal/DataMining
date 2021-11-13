@@ -70,7 +70,9 @@ public class FileManager {
 		for (String line : datalines) {
 			int j = 0;
 			for (String str_value : line.split(separator)) {
-				data[i][j++] = Double.parseDouble(str_value);
+				Double value = null;
+				try {value = Double.parseDouble(str_value);} catch(Exception e) {};
+				data[i][j++] = value;
 			}i++;
 		}
 		return new Dataset(null,n,m, data);

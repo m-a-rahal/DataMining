@@ -3,10 +3,6 @@ package data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 public class Dataset {
 	public Double data [][] = null;
@@ -15,6 +11,7 @@ public class Dataset {
 	HashMap<String, Integer> col_index; // used to get column index by column name
 	public String col_names [];
 	private static final String default_names = "area,perimeter,compactness,length of kernel,width of kernel,asymmetry coefficient,length of kernel groove,class";
+	public static final String classes [] = new String[] {"Kama", "Rosa", "Canadian"};
 	
 	public Dataset(String[] names, int n, int m, Double[][] data) {
 		extract_names(names);
@@ -35,44 +32,6 @@ public class Dataset {
 		}
 	}
 
-	private void extract_data(List<String> data_lines) {
-		/** extracts rows from space-separated lines (Strings)
-		 * eg: 1.5 1.45 156.2 --> [1.5, 1.45, 156.2]
-		 * */
-		// detect data dimensions
-		n = data_lines.size();
-		m = data_lines.get(0).split("[\s\t]+").length;
-		// allocate data matrix
-		this.data = new Double[n][m];
-		// fill data matrix with values
-		int i = 0;
-		for (String line : data_lines) {
-			int j = 0;
-			for (String str_value : line.split("[\s\t]+")) {
-				data[i][j++] = Double.parseDouble(str_value);
-			}i++;
-		}
-
-	}
-
-	public double get(int line, String col_name) {
-		int col = col_index.get(col_name);
-		return get(line, col);
-	}
-	
-	public double get(int line, int col) {
-		return data[line][col];
-	}
-	
-	public void changer_ligne() {
-
-	}
-	public void supprimer_ligne() {
-
-	}
-	public void ajouter_ligne() {
-	}
-
 	public void show() {
 		for (String name : col_names) {
 			System.out.print(name + "\t");
@@ -89,11 +48,13 @@ public class Dataset {
 
 		public double moyenne(int indice_attribut) {
 			double moy = 0.0;
+			int count = 0;
 			for (int i = 0; i < n; i++) {
+				if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
 				moy += data[i][indice_attribut];
+				count++;
 			}
-			moy /= n;
-			return moy;
+			return moy / count;
 		}
 		
 
@@ -107,7 +68,8 @@ public class Dataset {
 				double somme = 0;
 				int count = 0;
 				for (int i = 0; i < n; i++) {
-					double x = data[i][indice_attribut];
+					Double x = data[i][indice_attribut];
+					if (x == null) continue; // pour eviter les cases vides
 					if (x >= inf && x <= sup) {
 						somme += x;
 						count++;
@@ -126,7 +88,7 @@ public class Dataset {
 			if (q == 1)
 				return max(indice_attribut);
 			ArrayList<Double> valeurs = getSortedValues(indice_attribut);
-			double h = n * q + 0.5;
+			double h = valeurs.size() * q + 0.5;
 			int left = (int) Math.ceil(h - 0.5); left = Math.min(left, valeurs.size()-1);
 			int right = (int) Math.floor(h + 0.5); right = Math.min(right, valeurs.size()-1);
 			return (valeurs.get(left) + valeurs.get(right)) / 2;
@@ -136,10 +98,13 @@ public class Dataset {
 			double var;
 			double moyenne = moyenne(indice_attribut);
 			var = 0.0;
+			int count = 0;
 			for (int i = 0; i < n; i++) {
+				if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
 				var += Math.pow(data[i][indice_attribut] - moyenne, 2);
+				count++;
 			}
-			var /= n;
+			var /= count;
 			return var;
 		}
 
@@ -153,10 +118,13 @@ public class Dataset {
 			double var1 = variance(attribut1);
 			double var2 = variance(attribut2);
 			double cov = 0.0;
+			int count = 0;
 			for (int i = 0; i < n; i++) {
+				if (data[i][attribut1] == null || data[i][attribut2] == null) continue; // pour eviter les cases vides
 				cov += (data[i][attribut1] - moy1) * (data[i][attribut2] - moy2);
+				count++;
 			}
-			cov /= n;
+			cov /= count;
 			return cov / (Math.sqrt(var1) * Math.sqrt(var2));
 		}
 		
@@ -167,12 +135,11 @@ public class Dataset {
 		public double mode(int indice_attribut) throws Exception {
 			Double mod = null;
 			Integer mod_freq = null;
-			TreeMap<Double, Integer> frequences = new TreeMap<>();
+			Frequences frequences = new Frequences();
 			for (int i = 0; i < n; i++) {
-				double val = data[i][indice_attribut];
-				Integer freq = frequences.get(val);
-				freq = freq != null ? freq+1 : 1;
-				frequences.put(val, freq);
+				if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
+				Double val = data[i][indice_attribut];
+				Integer freq = frequences.ajouter(val);
 				if (mod == null || mod_freq < freq) {
 					mod = val;
 					mod_freq = freq;
@@ -182,12 +149,12 @@ public class Dataset {
 			return mod;
 		}
 
-		public double mode_discret(int indice_attribut) throws Exception {
+		/*public double mode_discret(int indice_attribut) throws Exception {
 			/** fait une discrétization des donnés avec des intervales de longeure = w
 			 * tel que w = (max-min)/k
 			 * k = round(   5*log10(nombre de valeurs)  )
 			 * le mode est donc le milieu de l'intervale ayant la plus grande frequence
-			*/
+			*//*
 			double mod_discret;
 
 			int k = (int) Math.round(5 * Math.log10(n));
@@ -207,7 +174,7 @@ public class Dataset {
 			}
 			mod_discret = min + (indice_max + 0.5) * w;
 			return mod_discret;
-		}
+		}*/
 
 		public double mediane(int indice_attribut) throws Exception {
 			double med;
@@ -226,6 +193,7 @@ public class Dataset {
 			new ArrayList<>(n);
 			ArrayList<Double> vecteur = new ArrayList<Double>();
 			for (int i = 0; i < n; i++) {
+				if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
 				vecteur.add(data[i][indice_attribut]);
 			}
 			Collections.sort(vecteur);
@@ -235,6 +203,7 @@ public class Dataset {
 		public double min(int indice_attribut) {
 			double min = data[0][indice_attribut];
 			for (int i = 1; i < n; i++) {
+				if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
 				if (data[i][indice_attribut] < min) {
 					min = data[i][indice_attribut];
 				}
@@ -245,6 +214,7 @@ public class Dataset {
 		public double max(int indice_attribut) {
 			double max = data[0][indice_attribut];
 			for (int i = 1; i < n; i++) {
+				if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
 				if (data[i][indice_attribut] > max) {
 					max = data[i][indice_attribut];
 				}
@@ -266,6 +236,7 @@ public class Dataset {
 			}
 			ArrayList<Double> vecteur = new ArrayList<Double>();
 			vecteur = getSortedValues(indice_attribut);
+			int n = vecteur.size();
 			if(q==1) {
 				return vecteur.get(n/4);
 			}else if(q==2) {
@@ -284,12 +255,16 @@ public class Dataset {
 			ArrayList<Double> vecteur = new ArrayList<Double>();
 			ArrayList<Double> outlier = new ArrayList<Double>();
 			int i;
+			double Q1 = quartile(indice_attribut, 1);
+			double Q3 = quartile(indice_attribut, 3);
+			double IQR = Q3 - Q1;
 			vecteur = getSortedValues(indice_attribut);
-				for(i=0;i<n;i++) {
-					if(vecteur.get(i)<=quartile(indice_attribut,1)-1.5*IQR(indice_attribut) | vecteur.get(i)>=quartile(indice_attribut,3)+1.5*IQR(indice_attribut)) {
+			int n = vecteur.size();
+			for(i=0;i<n;i++) {
+				if(vecteur.get(i)<=Q1-1.5*IQR | vecteur.get(i)>=Q3+1.5*IQR) {
 					outlier.add(vecteur.get(i));
-					}
 				}
+			}
 
 			return outlier;
 		}
@@ -307,7 +282,7 @@ public class Dataset {
 					text += "\t - moyenne   = " + arrondi(moyenne(indice_attribut)) + "\n";
 					text += "\t - mediane   = " + arrondi(mediane(indice_attribut)) + "\n";
 					text += "\t - mode      = " + arrondi(mode(indice_attribut)) + "\n";
-					text += "\t - mode_disc = " + arrondi(mode_discret(indice_attribut)) + "\n";
+					//text += "\t - mode_disc = " + arrondi(mode_discret(indice_attribut)) + "\n";
 					text += "\t - max       = " + max(indice_attribut) + "\n";
 					text += "\t - min       = " + min(indice_attribut) + "\n";
 					text += "\t - etendu    = " + arrondi(etendu(indice_attribut)) + "\n";
@@ -333,10 +308,13 @@ public class Dataset {
 			 * */
 			double m = 0;
 			double moyenne = moyenne(indice_attribut);
+			int count = 0;
 			for (int i = 0; i < n; i++) {
+				if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
 				m += Math.pow(data[i][indice_attribut] - moyenne, k);
+				count++;
 			}
-			return m / n;
+			return m / count;
 		}
 		
 		public double skewness(int indice_attribut) {
@@ -348,19 +326,15 @@ public class Dataset {
 	// ----------------------------------------------------------------------------------
 
 	public int getClassCount() {
-		return uniqueValues(m-1).length;
+		return frequences_de(m-1).keySet().size();
 	}
 	
-	public Double [] uniqueValues(int indice_attribut) {
-		TreeSet<Double> unique_values = new TreeSet<>();
+	public Frequences frequences_de(int indice_attribut) {
+		Frequences counts = new Frequences();
 		for (int i = 0; i < n; i++) {
-			unique_values.add(data[i][indice_attribut]);
+			if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
+			counts.ajouter(data[i][indice_attribut]);
 		}
-		Double [] values = new Double[unique_values.size()];
-		int i = 0;
-		for (Double x : unique_values) {
-			values[i++] = x;
-		}
-		return values;
+		return counts;
 	}
 }

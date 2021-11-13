@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -16,7 +15,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -31,13 +29,13 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.jfree.chart.ChartPanel;
 
 import data.Dataset;
+import data.Frequences;
 import diagrammes.Diagrammes;
 import input_sources.FileManager;
 import input_sources.URLManager;
@@ -53,7 +51,6 @@ public class Application {
 	private JSlider slider_moy_tronquee;
 	private JLabel label_pourcentage_moy_tronquee;
 	private Integer position_moy_tronquee = null;
-	private String source_file = null;
 	private String dest_file = null;
 	private JTextField textField_dest_file;
 
@@ -177,7 +174,7 @@ public class Application {
 		            try {
 		            	text_dataset_src.setText(FileManager.ChooseFileWindow());
 		            	dataset = FileManager.extract_dataset(text_dataset_src.getText());
-		            	source_file = text_dataset_src.getText(); // save source file, needed later to compare with destination file for saving
+		            	text_dataset_src.getText();
 		            } catch (NullPointerException nullPointerException) {} catch (FileNotFoundException e1) {e1.printStackTrace();}
 				}else {
 					try {
@@ -436,7 +433,7 @@ public class Application {
 		TableModel tableModel = new DefaultTableModel(dataset.col_names, dataset.n);
 		for (int i = 0; i < dataset.n; i++) {
 			for (int j = 0; j < dataset.m; j++) {
-				tableModel.setValueAt(dataset.get(i, j), i, j);
+				tableModel.setValueAt(dataset.data[i][j], i, j);
 			}
 		}
 		table_dataset.setModel(tableModel);
@@ -451,13 +448,13 @@ public class Application {
 			names[i] = dataset.col_names[i-1];
 		}
 		names[0] = "Mesures";
-		final int NOMBRE_DE_MESURES = 18; // 18 est le nombre de mesures a afficher ! il faut le mettre a jour
+		final int NOMBRE_DE_MESURES = 17; // 17 est le nombre de mesures a afficher ! il faut le mettre a jour
 		TableModel model_mesures = new DefaultTableModel(names, NOMBRE_DE_MESURES); 
 		int i = 1;
 		model_mesures.setValueAt("moyenne",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne(j)), i, j+1); i++;
 		model_mesures.setValueAt("mediane",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mediane(j)), i, j+1); i++;
 		model_mesures.setValueAt("mode",i,0);      for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode(j)), i, j+1); i++;
-		model_mesures.setValueAt("mode discrèt",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode_discret(j)), i, j+1); i++;
+		//model_mesures.setValueAt("mode discrèt",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode_discret(j)), i, j+1); i++;
 		model_mesures.setValueAt("max",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.max(j), i, j+1); i++;
 		model_mesures.setValueAt("min",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.min(j), i, j+1); i++;
 		model_mesures.setValueAt("etendu",i,0);    for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.etendu(j)), i, j+1); i++;
@@ -495,6 +492,13 @@ public class Application {
 		description += "- nombre d'instances = " + dataset.n + "\n";
 		description += "- nombre d'attributs = " + dataset.m + "\n";
 		description += "- nombre de classes  = " + dataset.getClassCount() + "\n";
+		description += "- classes :\n";
+		
+		Frequences f = dataset.frequences_de(dataset.m-1); // frequences du dernier attribut
+		for (int i = 0; i < Dataset.classes.length; i++) {
+			double k = i+1;
+			description += "\t"+(i+1)+". " + Dataset.classes[i] + "("+k+") : "+ f.frequence_de(k) +" instances ("+ dataset.arrondi(100*f.pourcentage(k))+"%)\n";
+		}
 		description += "- attributs :\n";
 		int i;
 		for (i = 0; i < dataset.m-1; i++) { // all except last attribut
@@ -514,7 +518,9 @@ public class Application {
 			dataset.data = new Double[dataset.n][dataset.m];
 			for (i = 0; i < dataset.n; i++) {
 				for (j = 0; j < dataset.m; j++) {
-					dataset.data[i][j] = Double.parseDouble(table_dataset.getValueAt(i,j).toString());
+					Double x = null;
+					try {x = Double.parseDouble(table_dataset.getValueAt(i,j).toString());} catch(Exception e) {};
+					dataset.data[i][j] = x;
 				}
 			}
 			System.out.println("new dataset has "+ dataset.n +" rows");
