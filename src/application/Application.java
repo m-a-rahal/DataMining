@@ -204,31 +204,29 @@ public class Application {
 				switch(JOptionPane.showConfirmDialog(frame, "voulez vous appliquer les changements avant de sauvegarder le dataset?")) {
 					case 0: // yes
 						appliquer_les_changements();
-						dest_file = textField_dest_file.getText();
-						if (dest_file == null || dest_file.equals("")) {
-							dest_file = FileManager.ChooseFileWindow();
-							dest_file = dest_file + ".txt";
-							textField_dest_file.setText(dest_file);
-						}
-						try {
-							FileManager.save_dataset(dataset, dest_file);
-						} catch (FileNotFoundException e1) {
-							e1.printStackTrace();
-							afficherMessage("Erreure lors de la sauvegarde!\n" + e.toString());
-							return;
-						}
-						afficherMessage("dataset sauvegardé sous \""+ dest_file+"\"");
 						break;
 					case 1: // no
 						break;
 					case 2: // cancel
 						return;
 				}
-				
+				dest_file = textField_dest_file.getText();
+				if (dest_file == null || dest_file.equals("")) {
+					dest_file = FileManager.ChooseFileWindow();
+					textField_dest_file.setText(dest_file);
+				}
+				try {
+					FileManager.save_dataset(dataset, dest_file);
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+					afficherMessage("Erreure lors de la sauvegarde!\n" + e.toString());
+					return;
+				}
+				afficherMessage("dataset sauvegardé sous \""+ dest_file+"\"");
 			}
 
 		});
-
+		
 		JLabel lblNewLabel_1 = new JLabel("Destination");
 		
 		textField_dest_file = new JTextField();
