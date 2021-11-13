@@ -53,6 +53,9 @@ public class Application {
 	private JSlider slider_moy_tronquee;
 	private JLabel label_pourcentage_moy_tronquee;
 	private Integer position_moy_tronquee = null;
+	private String source_file = null;
+	private String dest_file = null;
+	private JTextField textField_dest_file;
 
 	/**
 	 * Launch the application.
@@ -121,11 +124,11 @@ public class Application {
 		);
 		gl_panel_dataset.setVerticalGroup(
 			gl_panel_dataset.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_dataset.createSequentialGroup()
+				.addGroup(gl_panel_dataset.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
+					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 121, GroupLayout.PREFERRED_SIZE)
 					.addGap(10))
 		);
 		
@@ -159,7 +162,7 @@ public class Application {
 					updateMesures();
 					update_description_text();
 				} catch (Exception e1) {e1.printStackTrace();
-				JOptionPane.showMessageDialog(frame, "veillez corriger la valeure dans dans la position ("+i+", "+j+").\n(ou vérifier que vous avez déselectionné la case que vous êtes en train de remplir pour valider l'entrée)");
+				afficherMessage("veillez corriger la valeure dans dans la position ("+i+", "+j+").\n(ou vérifier que vous avez déselectionné la case que vous êtes en train de remplir pour valider l'entrée)");
 				table_dataset.changeSelection(i, j, true, false);
 				Object old_value = table_dataset.getValueAt(i, j);
 				String value = old_value == null ? "*" : old_value + "*";
@@ -193,14 +196,10 @@ public class Application {
 		btnCharger.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(! chckbxUrl.isSelected()) {
-					JFileChooser fileChooser = new JFileChooser();
-		            fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-		            fileChooser.setAcceptAllFileFilterUsed(false);
-		            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("ficher texte (.txt)", new String[] { "txt" }));
-		            fileChooser.showOpenDialog(null);
 		            try {
-		            	text_dataset_src.setText(fileChooser.getSelectedFile().getAbsolutePath());
+		            	text_dataset_src.setText(FileManager.ChooseFileWindow());
 		            	dataset = FileManager.extract_dataset(text_dataset_src.getText());
+		            	source_file = text_dataset_src.getText(); // save source file, needed later to compare with destination file for saving
 		            } catch (NullPointerException nullPointerException) {} catch (FileNotFoundException e1) {e1.printStackTrace();}
 				}else {
 					try {
@@ -219,26 +218,59 @@ public class Application {
 
 			
 		});
+		
+		JButton btnSauvegarder = new JButton("sauvegarder");
+		btnSauvegarder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dest_file = textField_dest_file.getText();
+				if (dest_file == null || dest_file.equals("")) {
+					dest_file = FileManager.ChooseFileWindow();
+					textField_dest_file.setText(dest_file);
+				}
+				try {
+					FileManager.save_dataset(dataset, dest_file);
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+					afficherMessage("Erreure lors de la sauvegarde!\n" + e.toString());
+					return;
+				}
+				afficherMessage("dataset sauvegardé sous \""+ dest_file+"\"");
+			}
+		});
+		
+		JLabel lblNewLabel_1 = new JLabel("Destination");
+		
+		textField_dest_file = new JTextField();
+		textField_dest_file.setColumns(10);
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(btnNewButton)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnSupprimerligne)
-							.addPreferredGap(ComponentPlacement.RELATED, 203, Short.MAX_VALUE)
-							.addComponent(btn_appliquer_changements))
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(lblNewLabel)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_1.createSequentialGroup()
+									.addComponent(lblNewLabel)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.UNRELATED))
+								.addGroup(gl_panel_1.createSequentialGroup()
+									.addComponent(btnNewButton)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(btnSupprimerligne)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(btn_appliquer_changements)
+									.addGap(79)))
 							.addComponent(chckbxUrl)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnCharger)))
+							.addComponent(btnCharger))
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(textField_dest_file, GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
+							.addGap(9)
+							.addComponent(btnSauvegarder, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		gl_panel_1.setVerticalGroup(
@@ -247,15 +279,20 @@ public class Application {
 					.addGap(15)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
-						.addComponent(text_dataset_src, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+						.addComponent(text_dataset_src, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnCharger)
 						.addComponent(chckbxUrl))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btn_appliquer_changements)
 						.addComponent(btnNewButton)
-						.addComponent(btnSupprimerligne))
-					.addContainerGap(21, Short.MAX_VALUE))
+						.addComponent(btnSupprimerligne)
+						.addComponent(btn_appliquer_changements))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnSauvegarder)
+						.addComponent(lblNewLabel_1)
+						.addComponent(textField_dest_file, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(17, Short.MAX_VALUE))
 		);
 		panel_1.setLayout(gl_panel_1);
 		panel_dataset.setLayout(gl_panel_dataset);
@@ -471,9 +508,11 @@ public class Application {
 		description += "- nombre d'attributs = " + dataset.m + "\n";
 		description += "- nombre de classes  = " + dataset.getClassCount() + "\n";
 		description += "- attributs :\n";
-		for (int i = 0; i < dataset.m; i++) {
-			description += "\t"+(i+1)+". "+ dataset.col_names[i]+ "  (type = " + (i==dataset.m-1 ? "entier" : "réel") + ")\n";
+		int i;
+		for (i = 0; i < dataset.m-1; i++) { // all except last attribut
+			description += "\t"+(i+1)+". "+ dataset.col_names[i]+ "  (type = réel)\n";
 		}
+		description += "\t"+(i+1)+". "+ dataset.col_names[i]+ "  (type = " + (i==dataset.m-1 ? "entier" : "réel") + ")\n";
 		textArea_description.setText(description);
 	}
 	
@@ -482,4 +521,7 @@ public class Application {
 		return Paths.get(text_dataset_src.getText()).getFileName().toString();
 	}
 	
+	public void afficherMessage(String message) {
+		JOptionPane.showMessageDialog(frame, message);
+	}
 }

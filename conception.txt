@@ -17,6 +17,7 @@ DESCRIPTION + MESURES:
 
 # TODO:
 - read from CSV
+- save to txt or CSV ;(
 desc:
     Informations générales sur le dataset (file type, filename/url, ... source = url or file, file size, other?)
     Nombre d'instances

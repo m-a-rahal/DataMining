@@ -16,12 +16,13 @@ public class Dataset {
 	public String col_names [];
 	private static final String default_names = "area,perimeter,compactness,length of kernel,width of kernel,asymmetry coefficient,length of kernel groove,class";
 	
-	public Dataset(String[] names, List<String> data_lines) {
-		// extract data from string lines
+	public Dataset(String[] names, int n, int m, Double[][] data) {
 		extract_names(names);
-		extract_data(data_lines);
+		this.data = data;
+		this.n = n;
+		this.m = m;
 	}
-	
+
 	private void extract_names(String[] names) {
 		if (names == null) {
 			col_names = default_names.split(",");
@@ -355,6 +356,11 @@ public class Dataset {
 		for (int i = 0; i < n; i++) {
 			unique_values.add(data[i][indice_attribut]);
 		}
-		return (Double[]) unique_values.toArray();
+		Double [] values = new Double[unique_values.size()];
+		int i = 0;
+		for (Double x : unique_values) {
+			values[i++] = x;
+		}
+		return values;
 	}
 }
