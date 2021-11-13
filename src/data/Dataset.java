@@ -4,20 +4,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
 public class Dataset {
-	public Double data [][] = null;
+	public Double[][] data = null;
 	public int n; // dataset dimentions, lines and columns repectively
 	public int m;
 	HashMap<String, Integer> col_index; // used to get column index by column name
 	public String col_names [];
+	public Type[] types;
 	private static final String default_names = "area,perimeter,compactness,length of kernel,width of kernel,asymmetry coefficient,length of kernel groove,class";
 	public static final String classes [] = new String[] {"Kama", "Rosa", "Canadian"};
 	
-	public Dataset(String[] names, int n, int m, Double[][] data) {
+	public Dataset(String[] names, int n, int m, Double[][] data, Type[] types) {
 		extract_names(names);
 		this.data = data;
 		this.n = n;
 		this.m = m;
+		this.types = types;
 	}
 
 	private void extract_names(String[] names) {
@@ -325,6 +330,14 @@ public class Dataset {
 	
 	// ----------------------------------------------------------------------------------
 
+	public int nombre_de_cases_vides(int indice_attribut) {
+		int count = 0;
+		for (int i = 0; i < n; i++) {
+			if (data[i][indice_attribut] == null) count++;
+		}
+		return count;
+	}
+		
 	public int getClassCount() {
 		return frequences_de(m-1).keySet().size();
 	}
@@ -336,5 +349,24 @@ public class Dataset {
 			counts.ajouter(data[i][indice_attribut]);
 		}
 		return counts;
+	}
+
+	public String getType(int i) {
+		return types[i].toString();
+	}
+	
+	public void data_from_table(JTable table) {
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		n = model.getRowCount();
+		m = model.getColumnCount();
+		data = new Double[n][m];
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				Double x = null;
+				try {x = Double.parseDouble(table.getValueAt(i,j).toString());} catch(Exception e) {};
+				data[i][j] = x;
+			}
+		}
+		System.out.println("loaded dataset has "+ n +" rows");
 	}
 }

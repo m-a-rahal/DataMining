@@ -16,6 +16,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import data.Dataset;
+import data.Type;
 
 public class FileManager {
 	private static final Integer TXT_FILETYPE = 1;
@@ -63,6 +64,9 @@ public class FileManager {
 		// detect data dimensions
 		int n = datalines.size();
 		int m = datalines.get(0).split(separator).length;
+		// create JTable
+		
+		Type[] types = new Type[m];
 		// allocate data matrix
 		Double data[][] = new Double[n][m];
 		// fill data matrix with values
@@ -72,10 +76,12 @@ public class FileManager {
 			for (String str_value : line.split(separator)) {
 				Double value = null;
 				try {value = Double.parseDouble(str_value);} catch(Exception e) {};
+				types[j] = Type.parse(str_value).combine(types[j]);
 				data[i][j++] = value;
 			}i++;
 		}
-		return new Dataset(null,n,m, data);
+
+		return new Dataset(null,n,m, data, types);
 	}
 
 	public static void save_dataset(Dataset dataset, String dest_file) throws FileNotFoundException {

@@ -36,6 +36,7 @@ import org.jfree.chart.ChartPanel;
 
 import data.Dataset;
 import data.Frequences;
+import data.Type;
 import diagrammes.Diagrammes;
 import input_sources.FileManager;
 import input_sources.URLManager;
@@ -53,6 +54,7 @@ public class Application {
 	private Integer position_moy_tronquee = null;
 	private String dest_file = null;
 	private JTextField textField_dest_file;
+	private JTable table_attributs;
 
 	/**
 	 * Launch the application.
@@ -175,7 +177,9 @@ public class Application {
 		            	text_dataset_src.setText(FileManager.ChooseFileWindow());
 		            	dataset = FileManager.extract_dataset(text_dataset_src.getText());
 		            	text_dataset_src.getText();
-		            } catch (NullPointerException nullPointerException) {} catch (FileNotFoundException e1) {e1.printStackTrace();}
+		            } catch (NullPointerException e1) {
+		            	e1.printStackTrace();
+		            } catch (FileNotFoundException e1) {e1.printStackTrace();}
 				}else {
 					try {
 						dataset = URLManager.extract_dataset(text_dataset_src.getText());
@@ -311,19 +315,16 @@ public class Application {
 		JPanel panel_4 = new JPanel();
 		textArea_description = add_textArea_to(panel_4);
 		
-		
-		
-		
-		
+		JPanel panel_5 = new JPanel();
+		table_attributs = add_table_to(panel_5);
 		
 		GroupLayout gl_panel_desc_mesures = new GroupLayout(panel_desc_mesures);
 		gl_panel_desc_mesures.setHorizontalGroup(
 			gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel_desc_mesures.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-						.addComponent(panel_4, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
 						.addGroup(gl_panel_desc_mesures.createSequentialGroup()
 							.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
@@ -333,7 +334,11 @@ public class Application {
 									.addPreferredGap(ComponentPlacement.RELATED)))
 							.addGap(18)
 							.addComponent(label_pourcentage_moy_tronquee, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE))
-						.addComponent(lblNewLabel_2_1, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE))
+						.addComponent(lblNewLabel_2_1, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel_desc_mesures.createSequentialGroup()
+							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		gl_panel_desc_mesures.setVerticalGroup(
@@ -342,7 +347,9 @@ public class Application {
 					.addContainerGap()
 					.addComponent(lblNewLabel_2, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
+					.addGroup(gl_panel_desc_mesures.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
+						.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNewLabel_2_1, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -448,7 +455,7 @@ public class Application {
 			names[i] = dataset.col_names[i-1];
 		}
 		names[0] = "Mesures";
-		final int NOMBRE_DE_MESURES = 17; // 17 est le nombre de mesures a afficher ! il faut le mettre a jour
+		final int NOMBRE_DE_MESURES = 18; // 17 est le nombre de mesures a afficher ! il faut le mettre a jour
 		TableModel model_mesures = new DefaultTableModel(names, NOMBRE_DE_MESURES); 
 		int i = 1;
 		model_mesures.setValueAt("moyenne",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne(j)), i, j+1); i++;
@@ -468,7 +475,6 @@ public class Application {
 		model_mesures.setValueAt("ecartType",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.ecartType(j)), i, j+1); i++;
 		model_mesures.setValueAt("variance",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.variance(j)), i, j+1); i++;
 
-		//TODO: ajouter coéffitient de corélation ici add it here
 		// moyenne tronquée
 		position_moy_tronquee = i = 0; // save this position for later
 		double q = slider_moy_tronquee.getValue()/100.0;
@@ -499,31 +505,48 @@ public class Application {
 			double k = i+1;
 			description += "\t"+(i+1)+". " + Dataset.classes[i] + "("+k+") : "+ f.frequence_de(k) +" instances ("+ dataset.arrondi(100*f.pourcentage(k))+"%)\n";
 		}
-		description += "- attributs :\n";
-		int i;
-		for (i = 0; i < dataset.m-1; i++) { // all except last attribut
-			description += "\t"+(i+1)+". "+ dataset.col_names[i]+ "  (type = réel)\n";
-		}
-		description += "\t"+(i+1)+". "+ dataset.col_names[i]+ "  (type = " + (i==dataset.m-1 ? "entier" : "réel") + ")\n";
+		remplir_table_attributs();
 		textArea_description.setText(description);
 	}
 	
+	private void remplir_table_attributs() {
+		int i;
+		DefaultTableModel model = new DefaultTableModel(" ,attribut,type,nombre de valeurs manquantes, valeurs possibles".split(","), dataset.m);
+		for (i = 0; i < dataset.m; i++) { // all except last attribut
+			int j = 0;
+			model.setValueAt(i+1, i, j++);
+			model.setValueAt(dataset.col_names[i], i, j++);
+			if (i<dataset.m-1) 
+			model.setValueAt("continu | numérique | quantitatif", i, j++);
+			else 
+			model.setValueAt("discret | numérique | quantitatif", i, j++);
+			model.setValueAt(dataset.nombre_de_cases_vides(i), i, j++);
+			model.setValueAt(dataset.frequences_de(i).keySet().toString(), i, j++);
+		}
+		table_attributs.setModel(model);
+	}
+
 	private void appliquer_les_changements() {
 		int i = 0,j = 0;
 		table_dataset.clearSelection(); // must use this to avoid some errors
 		try {
 			// recreate dataset from table
 			DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
-			dataset.n = model.getRowCount();;
+			dataset.n = model.getRowCount();
+			dataset.m = model.getColumnCount();
 			dataset.data = new Double[dataset.n][dataset.m];
+			dataset.types = new Type[dataset.m];
 			for (i = 0; i < dataset.n; i++) {
 				for (j = 0; j < dataset.m; j++) {
 					Double x = null;
-					try {x = Double.parseDouble(table_dataset.getValueAt(i,j).toString());} catch(Exception e) {};
+					Object tmp = table_dataset.getValueAt(i,j);
+					String str_value = tmp == null ? "": tmp.toString();
+					try {x = Double.parseDouble(str_value);} catch(Exception e) {};
+					dataset.types[j] = Type.parse(str_value).combine(dataset.types[j]);
 					dataset.data[i][j] = x;
 				}
 			}
-			System.out.println("new dataset has "+ dataset.n +" rows");
+			System.out.println("loaded dataset has "+ dataset.n +" rows");
 			// update mesures and other stuff
 			updateMesures();
 			update_description_text();
