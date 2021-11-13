@@ -145,29 +145,7 @@ public class Application {
 		JButton btn_appliquer_changements = new JButton("appliquer les modifications");
 		btn_appliquer_changements.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int i = 0,j = 0;
-				table_dataset.clearSelection(); // must use this to avoid some errors
-				try {
-					// recreate dataset from table
-					DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
-					dataset.n = model.getRowCount();;
-					dataset.data = new Double[dataset.n][dataset.m];
-					for (i = 0; i < dataset.n; i++) {
-						for (j = 0; j < dataset.m; j++) {
-							dataset.data[i][j] = Double.parseDouble(table_dataset.getValueAt(i,j).toString());
-						}
-					}
-					System.out.println("new dataset has "+ dataset.n +" rows");
-					// update mesures and other stuff
-					updateMesures();
-					update_description_text();
-				} catch (Exception e1) {e1.printStackTrace();
-				afficherMessage("veillez corriger la valeure dans dans la position ("+i+", "+j+").\n(ou vérifier que vous avez déselectionné la case que vous êtes en train de remplir pour valider l'entrée)");
-				table_dataset.changeSelection(i, j, true, false);
-				Object old_value = table_dataset.getValueAt(i, j);
-				String value = old_value == null ? "*" : old_value + "*";
-				table_dataset.setValueAt(value, i, j);
-				System.out.println(i + " "+ j);}
+				appliquer_les_changements();
 			}
 		});
 		
@@ -222,6 +200,15 @@ public class Application {
 		JButton btnSauvegarder = new JButton("sauvegarder");
 		btnSauvegarder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				switch(JOptionPane.showConfirmDialog(frame, "voulez vous appliquer les changements avant de sauvegarder le dataset?")) {
+					case 0: // yes
+						appliquer_les_changements();
+						break;
+					case 1: // no
+						break;
+					case 2: // cancel
+						return;
+				}
 				dest_file = textField_dest_file.getText();
 				if (dest_file == null || dest_file.equals("")) {
 					dest_file = FileManager.ChooseFileWindow();
@@ -236,6 +223,7 @@ public class Application {
 				}
 				afficherMessage("dataset sauvegardé sous \""+ dest_file+"\"");
 			}
+
 		});
 		
 		JLabel lblNewLabel_1 = new JLabel("Destination");
@@ -514,6 +502,32 @@ public class Application {
 		}
 		description += "\t"+(i+1)+". "+ dataset.col_names[i]+ "  (type = " + (i==dataset.m-1 ? "entier" : "réel") + ")\n";
 		textArea_description.setText(description);
+	}
+	
+	private void appliquer_les_changements() {
+		int i = 0,j = 0;
+		table_dataset.clearSelection(); // must use this to avoid some errors
+		try {
+			// recreate dataset from table
+			DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
+			dataset.n = model.getRowCount();;
+			dataset.data = new Double[dataset.n][dataset.m];
+			for (i = 0; i < dataset.n; i++) {
+				for (j = 0; j < dataset.m; j++) {
+					dataset.data[i][j] = Double.parseDouble(table_dataset.getValueAt(i,j).toString());
+				}
+			}
+			System.out.println("new dataset has "+ dataset.n +" rows");
+			// update mesures and other stuff
+			updateMesures();
+			update_description_text();
+		} catch (Exception e1) {e1.printStackTrace();
+		afficherMessage("veillez corriger la valeure dans dans la position ("+i+", "+j+").\n(ou vérifier que vous avez déselectionné la case que vous êtes en train de remplir pour valider l'entrée)");
+		table_dataset.changeSelection(i, j, true, false);
+		Object old_value = table_dataset.getValueAt(i, j);
+		String value = old_value == null ? "*" : old_value + "*";
+		table_dataset.setValueAt(value, i, j);
+		System.out.println(i + " "+ j);}
 	}
 	
 	// extra methods
