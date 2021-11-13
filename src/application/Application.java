@@ -146,7 +146,7 @@ public class Application {
 			}
 		});
 		
-		JButton btnSupprimerligne = new JButton("supprimer_lignes");
+		JButton btnSupprimerligne = new JButton("supprimer lignes");
 		btnSupprimerligne.setToolTipText("supprimer les lignes sélectionnées");
 		btnSupprimerligne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -200,29 +200,31 @@ public class Application {
 				switch(JOptionPane.showConfirmDialog(frame, "voulez vous appliquer les changements avant de sauvegarder le dataset?")) {
 					case 0: // yes
 						appliquer_les_changements();
+						dest_file = textField_dest_file.getText();
+						if (dest_file == null || dest_file.equals("")) {
+							dest_file = FileManager.ChooseFileWindow();
+							dest_file = dest_file + ".txt";
+							textField_dest_file.setText(dest_file);
+						}
+						try {
+							FileManager.save_dataset(dataset, dest_file);
+						} catch (FileNotFoundException e1) {
+							e1.printStackTrace();
+							afficherMessage("Erreure lors de la sauvegarde!\n" + e.toString());
+							return;
+						}
+						afficherMessage("dataset sauvegardé sous \""+ dest_file+"\"");
 						break;
 					case 1: // no
 						break;
 					case 2: // cancel
 						return;
 				}
-				dest_file = textField_dest_file.getText();
-				if (dest_file == null || dest_file.equals("")) {
-					dest_file = FileManager.ChooseFileWindow();
-					textField_dest_file.setText(dest_file);
-				}
-				try {
-					FileManager.save_dataset(dataset, dest_file);
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
-					afficherMessage("Erreure lors de la sauvegarde!\n" + e.toString());
-					return;
-				}
-				afficherMessage("dataset sauvegardé sous \""+ dest_file+"\"");
+				
 			}
 
 		});
-		
+
 		JLabel lblNewLabel_1 = new JLabel("Destination");
 		
 		textField_dest_file = new JTextField();
@@ -251,11 +253,11 @@ public class Application {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnCharger))
 						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(textField_dest_file, GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
-							.addGap(9)
-							.addComponent(btnSauvegarder, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(textField_dest_file, GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnSauvegarder, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		gl_panel_1.setVerticalGroup(
@@ -367,16 +369,19 @@ public class Application {
 			public void actionPerformed(ActionEvent e) {
 				Diagrammes diagrammes = new Diagrammes(dataset);
 				switch(comboBox_type_diagramme.getSelectedIndex()) {
-					case 0 : // Histogramme
+					case 1 : // Histogramme
 						panel_diagrammes.setChart(diagrammes.histogram(0));
 						break;
-					case 3 : // scatterplot
+					case 4 : // scatterplot
 						panel_diagrammes.setChart(diagrammes.diagramme_disperssion(0,1));
+						break;
+					default:
+						panel_diagrammes.setChart(null);
 						break;
 				}
 			}
 		});
-		comboBox_type_diagramme.setModel(new DefaultComboBoxModel(new String[] {"Histogramme", "Boite à moustache", "Q-Q Plot", "ScatterPlot"}));
+		comboBox_type_diagramme.setModel(new DefaultComboBoxModel(new String[] {"","Histogramme", "Boite à moustache", "Q-Q Plot", "ScatterPlot"}));
 		
 		panel_diagrammes = new ChartPanel(null);
 		panel_diagrammes.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -421,6 +426,7 @@ public class Application {
 	private JTextArea add_textArea_to(JPanel panel) {
 		panel.setLayout(new BorderLayout(0,0));
 		JTextArea area = new JTextArea();
+		area.setEditable(false);
 		panel.add(area, BorderLayout.CENTER);
 		panel.add(new JScrollPane(area));
 		return area;
