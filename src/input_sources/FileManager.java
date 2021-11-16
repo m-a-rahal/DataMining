@@ -34,7 +34,7 @@ public class FileManager {
 		if (format == CSV_FILETYPE)
 			separator = ",";
 		else if (format == TXT_FILETYPE)
-			separator = "[\s\t]+";
+			separator = "[\\s\\t]+";
 		try {
 			ArrayList<String> datalines = new ArrayList<>();
 			while (true) {
