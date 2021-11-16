@@ -297,7 +297,7 @@ public class Application {
 		JPanel panel_3 = new JPanel();
 		table_mesures = add_table_to(panel_3);
 		
-		JLabel lblNewLabel_3 = new JLabel("Pourcentage à trouquer pour la moyenne tronquée (de 0% à 50%)");
+		JLabel lblNewLabel_3 = new JLabel("Pourcentage à trouquer");
 		label_pourcentage_moy_tronquee = new JLabel("10%");
 		
 		slider_moy_tronquee = new JSlider();
@@ -310,7 +310,7 @@ public class Application {
 			}
 		});
 		slider_moy_tronquee.setMinorTickSpacing(1);
-		slider_moy_tronquee.setMaximum(49);
+		slider_moy_tronquee.setMaximum(99);
 		
 		JPanel panel_4 = new JPanel();
 		textArea_description = add_textArea_to(panel_4);
@@ -481,7 +481,7 @@ public class Application {
 
 		// moyenne tronquée
 		position_moy_tronquee = i = 0; // save this position for later
-		double q = slider_moy_tronquee.getValue()/100.0;
+		double q = slider_moy_tronquee.getValue()/200.0;
 		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
 		table_mesures.setModel(model_mesures);
 	}
@@ -491,7 +491,7 @@ public class Application {
 			return;
 		}
 		int i = position_moy_tronquee;
-		double q = slider_moy_tronquee.getValue()/100.0;
+		double q = slider_moy_tronquee.getValue()/200.0;
 		TableModel model_mesures = table_mesures.getModel();
 		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
 		table_mesures.setModel(model_mesures);
