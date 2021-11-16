@@ -42,6 +42,7 @@ import input_sources.FileManager;
 import input_sources.URLManager;
 
 public class Application {
+	private Application application;
 	private Dataset dataset;
 	private JFrame frame;
 	private JTable table_dataset;
@@ -78,6 +79,7 @@ public class Application {
 	 * Create the application.
 	 */
 	public Application() {
+		application = this; // self reference, needed later
 		frame = new JFrame();
 		frame.setBounds(100, 100, 629, 482);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -174,7 +176,7 @@ public class Application {
 			public void actionPerformed(ActionEvent e) {
 				if(! chckbxUrl.isSelected()) {
 		            try {
-		            	text_dataset_src.setText(FileManager.ChooseFileWindow());
+		            	text_dataset_src.setText(FileManager.ChooseFileWindow(application));
 		            	dataset = FileManager.extract_dataset(text_dataset_src.getText());
 		            	text_dataset_src.getText();
 		            } catch (NullPointerException e1) {
@@ -184,7 +186,7 @@ public class Application {
 					try {
 						dataset = URLManager.extract_dataset(text_dataset_src.getText());
 					} catch (IOException e1) {
-						e1.printStackTrace();
+						afficherMessage("l'URL que vous avez introduit est éronné");
 					}
 				}
 				try {
@@ -565,7 +567,12 @@ public class Application {
 	
 	// extra methods
 	private String getFilename() {
-		return Paths.get(text_dataset_src.getText()).getFileName().toString();
+		try {
+			return Paths.get(text_dataset_src.getText()).getFileName().toString();
+		} catch (Exception e) {
+			return text_dataset_src.getText();
+		}
+		
 	}
 	
 	public void afficherMessage(String message) {

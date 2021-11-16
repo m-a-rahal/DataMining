@@ -74,6 +74,7 @@ public class Dataset {
 			ArrayList<Double> valeurs = getSortedValues(indice_attribut);
 			double somme = 0;
 			int count = 0;
+			int n = valeurs.size();
 			for (int i = 0; i < n; i++) {
 				Double x = valeurs.get(i);
 				if (x == null) continue; // pour eviter les cases vides

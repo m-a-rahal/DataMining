@@ -28,7 +28,7 @@ public class Type {
 	public static Type parse(String str_value) {
 		int type = 0;
 		if (isLike(str_value, "[0-9]+")) {
-			System.out.println(str_value);
+			//System.out.println(str_value);
 			return new Type(0); // entier
 		}
 		if (isLike(str_value, "[0-9]*\\.[0-9]+")) 

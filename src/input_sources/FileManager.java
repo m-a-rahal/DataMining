@@ -1,5 +1,6 @@
 package input_sources;
 
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,14 +14,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import application.Application;
 import data.Dataset;
 import data.Type;
 
 public class FileManager {
 	private static final Integer TXT_FILETYPE = 1;
 	private static final Integer CSV_FILETYPE = 2;
+	private static final Integer DEFAULT_FILETYPE = TXT_FILETYPE;
 	public static String default_dataset_file = "resources/seeds_dataset.txt";
 	public static String default_dataset_save_file = "saved_dataset.txt";
 	
@@ -115,7 +119,7 @@ public class FileManager {
 				return TXT_FILETYPE;
 			}
 		}
-		return null;
+		return DEFAULT_FILETYPE;
 	}
 	
 	public static Matcher match(String pattern,String text) {
@@ -132,5 +136,14 @@ public class FileManager {
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("ficher texte (.txt) ou CSV (.csv)", new String[] { "txt", "csv" }));
         fileChooser.showOpenDialog(null);
         return fileChooser.getSelectedFile().getAbsolutePath();
+	}
+	
+	public static String ChooseFileWindow(Application application) {
+		try {
+			return ChooseFileWindow();
+		} catch (Exception e) {
+			application.afficherMessage("Le fichier ou l'URL que vous avez introduit est érroné");
+			return null;
+		}
 	}
 }
