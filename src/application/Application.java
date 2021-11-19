@@ -81,7 +81,7 @@ public class Application {
 	public Application() {
 		application = this; // self reference, needed later
 		frame = new JFrame();
-		frame.setBounds(100, 100, 629, 482);
+		frame.setBounds(100, 100, 830, 482);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JPanel panel = new JPanel();
@@ -372,15 +372,37 @@ public class Application {
 		JLabel lblNewLabel_4 = new JLabel("Type du diagramme");
 		
 		JComboBox comboBox_type_diagramme = new JComboBox();
-		comboBox_type_diagramme.addActionListener(new ActionListener() {
+		comboBox_type_diagramme.setModel(new DefaultComboBoxModel(new String[] {"Histogramme", "Boite à moustache", "Q-Q Plot", "ScatterPlot"}));
+		
+		panel_diagrammes = new ChartPanel(null);
+		panel_diagrammes.setBorder(new LineBorder(new Color(0, 0, 0)));
+		
+		JComboBox comboBox_col1 = new JComboBox();
+		
+		JComboBox comboBox_col2 = new JComboBox();
+		comboBox_col1.setModel(new DefaultComboBoxModel(new String[] {"area", "perimeter", "compactness", "length of kernel","width of kernel","asymmetry coefficient","length of kernel groove","class"}));
+		comboBox_col2.setModel(new DefaultComboBoxModel(new String[] {"area", "perimeter", "compactness", "length of kernel","width of kernel","asymmetry coefficient","length of kernel groove","class"}));
+		comboBox_col2.disable();
+		JLabel lblNewLabel_5 = new JLabel("Col 1 : ");
+		
+		JLabel lblNewLabel_5_1 = new JLabel("Col 2 : ");
+		
+		JButton btnNewButton_afficher = new JButton("Afficher");
+		btnNewButton_afficher.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Diagrammes diagrammes = new Diagrammes(dataset);
 				switch(comboBox_type_diagramme.getSelectedIndex()) {
-					case 1 : // Histogramme
-						panel_diagrammes.setChart(diagrammes.histogram(0));
+					case 0 : // Histogramme
+						panel_diagrammes.setChart(diagrammes.histogram(comboBox_col1.getSelectedIndex()));
 						break;
-					case 4 : // scatterplot
-						panel_diagrammes.setChart(diagrammes.diagramme_disperssion(0,1));
+					case 1 : // Histogramme
+						panel_diagrammes.setChart(null);
+						break;
+					case 2 : // Histogramme
+						panel_diagrammes.setChart(null);
+						break;
+					case 3 : // scatterplot
+						panel_diagrammes.setChart(diagrammes.diagramme_disperssion(comboBox_col1.getSelectedIndex(),comboBox_col2.getSelectedIndex()));
 						break;
 					default:
 						panel_diagrammes.setChart(null);
@@ -388,21 +410,52 @@ public class Application {
 				}
 			}
 		});
-		comboBox_type_diagramme.setModel(new DefaultComboBoxModel(new String[] {"","Histogramme", "Boite à moustache", "Q-Q Plot", "ScatterPlot"}));
-		
-		panel_diagrammes = new ChartPanel(null);
-		panel_diagrammes.setBorder(new LineBorder(new Color(0, 0, 0)));
+		comboBox_type_diagramme.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				switch(comboBox_type_diagramme.getSelectedIndex()) {
+					case 0 : // Histogramme
+						panel_diagrammes.setChart(null);
+						comboBox_col2.disable();
+						break;
+					case 1 : // boxplot
+						panel_diagrammes.setChart(null);
+						comboBox_col2.disable();
+						break;
+					case 2 : // qqplot
+						panel_diagrammes.setChart(null);
+						comboBox_col2.enable();
+						break;
+					case 3 : // scatterplot
+						panel_diagrammes.setChart(null);
+						comboBox_col2.enable();
+						break;
+					default:
+						
+						break;
+				}
+			}
+		});
 		GroupLayout gl_panel_plots = new GroupLayout(panel_plots);
 		gl_panel_plots.setHorizontalGroup(
-			gl_panel_plots.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_plots.createSequentialGroup()
+			gl_panel_plots.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_plots.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_plots.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel_diagrammes, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+					.addGroup(gl_panel_plots.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 789, Short.MAX_VALUE)
 						.addGroup(gl_panel_plots.createSequentialGroup()
 							.addComponent(lblNewLabel_4)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(comboBox_type_diagramme, 0, 484, Short.MAX_VALUE)))
+							.addComponent(comboBox_type_diagramme, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblNewLabel_5)
+							.addGap(10)
+							.addComponent(comboBox_col1, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblNewLabel_5_1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(comboBox_col2, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(btnNewButton_afficher, GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		gl_panel_plots.setVerticalGroup(
@@ -411,9 +464,14 @@ public class Application {
 					.addContainerGap()
 					.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel_4)
-						.addComponent(comboBox_type_diagramme, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
+						.addComponent(comboBox_type_diagramme, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_5)
+						.addComponent(lblNewLabel_5_1)
+						.addComponent(comboBox_col2, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
+						.addComponent(comboBox_col1, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnNewButton_afficher, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
+					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		panel_plots.setLayout(gl_panel_plots);

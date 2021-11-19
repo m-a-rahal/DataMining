@@ -29,7 +29,7 @@ public class Diagrammes {
 			couple.add(dataset.data[i][col1], dataset.data[i][col2]);
 		}
 		data.addSeries(couple);
-		JFreeChart scatterplot = ChartFactory.createScatterPlot("scatter", "x", "y", data);
+		JFreeChart scatterplot = ChartFactory.createScatterPlot("diagramme_disperssion", dataset.col_names[col1], dataset.col_names[col2], data);
 		//ChartPanel panel = new ChartPanel(scatterplot);
 		//JFrame frame = new JFrame();
 		//frame.add(panel);
@@ -45,7 +45,7 @@ public class Diagrammes {
 				d[i]=dataset.data[i][col];
 			}
 			histdata.addSeries("", d, dataset.n);
-			JFreeChart hist = ChartFactory.createHistogram("histogram", dataset.col_names[col], "frequence", histdata);
+			JFreeChart hist = ChartFactory.createHistogram("histogramme", dataset.col_names[col], "frequence", histdata);
 			//ChartPanel panel = new ChartPanel(hist);
 			//panel.setChart(hist);
 			//JFrame frame = new JFrame();
