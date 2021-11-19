@@ -187,12 +187,12 @@ public class Dataset {
 	public double mediane(int indice_attribut) throws Exception {
 		double med;
 		ArrayList<Double> vecteur = getSortedValues(indice_attribut);
-		// si la taile de la liste est pair, retourner l'élement x(n/2), sinon la moyenne des deux élements au milieu
+		// si la taile de la liste est impair, retourner l'élement x(n/2), sinon la moyenne des deux élements au milieu
 		int n = vecteur.size();
 		if (n % 2 == 1) {
-			med = (vecteur.get(n/2) + vecteur.get(n/2 - 1)) / 2;
-		} else {
 			med =  vecteur.get(n/2);
+		} else {
+			med = (vecteur.get(n/2) + vecteur.get(n/2 - 1)) / 2;
 		}
 		return med;
 	}

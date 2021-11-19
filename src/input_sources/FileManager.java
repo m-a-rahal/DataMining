@@ -138,6 +138,17 @@ public class FileManager {
         return fileChooser.getSelectedFile().getAbsolutePath();
 	}
 	
+	public static String SaveFileWindow() {
+		JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setDialogTitle("Save");
+        fileChooser.setApproveButtonText("Save");
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("ficher texte (.txt) ou CSV (.csv)", new String[] { "txt", "csv" }));
+        fileChooser.showOpenDialog(null);
+        return fileChooser.getSelectedFile().getAbsolutePath();
+	}
+	
 	public static String ChooseFileWindow(Application application) {
 		try {
 			return ChooseFileWindow();

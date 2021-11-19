@@ -214,7 +214,7 @@ public class Application {
 				}
 				dest_file = textField_dest_file.getText();
 				if (dest_file == null || dest_file.equals("")) {
-					dest_file = FileManager.ChooseFileWindow();
+					dest_file = FileManager.SaveFileWindow();
 					textField_dest_file.setText(dest_file);
 				}
 				try {
@@ -527,7 +527,7 @@ public class Application {
 			else 
 			model.setValueAt("discret | numérique | quantitatif", i, j++);
 			model.setValueAt(dataset.nombre_de_cases_vides(i), i, j++);
-			model.setValueAt(dataset.frequences_de(i).keySet().toString(), i, j++);
+			model.setValueAt("[ "+dataset.min(i)+" , "+dataset.max(i)+" ]", i, j++);
 		}
 		table_attributs.setModel(model);
 	}
