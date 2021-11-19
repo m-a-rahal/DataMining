@@ -312,7 +312,7 @@ public class Application {
 			}
 		});
 		slider_moy_tronquee.setMinorTickSpacing(1);
-		slider_moy_tronquee.setMaximum(99);
+		slider_moy_tronquee.setMaximum(49);
 		
 		JPanel panel_4 = new JPanel();
 		textArea_description = add_textArea_to(panel_4);
@@ -524,7 +524,7 @@ public class Application {
 		int i = 1;
 		model_mesures.setValueAt("moyenne",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne(j)), i, j+1); i++;
 		model_mesures.setValueAt("mediane",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mediane(j)), i, j+1); i++;
-		model_mesures.setValueAt("mode",i,0);      for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode(j)), i, j+1); i++;
+		model_mesures.setValueAt("mode",i,0);      for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.mode(j), i, j+1); i++;
 		//model_mesures.setValueAt("mode discrèt",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode_discret(j)), i, j+1); i++;
 		model_mesures.setValueAt("max",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.max(j), i, j+1); i++;
 		model_mesures.setValueAt("min",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.min(j), i, j+1); i++;
@@ -541,7 +541,7 @@ public class Application {
 
 		// moyenne tronquée
 		position_moy_tronquee = i = 0; // save this position for later
-		double q = slider_moy_tronquee.getValue()/200.0;
+		double q = slider_moy_tronquee.getValue()/100.0;
 		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
 		table_mesures.setModel(model_mesures);
 	}
@@ -551,7 +551,7 @@ public class Application {
 			return;
 		}
 		int i = position_moy_tronquee;
-		double q = slider_moy_tronquee.getValue()/200.0;
+		double q = slider_moy_tronquee.getValue()/100.0;
 		TableModel model_mesures = table_mesures.getModel();
 		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
 		table_mesures.setModel(model_mesures);

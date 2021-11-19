@@ -140,21 +140,36 @@ public class Dataset {
 		return (max(indice_attribut)+min(indice_attribut))/2;
 	}
 	
-	public double mode(int indice_attribut) throws Exception {
+	public ArrayList<Double> mode(int indice_attribut) throws Exception {
 		Double mod = null;
 		Integer mod_freq = null;
 		Frequences frequences = new Frequences();
+		Double val = null;
+		Integer freq = null;
+		ArrayList<Double> modes = new ArrayList<Double>();
 		for (int i = 0; i < n; i++) {
 			if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
-			Double val = data[i][indice_attribut];
-			Integer freq = frequences.ajouter(val);
+			val = data[i][indice_attribut];
+			freq = frequences.ajouter(val);
 			if (mod == null || mod_freq < freq) {
 				mod = val;
 				mod_freq = freq;
 				continue;
 			}
+			
 		}
-		return mod;
+		for (int i = 0; i < n; i++) {
+			if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
+			val = data[i][indice_attribut];
+			freq = frequences.frequence_de(val);
+			if (freq == mod_freq) {
+				if(! modes.contains(val)){
+					modes.add(val);
+				}
+				continue;
+			}
+		}
+		return modes;
 	}
 
 	/*public double mode_discret(int indice_attribut) throws Exception {
@@ -289,7 +304,7 @@ public class Dataset {
 			try {
 				text += "\t - moyenne   = " + arrondi(moyenne(indice_attribut)) + "\n";
 				text += "\t - mediane   = " + arrondi(mediane(indice_attribut)) + "\n";
-				text += "\t - mode      = " + arrondi(mode(indice_attribut)) + "\n";
+				text += "\t - mode      = " + mode(indice_attribut) + "\n";
 				//text += "\t - mode_disc = " + arrondi(mode_discret(indice_attribut)) + "\n";
 				text += "\t - max       = " + max(indice_attribut) + "\n";
 				text += "\t - min       = " + min(indice_attribut) + "\n";
