@@ -9,16 +9,19 @@ import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import application.Application;
 import data.Dataset;
 
 public class Diagrammes {
 	Dataset dataset;
 	XYSeriesCollection data = new XYSeriesCollection();
+	private Application app;
 	
 	
 	
-	public Diagrammes(Dataset dataset) {
+	public Diagrammes(Dataset dataset, Application application) {
 		this.dataset = dataset;
+		this.app = application;
 	}
 
 
@@ -29,7 +32,10 @@ public class Diagrammes {
 			couple.add(dataset.data[i][col1], dataset.data[i][col2]);
 		}
 		data.addSeries(couple);
-		JFreeChart scatterplot = ChartFactory.createScatterPlot("diagramme_disperssion", dataset.col_names[col1], dataset.col_names[col2], data);
+
+		String x = app.get_attribut1(),
+			   y = app.get_attribut2();
+		JFreeChart scatterplot = ChartFactory.createScatterPlot("Scatter Plot", x, y, data);
 		//ChartPanel panel = new ChartPanel(scatterplot);
 		//JFrame frame = new JFrame();
 		//frame.add(panel);
