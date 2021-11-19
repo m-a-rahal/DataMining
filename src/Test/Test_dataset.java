@@ -22,7 +22,7 @@ public class Test_dataset {
 	@SuppressWarnings("unused")
 	private static void test_dispersion_diag() throws FileNotFoundException {
 		Dataset dataset = FileManager.extract_dataset(null);
-		Diagrammes diag = new Diagrammes(dataset);
+		Diagrammes diag = new Diagrammes(dataset, null);
 		diag.diagramme_disperssion(5, 6);
 	}
 	
