@@ -1,8 +1,16 @@
 package diagrammes;
+import java.awt.Color;
+import java.awt.Font;
 import java.util.ArrayList;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.BoxAndWhiskerToolTipGenerator;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer;
+import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.XYSeries;
@@ -63,7 +71,38 @@ public class Diagrammes {
 		
 	}
 	
+	public JFreeChart boxplot(int col) {
+		DefaultBoxAndWhiskerCategoryDataset boxPlot_dataset = new DefaultBoxAndWhiskerCategoryDataset();
+		fillBoxPlot_dataset(boxPlot_dataset, col);
+		
+		final CategoryAxis xAxis = new CategoryAxis("Type");
+        final NumberAxis yAxis = new NumberAxis("Value");
+        yAxis.setAutoRangeIncludesZero(false);
+        final BoxAndWhiskerRenderer renderer = new BoxAndWhiskerRenderer();
+        renderer.setFillBox(false);
+        renderer.setDefaultToolTipGenerator(new BoxAndWhiskerToolTipGenerator());
+        renderer.setDefaultPaint(new Color(153,0,0));
+        final CategoryPlot plot = new CategoryPlot(boxPlot_dataset, xAxis, yAxis, renderer);
+        plot.setBackgroundPaint(new Color(224,224,224));
+
+        final JFreeChart chart = new JFreeChart(
+            "Box Plot",
+            new Font("SansSerif", Font.BOLD, 14),
+            plot,
+            true
+        );
+        chart.setBackgroundPaint(new Color(255,255,255));
+        return chart;
+	}
 	
+	
+	private void fillBoxPlot_dataset(DefaultBoxAndWhiskerCategoryDataset boxPlot_dataset, int col) {
+		ArrayList<Double> values = dataset.getSortedValues(col);
+		boxPlot_dataset.add(values, app.get_attribut1(), values.get(0));
+	}
+
+
+
 		public JFreeChart histogram(int col) {
 			double[] d = new double[dataset.n];
 			HistogramDataset histdata = new HistogramDataset();

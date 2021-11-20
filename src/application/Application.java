@@ -461,6 +461,11 @@ public class Application {
 				comboBox_attribut2.setEnabled(false); // disable attribut 2 for histogram
 				panel_diagrammes.setChart(diagrammes.histogram(attribut1));
 				break;
+				
+			case 2 : // qqplot
+				comboBox_attribut2.setEnabled(false); // disable attribut 2
+				panel_diagrammes.setChart(diagrammes.boxplot(attribut1));
+				break;
 			
 			case 3 : // qqplot
 				comboBox_attribut2.setEnabled(true); // enable attribut 2
