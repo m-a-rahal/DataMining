@@ -1,8 +1,7 @@
 package diagrammes;
-import javax.swing.JFrame;
+import java.util.ArrayList;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
@@ -43,6 +42,28 @@ public class Diagrammes {
 		return scatterplot;
 		
 	}
+	
+	public JFreeChart qqplot(int col1, int col2) {
+		XYSeries couple = new XYSeries("");
+		ArrayList<Double> X = app.dataset.getSortedValues(col1);
+		ArrayList<Double> Y = app.dataset.getSortedValues(col2);
+		for (int i = 0; i < dataset.n; i++) {
+			couple.add(X.get(i), Y.get(i));
+		}
+		data.addSeries(couple);
+
+		String x = app.get_attribut1(),
+			   y = app.get_attribut2();
+		JFreeChart plot = ChartFactory.createScatterPlot("Q-Q Plot", x, y, data);
+		//ChartPanel panel = new ChartPanel(scatterplot);
+		//JFrame frame = new JFrame();
+		//frame.add(panel);
+		//frame.setVisible(true);
+		return plot;
+		
+	}
+	
+	
 		public JFreeChart histogram(int col) {
 			double[] d = new double[dataset.n];
 			HistogramDataset histdata = new HistogramDataset();

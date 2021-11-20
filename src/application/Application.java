@@ -43,7 +43,7 @@ import input_sources.URLManager;
 
 public class Application {
 	private Application application;
-	private Dataset dataset;
+	public Dataset dataset;
 	private JFrame frame;
 	private JTable table_dataset;
 	private JTextField text_dataset_src;
@@ -461,6 +461,12 @@ public class Application {
 				comboBox_attribut2.setEnabled(false); // disable attribut 2 for histogram
 				panel_diagrammes.setChart(diagrammes.histogram(attribut1));
 				break;
+			
+			case 3 : // qqplot
+				comboBox_attribut2.setEnabled(true); // enable attribut 2
+				panel_diagrammes.setChart(diagrammes.qqplot(attribut1,attribut2));
+				break;
+				
 			case 4 : // scatterplot
 				comboBox_attribut2.setEnabled(true); // enable attribut 2
 				panel_diagrammes.setChart(diagrammes.diagramme_disperssion(attribut1,attribut2));

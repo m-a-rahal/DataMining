@@ -212,7 +212,7 @@ public class Dataset {
 		return med;
 	}
 
-	private ArrayList<Double> getSortedValues(int indice_attribut) {
+	public ArrayList<Double> getSortedValues(int indice_attribut) {
 		new ArrayList<>(n);
 		ArrayList<Double> vecteur = new ArrayList<Double>();
 		for (int i = 0; i < n; i++) {
