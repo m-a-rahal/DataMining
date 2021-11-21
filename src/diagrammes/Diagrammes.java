@@ -1,15 +1,18 @@
 package diagrammes;
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.labels.BoxAndWhiskerToolTipGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer;
+import org.jfree.data.statistics.BoxAndWhiskerCalculator;
+import org.jfree.data.statistics.BoxAndWhiskerItem;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
@@ -72,36 +75,73 @@ public class Diagrammes {
 	}
 	
 	public JFreeChart boxplot(int col) {
-		DefaultBoxAndWhiskerCategoryDataset boxPlot_dataset = new DefaultBoxAndWhiskerCategoryDataset();
-		fillBoxPlot_dataset(boxPlot_dataset, col);
+		DefaultBoxAndWhiskerCategoryDataset box_dataset = new DefaultBoxAndWhiskerCategoryDataset();
+
+		BoxAndWhiskerItem data_item = BoxAndWhiskerCalculator.calculateBoxAndWhiskerStatistics(dataset.getValues(col));
+		box_dataset.add(data_item, dataset.col_names[col], dataset.col_names[col]);
 		
-		final CategoryAxis xAxis = new CategoryAxis("Type");
-        final NumberAxis yAxis = new NumberAxis("Value");
-        yAxis.setAutoRangeIncludesZero(false);
-        final BoxAndWhiskerRenderer renderer = new BoxAndWhiskerRenderer();
-        renderer.setFillBox(false);
-        renderer.setDefaultToolTipGenerator(new BoxAndWhiskerToolTipGenerator());
-        renderer.setDefaultPaint(new Color(153,0,0));
-        final CategoryPlot plot = new CategoryPlot(boxPlot_dataset, xAxis, yAxis, renderer);
-        plot.setBackgroundPaint(new Color(224,224,224));
-
-        final JFreeChart chart = new JFreeChart(
-            "Box Plot",
-            new Font("SansSerif", Font.BOLD, 14),
-            plot,
-            true
-        );
-        chart.setBackgroundPaint(new Color(255,255,255));
-        return chart;
+		return make_boxplot(box_dataset);
+	}
+	
+	public JFreeChart boxplot() {
+		DefaultBoxAndWhiskerCategoryDataset box_dataset = new DefaultBoxAndWhiskerCategoryDataset();
+		for (int i = 0; i < dataset.m; i++) {
+			BoxAndWhiskerItem data_item = BoxAndWhiskerCalculator.calculateBoxAndWhiskerStatistics(dataset.getValues(i));
+			box_dataset.add(data_item, dataset.col_names[i], "");
+		}
+		return make_boxplot(box_dataset);
+	}
+	
+	private JFreeChart make_boxplot(DefaultBoxAndWhiskerCategoryDataset box_dataset) {
+		JFreeChart box_plot = ChartFactory.createBoxAndWhiskerChart("Title", "attribute name", "attribute values",box_dataset, true);
+		CategoryPlot plot = (CategoryPlot) box_plot.getPlot();
+		
+		ExtendedBoxAndWhiskerRenderer renderer = new ExtendedBoxAndWhiskerRenderer();
+		renderer.setFillBox(true);
+		renderer.setUseOutlinePaintForWhiskers(true);   
+		renderer.setMeanVisible(false);
+		plot.setRenderer(renderer);
+		return box_plot;
 	}
 	
 	
-	private void fillBoxPlot_dataset(DefaultBoxAndWhiskerCategoryDataset boxPlot_dataset, int col) {
-		ArrayList<Double> values = dataset.getSortedValues(col);
-		boxPlot_dataset.add(values, app.get_attribut1(), values.get(0));
-	}
+	/*private JFreeChart make_boxplot2(DefaultBoxAndWhiskerCategoryDataset box_dataset) {
+		JFreeChart box_plot = ChartFactory.createBoxAndWhiskerChart("Title", "attribute name", "attribute values",box_dataset, true);
+		CategoryPlot plot = (CategoryPlot) box_plot.getPlot();
+		
+		ExtendedBoxAndWhiskerRenderer renderer = new ExtendedBoxAndWhiskerRenderer();
+		renderer.setFillBox(true);
+		renderer.setUseOutlinePaintForWhiskers(true);   
+		renderer.setMeanVisible(false);
+		plot.setRenderer(new BoxAndWhiskerRenderer() {
+			private static final long serialVersionUID = 1L;
 
+			public void drawVerticalItem(Graphics2D g2) {
+		        // existing code that calls the methods below
+		    }
 
+		    private void drawEllipse(Point2D point, double oRadius, Graphics2D g2) {
+		        Paint temp = g2.getPaint();
+		        g2.setColor(Color.black);
+		        Ellipse2D dot = new Ellipse2D.Double(point.getX() + oRadius / 2,
+		                point.getY(), oRadius, oRadius);
+		        g2.draw(dot);
+		        g2.setPaint(temp);
+		    }
+
+		    private void drawHighFarOut(double aRadius, Graphics2D g2, double xx,
+		            double m) {
+		        Paint temp = g2.getPaint();
+		        g2.setColor(Color.black);
+		        double side = aRadius * 2;
+		        g2.draw(new Line2D.Double(xx - side, m + side, xx + side, m + side));
+		        g2.draw(new Line2D.Double(xx - side, m + side, xx, m));
+		        g2.draw(new Line2D.Double(xx + side, m + side, xx, m));
+		        g2.setPaint(temp);
+		    }
+		});
+		return box_plot;
+	}*/
 
 		public JFreeChart histogram(int col) {
 			double[] d = new double[dataset.n];

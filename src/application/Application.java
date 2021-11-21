@@ -380,7 +380,7 @@ public class Application {
 				update_diagramme();
 			}
 		});
-		comboBox_type_diagramme.setModel(new DefaultComboBoxModel(new String[] {"","Histogramme", "Boite à moustache", "Q-Q Plot", "ScatterPlot"}));
+		comboBox_type_diagramme.setModel(new DefaultComboBoxModel(new String[] {"","Histogramme", "Boite à moustache", "Q-Q Plot", "ScatterPlot", "tous les Boites à moustache"}));
 		
 		panel_diagrammes = new ChartPanel(null);
 		panel_diagrammes.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -456,14 +456,16 @@ public class Application {
 		Diagrammes diagrammes = new Diagrammes(dataset, this);
 		int attribut1 = comboBox_attribut1.getSelectedIndex();
 		int attribut2 = comboBox_attribut2.getSelectedIndex();
+		
+		comboBox_attribut1.setEnabled(true); // by default
 		switch(comboBox_type_diagramme.getSelectedIndex()) {
 			case 1 : // Histogramme
 				comboBox_attribut2.setEnabled(false); // disable attribut 2 for histogram
 				panel_diagrammes.setChart(diagrammes.histogram(attribut1));
 				break;
 				
-			case 2 : // qqplot
-				comboBox_attribut2.setEnabled(false); // disable attribut 2
+			case 2 : // boxplot
+				comboBox_attribut2.setEnabled(false); 
 				panel_diagrammes.setChart(diagrammes.boxplot(attribut1));
 				break;
 			
@@ -476,11 +478,19 @@ public class Application {
 				comboBox_attribut2.setEnabled(true); // enable attribut 2
 				panel_diagrammes.setChart(diagrammes.diagramme_disperssion(attribut1,attribut2));
 				break;
+			
+			case 5 : // all box plots
+				comboBox_attribut1.setEnabled(false); // disable all, this will show all box plpots
+				comboBox_attribut2.setEnabled(false); 
+				panel_diagrammes.setChart(diagrammes.boxplot());
+				break;
+			
 			default:
 				comboBox_attribut2.setEnabled(true); // enable attribut 2 by default
 				panel_diagrammes.setChart(null);
 				break;
 		}
+	
 	}
 
 	private JTable add_table_to(JPanel panel) {

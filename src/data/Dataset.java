@@ -13,8 +13,10 @@ public class Dataset {
 	public int m;
 	HashMap<String, Integer> col_index; // used to get column index by column name
 	public String col_names [];
+	//public String short_col_names [];
 	public Type[] types;
 	private static final String default_names = "area,perimeter,compactness,length of kernel,width of kernel,asymmetry coefficient,length of kernel groove,class";
+	//private static final String default_short_names = "area,perim,compact,len-kern,width-kern,asym-coeff,len-ker-groov,class";
 	public static final String classes [] = new String[] {"Kama", "Rosa", "Canadian"};
 	
 	public Dataset(String[] names, int n, int m, Double[][] data, Type[] types) {
@@ -28,6 +30,7 @@ public class Dataset {
 	private void extract_names(String[] names) {
 		if (names == null) {
 			col_names = default_names.split(",");
+			//short_col_names = default_short_names.split(",");
 		}
 		// init col_index
 		int col = 0;
@@ -213,13 +216,18 @@ public class Dataset {
 	}
 
 	public ArrayList<Double> getSortedValues(int indice_attribut) {
+		ArrayList<Double> vecteur = getValues(indice_attribut);
+		Collections.sort(vecteur);
+		return vecteur;
+	}
+	
+	public ArrayList<Double> getValues(int indice_attribut) {
 		new ArrayList<>(n);
 		ArrayList<Double> vecteur = new ArrayList<Double>();
 		for (int i = 0; i < n; i++) {
 			if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
 			vecteur.add(data[i][indice_attribut]);
 		}
-		Collections.sort(vecteur);
 		return vecteur;
 	}
 
