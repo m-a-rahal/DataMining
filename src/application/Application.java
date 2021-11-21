@@ -59,6 +59,7 @@ public class Application {
 	private JComboBox comboBox_attribut1;
 	private JComboBox comboBox_attribut2;
 	private JComboBox comboBox_type_diagramme;
+	private JCheckBox chckbxOutliers;
 
 	/**
 	 * Launch the application.
@@ -408,27 +409,39 @@ public class Application {
 			}
 		});
 		
+		chckbxOutliers = new JCheckBox("Outliers");
+		chckbxOutliers.setSelected(true);
+		chckbxOutliers.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				update_diagramme();
+			}
+		});
+		
 		GroupLayout gl_panel_plots = new GroupLayout(panel_plots);
 		gl_panel_plots.setHorizontalGroup(
-			gl_panel_plots.createParallelGroup(Alignment.TRAILING)
+			gl_panel_plots.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_plots.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_plots.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 736, Short.MAX_VALUE)
+						.addGroup(gl_panel_plots.createSequentialGroup()
+							.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE)
+							.addContainerGap())
 						.addGroup(gl_panel_plots.createSequentialGroup()
 							.addComponent(lblNewLabel_4)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(comboBox_type_diagramme, 0, 226, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-							.addGap(2)
-							.addComponent(comboBox_attribut1, 0, 120, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(lblNewLabel_5_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(comboBox_attribut2, 0, 120, Short.MAX_VALUE)
-							.addGap(34)))
-					.addContainerGap())
+							.addGroup(gl_panel_plots.createParallelGroup(Alignment.LEADING)
+								.addComponent(chckbxOutliers)
+								.addGroup(gl_panel_plots.createSequentialGroup()
+									.addComponent(comboBox_type_diagramme, 0, 247, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+									.addGap(2)
+									.addComponent(comboBox_attribut1, 0, 142, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(lblNewLabel_5_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(comboBox_attribut2, 0, 143, Short.MAX_VALUE)
+									.addGap(44))))))
 		);
 		gl_panel_plots.setVerticalGroup(
 			gl_panel_plots.createParallelGroup(Alignment.LEADING)
@@ -443,8 +456,10 @@ public class Application {
 							.addComponent(comboBox_attribut1, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
 							.addComponent(lblNewLabel_5_1)
 							.addComponent(comboBox_attribut2, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)))
-					.addGap(6)
-					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(chckbxOutliers)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		panel_plots.setLayout(gl_panel_plots);
@@ -452,42 +467,48 @@ public class Application {
 		frame.getContentPane().setLayout(groupLayout);
 	}
 	
-	protected void update_diagramme() {
+	public void update_diagramme() {
 		Diagrammes diagrammes = new Diagrammes(dataset, this);
 		int attribut1 = comboBox_attribut1.getSelectedIndex();
 		int attribut2 = comboBox_attribut2.getSelectedIndex();
-		
+		boolean attribut3 = chckbxOutliers.isSelected();
 		comboBox_attribut1.setEnabled(true); // by default
 		switch(comboBox_type_diagramme.getSelectedIndex()) {
 			case 1 : // Histogramme
+				chckbxOutliers.setEnabled(false);
 				comboBox_attribut2.setEnabled(false); // disable attribut 2 for histogram
 				panel_diagrammes.setChart(diagrammes.histogram(attribut1));
 				break;
 				
 			case 2 : // boxplot
-				Diagrammes.FORCE_SHOW_OUTLIERS = true; // make this chagable from interface
+				chckbxOutliers.setEnabled(true);
+				Diagrammes.FORCE_SHOW_OUTLIERS = attribut3; // make this chagable from interface
 				comboBox_attribut2.setEnabled(false); 
 				panel_diagrammes.setChart(diagrammes.boxplot(attribut1));
 				break;
 			
 			case 3 : // qqplot
+				chckbxOutliers.setEnabled(false);
 				comboBox_attribut2.setEnabled(true); // enable attribut 2
 				panel_diagrammes.setChart(diagrammes.qqplot(attribut1,attribut2));
 				break;
 				
 			case 4 : // scatterplot
+				chckbxOutliers.setEnabled(false);
 				comboBox_attribut2.setEnabled(true); // enable attribut 2
 				panel_diagrammes.setChart(diagrammes.diagramme_disperssion(attribut1,attribut2));
 				break;
 			
 			case 5 : // all box plots
-				Diagrammes.FORCE_SHOW_OUTLIERS = false; // make this chagable from interface
+				chckbxOutliers.setEnabled(true);
+				Diagrammes.FORCE_SHOW_OUTLIERS = attribut3; // make this chagable from interface
 				comboBox_attribut1.setEnabled(false); // disable all, this will show all box plpots
 				comboBox_attribut2.setEnabled(false); 
 				panel_diagrammes.setChart(diagrammes.boxplot());
 				break;
 			
 			default:
+				chckbxOutliers.setEnabled(false);
 				comboBox_attribut2.setEnabled(true); // enable attribut 2 by default
 				panel_diagrammes.setChart(null);
 				break;
