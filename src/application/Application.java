@@ -60,6 +60,7 @@ public class Application {
 	private JComboBox comboBox_attribut2;
 	private JComboBox comboBox_type_diagramme;
 	private JCheckBox chckbxOutliers;
+	private JTextField coeffCorel;
 
 	/**
 	 * Launch the application.
@@ -410,12 +411,19 @@ public class Application {
 		});
 		
 		chckbxOutliers = new JCheckBox("Outliers");
+		chckbxOutliers.setEnabled(false);
 		chckbxOutliers.setSelected(true);
 		chckbxOutliers.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				update_diagramme();
 			}
 		});
+		
+		coeffCorel = new JTextField();
+		coeffCorel.setEditable(false);
+		coeffCorel.setColumns(10);
+		
+		JLabel lblNewLabel_6 = new JLabel("Coeffitient de correlation");
 		
 		GroupLayout gl_panel_plots = new GroupLayout(panel_plots);
 		gl_panel_plots.setHorizontalGroup(
@@ -424,24 +432,28 @@ public class Application {
 					.addContainerGap()
 					.addGroup(gl_panel_plots.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_plots.createSequentialGroup()
-							.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE)
+							.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 789, Short.MAX_VALUE)
 							.addContainerGap())
 						.addGroup(gl_panel_plots.createSequentialGroup()
 							.addComponent(lblNewLabel_4)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addGroup(gl_panel_plots.createParallelGroup(Alignment.LEADING)
-								.addComponent(chckbxOutliers)
 								.addGroup(gl_panel_plots.createSequentialGroup()
-									.addComponent(comboBox_type_diagramme, 0, 247, Short.MAX_VALUE)
+									.addComponent(chckbxOutliers)
+									.addGap(18)
+									.addComponent(lblNewLabel_6)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-									.addGap(2)
-									.addComponent(comboBox_attribut1, 0, 142, Short.MAX_VALUE)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(lblNewLabel_5_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(comboBox_attribut2, 0, 143, Short.MAX_VALUE)
-									.addGap(44))))))
+									.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE))
+								.addComponent(comboBox_type_diagramme, 0, 281, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(comboBox_attribut1, 0, 118, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblNewLabel_5_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(comboBox_attribut2, 0, 118, Short.MAX_VALUE)
+							.addGap(44))))
 		);
 		gl_panel_plots.setVerticalGroup(
 			gl_panel_plots.createParallelGroup(Alignment.LEADING)
@@ -457,9 +469,12 @@ public class Application {
 							.addComponent(lblNewLabel_5_1)
 							.addComponent(comboBox_attribut2, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(chckbxOutliers)
+					.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
+						.addComponent(chckbxOutliers)
+						.addComponent(lblNewLabel_6)
+						.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
+					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		panel_plots.setLayout(gl_panel_plots);
@@ -472,6 +487,7 @@ public class Application {
 		int attribut1 = comboBox_attribut1.getSelectedIndex();
 		int attribut2 = comboBox_attribut2.getSelectedIndex();
 		boolean attribut3 = chckbxOutliers.isSelected();
+		coeffCorel.setText(""+dataset.arrondi(dataset.coeffitient_de_correlation(attribut1, attribut2)));
 		comboBox_attribut1.setEnabled(true); // by default
 		switch(comboBox_type_diagramme.getSelectedIndex()) {
 			case 1 : // Histogramme
