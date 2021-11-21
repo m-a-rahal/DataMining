@@ -465,6 +465,7 @@ public class Application {
 				break;
 				
 			case 2 : // boxplot
+				Diagrammes.FORCE_SHOW_OUTLIERS = true; // make this chagable from interface
 				comboBox_attribut2.setEnabled(false); 
 				panel_diagrammes.setChart(diagrammes.boxplot(attribut1));
 				break;
@@ -480,6 +481,7 @@ public class Application {
 				break;
 			
 			case 5 : // all box plots
+				Diagrammes.FORCE_SHOW_OUTLIERS = false; // make this chagable from interface
 				comboBox_attribut1.setEnabled(false); // disable all, this will show all box plpots
 				comboBox_attribut2.setEnabled(false); 
 				panel_diagrammes.setChart(diagrammes.boxplot());

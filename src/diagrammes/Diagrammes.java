@@ -1,16 +1,10 @@
 package diagrammes;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer;
 import org.jfree.data.statistics.BoxAndWhiskerCalculator;
 import org.jfree.data.statistics.BoxAndWhiskerItem;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
@@ -26,6 +20,7 @@ public class Diagrammes {
 	Dataset dataset;
 	XYSeriesCollection data = new XYSeriesCollection();
 	private Application app;
+	public static boolean FORCE_SHOW_OUTLIERS = true;
 	
 	
 	
@@ -80,22 +75,35 @@ public class Diagrammes {
 		BoxAndWhiskerItem data_item = BoxAndWhiskerCalculator.calculateBoxAndWhiskerStatistics(dataset.getValues(col));
 		box_dataset.add(data_item, dataset.col_names[col], dataset.col_names[col]);
 		
-		return make_boxplot(box_dataset);
+		return make_boxplot(box_dataset, dataset.min(col), dataset.max(col));
 	}
 	
 	public JFreeChart boxplot() {
 		DefaultBoxAndWhiskerCategoryDataset box_dataset = new DefaultBoxAndWhiskerCategoryDataset();
-		for (int i = 0; i < dataset.m; i++) {
+		double min = dataset.min(0), max = dataset.max(0);
+		for (int i = 1; i < dataset.m; i++) {
 			BoxAndWhiskerItem data_item = BoxAndWhiskerCalculator.calculateBoxAndWhiskerStatistics(dataset.getValues(i));
 			box_dataset.add(data_item, dataset.col_names[i], "");
+			double local_max = dataset.min(i); 
+			double local_min = dataset.max(i);
+			if (max < local_max) max = local_max;
+			if (min > local_min) min = local_min;
+			
 		}
-		return make_boxplot(box_dataset);
+		return make_boxplot(box_dataset, min, max);
 	}
 	
-	private JFreeChart make_boxplot(DefaultBoxAndWhiskerCategoryDataset box_dataset) {
+	private JFreeChart make_boxplot(DefaultBoxAndWhiskerCategoryDataset box_dataset, double min, double max) {
 		JFreeChart box_plot = ChartFactory.createBoxAndWhiskerChart("Title", "attribute name", "attribute values",box_dataset, true);
 		CategoryPlot plot = (CategoryPlot) box_plot.getPlot();
+		// régler le problème d'outliers qui ne s'affichent pas------
 		
+		if (FORCE_SHOW_OUTLIERS ) {
+			ValueAxis range = plot.getRangeAxis();
+			double etendu = max - min;
+			range.setRange(min - etendu / 10, max + etendu / 10);
+		}
+		// -----------------------------------------------------------
 		ExtendedBoxAndWhiskerRenderer renderer = new ExtendedBoxAndWhiskerRenderer();
 		renderer.setFillBox(true);
 		renderer.setUseOutlinePaintForWhiskers(true);   
