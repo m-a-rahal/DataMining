@@ -202,7 +202,7 @@ public class Diagrammes {
 				int indice = (int) Math.floor((dataset.data[i][col] - min) / w);
 				d[i]=indice;
 			}
-			histdata.addSeries("", d, dataset.n);
+			histdata.addSeries("", d, d.length);
 			JFreeChart hist = ChartFactory.createHistogram("histogramme", dataset.col_names[col], "frequence", histdata);
 			//ChartPanel panel = new ChartPanel(hist);
 			//panel.setChart(hist);
