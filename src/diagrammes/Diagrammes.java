@@ -1,15 +1,18 @@
 package diagrammes;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Collections;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
+import org.jfree.chart.renderer.xy.StandardXYBarPainter;
+import org.jfree.chart.renderer.xy.XYBarPainter;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.statistics.BoxAndWhiskerCalculator;
 import org.jfree.data.statistics.BoxAndWhiskerItem;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
@@ -17,11 +20,13 @@ import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.chart.renderer.category.StandardBarPainter;
 
 import application.Application;
 import data.Dataset;
 
 public class Diagrammes {
+	static int randColorIndex = 0;
 	Dataset dataset;
 	XYSeriesCollection data = new XYSeriesCollection();
 	private Application app;
@@ -103,7 +108,7 @@ public class Diagrammes {
 	}
 	
 	private JFreeChart make_boxplot(DefaultBoxAndWhiskerCategoryDataset box_dataset, double min, double max) {
-		JFreeChart box_plot = ChartFactory.createBoxAndWhiskerChart("Title", "", "",box_dataset, true);
+		JFreeChart box_plot = ChartFactory.createBoxAndWhiskerChart(app.get_attribut1(), "", "",box_dataset, true);
 		CategoryPlot plot = (CategoryPlot) box_plot.getPlot();
 		CategoryAxis domainAxis = plot.getDomainAxis();
 		// régler le problème d'outliers qui ne s'affichent pas------
@@ -121,7 +126,8 @@ public class Diagrammes {
 		if (box_dataset.getRowCount() == 1) { // make individual boxplots thinner + set random color
 			domainAxis.setLowerMargin(0.4);
 			domainAxis.setUpperMargin(0.4);
-			renderer.setSeriesPaint(0, randomColor());
+			Color color = randomColor();
+			renderer.setSeriesPaint(0, color.equals(Color.BLACK) ? Color.DARK_GRAY : color);
 		}
 		
 		plot.setRenderer(renderer);
@@ -166,21 +172,17 @@ public class Diagrammes {
 		});
 		return box_plot;
 	}*/
-	
-	public static Color randomColor() {
-		Color[] colors = {Color.BLUE, Color.RED, Color.YELLOW, Color.MAGENTA, Color.BLACK, Color.DARK_GRAY};
-		int index = (int) (Math.random() * colors.length);
-		return colors[index];
-	}
 
-		public JFreeChart histogram(int col) {
+
+		public JFreeChart histogram(int col, boolean discretiser) {
 			double[] d = new double[dataset.n];
 			HistogramDataset histdata = new HistogramDataset();
 			histdata.setType(HistogramType.FREQUENCY);
 			for (int i = 0; i < dataset.n; i++) {
 				d[i]=dataset.data[i][col];
 			}
-			histdata.addSeries("", d, dataset.n);
+			int bins_count = discretiser ? (int) Math.round(5 * Math.log10(dataset.n)) : d.length;
+			histdata.addSeries("", d, bins_count);
 			JFreeChart hist = ChartFactory.createHistogram("histogramme", dataset.col_names[col], "frequence", histdata);
 			//ChartPanel panel = new ChartPanel(hist);
 			//panel.setChart(hist);
@@ -191,6 +193,15 @@ public class Diagrammes {
 			// random plot color
 			XYPlot plot = (XYPlot) hist.getPlot();
 			plot.getRenderer().setSeriesPaint(0, randomColor());
+			XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
+			renderer.setBarPainter(new StandardXYBarPainter()); // remove ugly gradient (light)
+			hist.setBorderVisible(true);
 			return hist;
+	}
+		
+	public static Color randomColor() {
+		Color[] colors = {Color.BLUE, Color.RED, Color.YELLOW, Color.MAGENTA, Color.BLACK};
+		randColorIndex = (randColorIndex+1)%colors.length; 
+		return colors[randColorIndex];
 	}
 }
