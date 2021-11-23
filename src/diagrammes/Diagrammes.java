@@ -94,7 +94,7 @@ public class Diagrammes {
 	}
 	
 	private JFreeChart make_boxplot(DefaultBoxAndWhiskerCategoryDataset box_dataset, double min, double max) {
-		JFreeChart box_plot = ChartFactory.createBoxAndWhiskerChart("Title", "attribute name", "attribute values",box_dataset, true);
+		JFreeChart box_plot = ChartFactory.createBoxAndWhiskerChart("Title", "", "",box_dataset, true);
 		CategoryPlot plot = (CategoryPlot) box_plot.getPlot();
 		// régler le problème d'outliers qui ne s'affichent pas------
 		

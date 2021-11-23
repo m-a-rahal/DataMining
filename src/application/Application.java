@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Iterator;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -40,6 +41,7 @@ import data.Type;
 import diagrammes.Diagrammes;
 import input_sources.FileManager;
 import input_sources.URLManager;
+import javax.swing.SwingConstants;
 
 public class Application {
 	private Application application;
@@ -59,6 +61,10 @@ public class Application {
 	private JComboBox comboBox_attribut1;
 	private JComboBox comboBox_attribut2;
 	private JComboBox comboBox_type_diagramme;
+	private JCheckBox chckbxOutliers;
+	private JTextField coeffCorel;
+	private JLabel label_correlation_info;
+	private JLabel label_symetrie_info;
 
 	/**
 	 * Launch the application.
@@ -408,27 +414,64 @@ public class Application {
 			}
 		});
 		
+		chckbxOutliers = new JCheckBox("Outliers");
+		chckbxOutliers.setEnabled(false);
+		chckbxOutliers.setSelected(true);
+		chckbxOutliers.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				update_diagramme();
+			}
+		});
+		
+		coeffCorel = new JTextField();
+		coeffCorel.setEditable(false);
+		coeffCorel.setColumns(10);
+		
+		JLabel lblNewLabel_6 = new JLabel("Coeffitient de correlation");
+		
+		label_correlation_info = new JLabel(" ");
+		label_correlation_info.setForeground(Color.RED);
+		label_symetrie_info = new JLabel(" ");
+		label_symetrie_info.setForeground(Color.BLUE);
+		label_symetrie_info.setHorizontalAlignment(SwingConstants.RIGHT);
+		
 		GroupLayout gl_panel_plots = new GroupLayout(panel_plots);
 		gl_panel_plots.setHorizontalGroup(
-			gl_panel_plots.createParallelGroup(Alignment.TRAILING)
+			gl_panel_plots.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_plots.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_plots.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 736, Short.MAX_VALUE)
 						.addGroup(gl_panel_plots.createSequentialGroup()
-							.addComponent(lblNewLabel_4)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(comboBox_type_diagramme, 0, 226, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-							.addGap(2)
-							.addComponent(comboBox_attribut1, 0, 120, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(lblNewLabel_5_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+							.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 789, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(gl_panel_plots.createSequentialGroup()
+							.addGroup(gl_panel_plots.createParallelGroup(Alignment.TRAILING)
+								.addGroup(Alignment.LEADING, gl_panel_plots.createSequentialGroup()
+									.addComponent(chckbxOutliers)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(lblNewLabel_6)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
+									.addGap(10)
+									.addComponent(label_correlation_info, GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
+								.addGroup(gl_panel_plots.createSequentialGroup()
+									.addComponent(lblNewLabel_4)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(comboBox_type_diagramme, 0, 281, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(comboBox_attribut2, 0, 120, Short.MAX_VALUE)
-							.addGap(34)))
-					.addContainerGap())
+							.addComponent(comboBox_attribut1, 0, 118, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_panel_plots.createParallelGroup(Alignment.TRAILING)
+								.addGroup(gl_panel_plots.createSequentialGroup()
+									.addComponent(lblNewLabel_5_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(comboBox_attribut2, 0, 118, Short.MAX_VALUE)
+									.addGap(44))
+								.addGroup(gl_panel_plots.createSequentialGroup()
+									.addComponent(label_symetrie_info, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+									.addContainerGap())))))
 		);
 		gl_panel_plots.setVerticalGroup(
 			gl_panel_plots.createParallelGroup(Alignment.LEADING)
@@ -443,8 +486,15 @@ public class Application {
 							.addComponent(comboBox_attribut1, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
 							.addComponent(lblNewLabel_5_1)
 							.addComponent(comboBox_attribut2, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_6)
+						.addComponent(chckbxOutliers)
+						.addComponent(label_correlation_info)
+						.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label_symetrie_info))
 					.addGap(6)
-					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		panel_plots.setLayout(gl_panel_plots);
@@ -452,47 +502,93 @@ public class Application {
 		frame.getContentPane().setLayout(groupLayout);
 	}
 	
-	protected void update_diagramme() {
+	public void update_diagramme() {
 		Diagrammes diagrammes = new Diagrammes(dataset, this);
 		int attribut1 = comboBox_attribut1.getSelectedIndex();
 		int attribut2 = comboBox_attribut2.getSelectedIndex();
-		
+		boolean attribut3 = chckbxOutliers.isSelected();
+		coeffCorel.setText(""+dataset.arrondi(dataset.coeffitient_de_correlation(attribut1, attribut2)));
 		comboBox_attribut1.setEnabled(true); // by default
 		switch(comboBox_type_diagramme.getSelectedIndex()) {
 			case 1 : // Histogramme
+				chckbxOutliers.setEnabled(false);
 				comboBox_attribut2.setEnabled(false); // disable attribut 2 for histogram
 				panel_diagrammes.setChart(diagrammes.histogram(attribut1));
 				break;
 				
 			case 2 : // boxplot
-				Diagrammes.FORCE_SHOW_OUTLIERS = true; // make this chagable from interface
+				chckbxOutliers.setEnabled(true);
+				Diagrammes.FORCE_SHOW_OUTLIERS = attribut3; // make this chagable from interface
 				comboBox_attribut2.setEnabled(false); 
 				panel_diagrammes.setChart(diagrammes.boxplot(attribut1));
 				break;
 			
 			case 3 : // qqplot
+				chckbxOutliers.setEnabled(false);
 				comboBox_attribut2.setEnabled(true); // enable attribut 2
 				panel_diagrammes.setChart(diagrammes.qqplot(attribut1,attribut2));
 				break;
 				
 			case 4 : // scatterplot
+				chckbxOutliers.setEnabled(false);
 				comboBox_attribut2.setEnabled(true); // enable attribut 2
 				panel_diagrammes.setChart(diagrammes.diagramme_disperssion(attribut1,attribut2));
 				break;
 			
 			case 5 : // all box plots
-				Diagrammes.FORCE_SHOW_OUTLIERS = false; // make this chagable from interface
+				chckbxOutliers.setEnabled(true);
+				Diagrammes.FORCE_SHOW_OUTLIERS = attribut3; // make this chagable from interface
 				comboBox_attribut1.setEnabled(false); // disable all, this will show all box plpots
 				comboBox_attribut2.setEnabled(false); 
 				panel_diagrammes.setChart(diagrammes.boxplot());
 				break;
 			
 			default:
+				chckbxOutliers.setEnabled(false);
 				comboBox_attribut2.setEnabled(true); // enable attribut 2 by default
 				panel_diagrammes.setChart(null);
 				break;
 		}
-	
+		
+		update_info_labels();
+	}
+
+	private void update_info_labels() {
+		// corrélation (positive/négative) [trés] [forte/faible]
+		double corr = Double.parseDouble(coeffCorel.getText());
+		double bornes[] = {0.1, 0.25, 0.75, 0.9, 1.0};
+		String[] descriptions = "trés faible,faible,moyenne,forte,trés forte".split(",");
+		String signe = corr > 0 ? "positive" : "négative";
+		String desc = "";
+		if (corr < 0) {corr = -corr;}
+		int i = 0;
+		for (double borne : bornes) {
+			if (corr <= borne) {
+				System.out.println(corr + " "+ i);
+				desc = descriptions[i]; break;
+			}
+			i++;
+		}
+		label_correlation_info.setText("corrélation " + signe + " "+ desc);
+		
+		// données [légèrement/fortement] (symétriques/asymétriques à (droite/gauche))
+		// si c'est le cas d'un seule attribut
+		if (comboBox_attribut1.isEnabled() && !comboBox_attribut2.isEnabled()) {
+			double skewness = dataset.skewness(comboBox_attribut1.getSelectedIndex());
+			descriptions = "symétriques,légèrement asymétriques,asymétriques,fortement asymétriques".split(",");
+			boolean asymetrique = false;
+			String direction = skewness < 0 ? "droite" : "gauche";
+			if (skewness < 0) {skewness = -skewness;}
+			i = 0;
+			for (double borne : bornes) {
+				if (skewness <= borne) {
+					if (i > 0) asymetrique = true;
+					desc = descriptions[i]; break;
+				}
+				i++;
+			}
+			label_symetrie_info.setText("données " + desc + (asymetrique ? " à " + direction : ""));
+		}
 	}
 
 	private JTable add_table_to(JPanel panel) {
