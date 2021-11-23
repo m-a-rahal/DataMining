@@ -194,7 +194,7 @@ public class Diagrammes {
 			XYPlot plot = (XYPlot) hist.getPlot();
 			plot.getRenderer().setSeriesPaint(0, randomColor());
 			XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
-			renderer.setBarPainter(new StandardXYBarPainter()); // remove ugly gradient (light)
+			renderer.setBarPainter(new StandardXYBarPainter()); // remove ugly gradient (light) : https://youtu.be/qrowBMvXkQo
 			hist.setBorderVisible(true);
 			return hist;
 	}

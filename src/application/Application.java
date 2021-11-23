@@ -65,6 +65,7 @@ public class Application {
 	private JCheckBox chckbxOutliers_disc;
 	private JTextField coeffCorel;
 	private JLabel label_info;
+	private JLabel label_coef_corr;
 
 	/**
 	 * Launch the application.
@@ -428,7 +429,7 @@ public class Application {
 		coeffCorel.setEditable(false);
 		coeffCorel.setColumns(10);
 		
-		JLabel lblNewLabel_6 = new JLabel("Coeffitient de correlation");
+		label_coef_corr = new JLabel("Coeffitient de correlation");
 		
 		label_info = new JLabel(" ");
 		label_info.setForeground(Color.RED);
@@ -449,7 +450,7 @@ public class Application {
 									.addPreferredGap(ComponentPlacement.UNRELATED)
 									.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_panel_plots.createSequentialGroup()
-									.addComponent(lblNewLabel_6)
+									.addComponent(label_coef_corr)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
 									.addGap(10)
@@ -483,7 +484,7 @@ public class Application {
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
 						.addComponent(chckbxOutliers_disc)
-						.addComponent(lblNewLabel_6)
+						.addComponent(label_coef_corr)
 						.addComponent(label_info)
 						.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(6)
@@ -505,6 +506,8 @@ public class Application {
 		chckbxOutliers_disc.setVisible(false); // by default
 		chckbxOutliers_disc.setText("Outliers"); // by default
 		chckbxOutliers_disc.setEnabled(false); // by default
+		coeffCorel.setVisible(false); // by default
+		label_coef_corr.setVisible(false); // by dafault
 		switch(comboBox_type_diagramme.getSelectedIndex()) {
 			case 1 : // Histogramme
 				chckbxOutliers_disc.setVisible(true);
@@ -524,11 +527,15 @@ public class Application {
 				break;
 			
 			case 3 : // qqplot
+				label_coef_corr.setVisible(true);
+				coeffCorel.setVisible(true);
 				comboBox_attribut2.setEnabled(true); // enable attribut 2
 				panel_diagrammes.setChart(diagrammes.qqplot(attribut1,attribut2));
 				break;
 				
 			case 4 : // scatterplot
+				label_coef_corr.setVisible(true);
+				coeffCorel.setVisible(true);
 				comboBox_attribut2.setEnabled(true); // enable attribut 2
 				panel_diagrammes.setChart(diagrammes.diagramme_disperssion(attribut1,attribut2));
 				break;
