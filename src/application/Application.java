@@ -63,8 +63,7 @@ public class Application {
 	private JComboBox comboBox_type_diagramme;
 	private JCheckBox chckbxOutliers;
 	private JTextField coeffCorel;
-	private JLabel label_correlation_info;
-	private JLabel label_symetrie_info;
+	private JLabel label_info;
 
 	/**
 	 * Launch the application.
@@ -429,9 +428,9 @@ public class Application {
 		
 		JLabel lblNewLabel_6 = new JLabel("Coeffitient de correlation");
 		
-		label_correlation_info = new JLabel(" ");
-		label_symetrie_info = new JLabel(" ");
-		label_symetrie_info.setHorizontalAlignment(SwingConstants.RIGHT);
+		label_info = new JLabel(" ");
+		label_info.setForeground(Color.RED);
+
 		
 		GroupLayout gl_panel_plots = new GroupLayout(panel_plots);
 		gl_panel_plots.setHorizontalGroup(
@@ -451,7 +450,7 @@ public class Application {
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
 									.addGap(10)
-									.addComponent(label_correlation_info, GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
+									.addComponent(label_info, GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
 								.addGroup(gl_panel_plots.createSequentialGroup()
 									.addComponent(lblNewLabel_4)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -468,7 +467,6 @@ public class Application {
 									.addComponent(comboBox_attribut2, 0, 118, Short.MAX_VALUE)
 									.addGap(44))
 								.addGroup(gl_panel_plots.createSequentialGroup()
-									.addComponent(label_symetrie_info, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
 									.addContainerGap())))))
 		);
 		gl_panel_plots.setVerticalGroup(
@@ -488,9 +486,8 @@ public class Application {
 					.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel_6)
 						.addComponent(chckbxOutliers)
-						.addComponent(label_correlation_info)
-						.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(label_symetrie_info))
+						.addComponent(label_info)
+						.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(6)
 					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
 					.addContainerGap())
@@ -558,20 +555,24 @@ public class Application {
 		String[] descriptions = "trés faible,faible,moyenne,forte,trés forte".split(",");
 		String signe = corr > 0 ? "positive" : "négative";
 		String desc = "";
-		if (corr < 0) {corr = -corr;}
-		int i = 0;
-		for (double borne : bornes) {
-			if (corr <= borne) {
-				System.out.println(corr + " "+ i);
-				desc = descriptions[i]; break;
+		int i;
+		// si c'est le cas de deux attributs
+		if (comboBox_attribut1.isEnabled() && comboBox_attribut2.isEnabled() && panel_diagrammes.getChart() != null) {
+			if (corr < 0) {
+				corr = -corr;
 			}
-			i++;
-		}
-		label_correlation_info.setText("corrélation " + signe + " "+ desc);
-		
-		// données [légèrement/fortement] (symétriques/asymétriques à (droite/gauche))
-		// si c'est le cas d'un seule attribut
-		if (comboBox_attribut1.isEnabled() && !comboBox_attribut2.isEnabled()) {
+			i = 0;
+			for (double borne : bornes) {
+				if (corr <= borne) {
+					desc = descriptions[i];
+					break;
+				}
+				i++;
+			}
+			label_info.setText("corrélation " + signe + " " + desc);
+		} else if (comboBox_attribut1.isEnabled() && !comboBox_attribut2.isEnabled()) {
+			// si c'est le cas d'un seule attribut
+			// données [légèrement/fortement] (symétriques/asymétriques à (droite/gauche))
 			double skewness = dataset.skewness(comboBox_attribut1.getSelectedIndex());
 			descriptions = "symétriques,légèrement asymétriques,asymétriques,fortement asymétriques".split(",");
 			boolean asymetrique = false;
@@ -585,7 +586,11 @@ public class Application {
 				}
 				i++;
 			}
-			label_symetrie_info.setText("données " + desc + (asymetrique ? " à " + direction : ""));
+			label_info.setText("données " + desc + (asymetrique ? " à " + direction : ""));
+			coeffCorel.setText("");
+		} else {
+			label_info.setText(" ");
+			coeffCorel.setText("");
 		}
 	}
 
