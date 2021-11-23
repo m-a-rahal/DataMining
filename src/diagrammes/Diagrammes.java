@@ -7,6 +7,12 @@ import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
+import org.jfree.chart.renderer.xy.StandardXYBarPainter;
+import org.jfree.chart.renderer.xy.XYBarPainter;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.statistics.BoxAndWhiskerCalculator;
 import org.jfree.data.statistics.BoxAndWhiskerItem;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
@@ -14,6 +20,7 @@ import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.chart.renderer.category.StandardBarPainter;
 
 import application.Application;
 import data.Dataset;
@@ -167,14 +174,15 @@ public class Diagrammes {
 	}*/
 
 
-		public JFreeChart histogram(int col) {
+		public JFreeChart histogram(int col, boolean discretiser) {
 			double[] d = new double[dataset.n];
 			HistogramDataset histdata = new HistogramDataset();
 			histdata.setType(HistogramType.FREQUENCY);
 			for (int i = 0; i < dataset.n; i++) {
 				d[i]=dataset.data[i][col];
 			}
-			histdata.addSeries("", d, dataset.n);
+			int bins_count = discretiser ? (int) Math.round(5 * Math.log10(dataset.n)) : d.length;
+			histdata.addSeries("", d, bins_count);
 			JFreeChart hist = ChartFactory.createHistogram("histogramme", dataset.col_names[col], "frequence", histdata);
 			//ChartPanel panel = new ChartPanel(hist);
 			//panel.setChart(hist);
@@ -185,39 +193,14 @@ public class Diagrammes {
 			// random plot color
 			XYPlot plot = (XYPlot) hist.getPlot();
 			plot.getRenderer().setSeriesPaint(0, randomColor());
-			return hist;
-	}
-		
-		public JFreeChart histogram_discret(int col) {
-			double[] d = new double[dataset.n];
-			HistogramDataset histdata = new HistogramDataset();
-			histdata.setType(HistogramType.FREQUENCY);
-			
-			int k = (int) Math.round(5 * Math.log10(dataset.n));
-			double max = dataset.max(col);
-			double min = dataset.min(col);
-			double w = (max - min) / k;
-			
-			for (int i = 0; i < dataset.n; i++) {
-				int indice = (int) Math.floor((dataset.data[i][col] - min) / w);
-				d[i]=indice;
-			}
-			histdata.addSeries("", d, d.length);
-			JFreeChart hist = ChartFactory.createHistogram("histogramme", dataset.col_names[col], "frequence", histdata);
-			//ChartPanel panel = new ChartPanel(hist);
-			//panel.setChart(hist);
-			//JFrame frame = new JFrame();
-			//frame.add(panel);
-			//frame.setVisible(true);
-			
-			// random plot color
-			XYPlot plot = (XYPlot) hist.getPlot();
-			plot.getRenderer().setSeriesPaint(0, randomColor());
+			XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
+			renderer.setBarPainter(new StandardXYBarPainter()); // remove ugly gradient (light)
+			hist.setBorderVisible(true);
 			return hist;
 	}
 		
 	public static Color randomColor() {
-		Color[] colors = {Color.BLUE, Color.RED, Color.YELLOW, Color.MAGENTA, Color.BLACK, Color.DARK_GRAY};
+		Color[] colors = {Color.BLUE, Color.RED, Color.YELLOW, Color.MAGENTA, Color.BLACK};
 		randColorIndex = (randColorIndex+1)%colors.length; 
 		return colors[randColorIndex];
 	}

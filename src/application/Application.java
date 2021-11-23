@@ -415,6 +415,7 @@ public class Application {
 		});
 		
 		chckbxOutliers_disc = new JCheckBox("Outliers");
+		chckbxOutliers_disc.setToolTipText("");
 		chckbxOutliers_disc.setEnabled(false);
 		chckbxOutliers_disc.setSelected(true);
 		chckbxOutliers_disc.addActionListener(new ActionListener() {
@@ -509,9 +510,8 @@ public class Application {
 				chckbxOutliers_disc.setVisible(true);
 				chckbxOutliers_disc.setEnabled(true);
 				chckbxOutliers_disc.setText("discrétisation");
-				chckbxOutliers_disc.setToolTipText("fait une discrétization des donnés avec des intervales de longeure = w\ntel que w = (max-min)/k\nk = round(  5*log10(nombre de valeurs)  )");
 				comboBox_attribut2.setEnabled(false); // disable attribut 2 for histogram
-				JFreeChart chart = chckbxOutliers_disc.isSelected() ? diagrammes.histogram_discret(attribut1) : diagrammes.histogram(attribut1);
+				JFreeChart chart = diagrammes.histogram(attribut1, chckbxOutliers_disc.isSelected());
 				panel_diagrammes.setChart(chart);
 				break;
 				
