@@ -1,10 +1,15 @@
 package diagrammes;
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.Plot;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.statistics.BoxAndWhiskerCalculator;
 import org.jfree.data.statistics.BoxAndWhiskerItem;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
@@ -45,6 +50,10 @@ public class Diagrammes {
 		//JFrame frame = new JFrame();
 		//frame.add(panel);
 		//frame.setVisible(true);
+		
+		// random plot color
+		XYPlot plot = (XYPlot) scatterplot.getPlot();
+		plot.getRenderer().setSeriesPaint(0, randomColor());
 		return scatterplot;
 		
 	}
@@ -60,12 +69,12 @@ public class Diagrammes {
 
 		String x = app.get_attribut1(),
 			   y = app.get_attribut2();
-		JFreeChart plot = ChartFactory.createScatterPlot("Q-Q Plot", x, y, data);
-		//ChartPanel panel = new ChartPanel(scatterplot);
-		//JFrame frame = new JFrame();
-		//frame.add(panel);
-		//frame.setVisible(true);
-		return plot;
+		JFreeChart chart = ChartFactory.createScatterPlot("Q-Q Plot", x, y, data);
+		
+		// random plot color
+		XYPlot plot = (XYPlot) chart.getPlot();
+		plot.getRenderer().setSeriesPaint(0, randomColor());
+		return chart;
 		
 	}
 	
@@ -96,6 +105,7 @@ public class Diagrammes {
 	private JFreeChart make_boxplot(DefaultBoxAndWhiskerCategoryDataset box_dataset, double min, double max) {
 		JFreeChart box_plot = ChartFactory.createBoxAndWhiskerChart("Title", "", "",box_dataset, true);
 		CategoryPlot plot = (CategoryPlot) box_plot.getPlot();
+		CategoryAxis domainAxis = plot.getDomainAxis();
 		// régler le problème d'outliers qui ne s'affichent pas------
 		
 		if (FORCE_SHOW_OUTLIERS ) {
@@ -108,6 +118,12 @@ public class Diagrammes {
 		renderer.setFillBox(true);
 		renderer.setUseOutlinePaintForWhiskers(true);   
 		renderer.setMeanVisible(false);
+		if (box_dataset.getRowCount() == 1) { // make individual boxplots thinner + set random color
+			domainAxis.setLowerMargin(0.4);
+			domainAxis.setUpperMargin(0.4);
+			renderer.setSeriesPaint(0, randomColor());
+		}
+		
 		plot.setRenderer(renderer);
 		return box_plot;
 	}
@@ -150,6 +166,12 @@ public class Diagrammes {
 		});
 		return box_plot;
 	}*/
+	
+	public static Color randomColor() {
+		Color[] colors = {Color.BLUE, Color.RED, Color.YELLOW, Color.MAGENTA, Color.BLACK, Color.DARK_GRAY};
+		int index = (int) (Math.random() * colors.length);
+		return colors[index];
+	}
 
 		public JFreeChart histogram(int col) {
 			double[] d = new double[dataset.n];
@@ -165,6 +187,10 @@ public class Diagrammes {
 			//JFrame frame = new JFrame();
 			//frame.add(panel);
 			//frame.setVisible(true);
+			
+			// random plot color
+			XYPlot plot = (XYPlot) hist.getPlot();
+			plot.getRenderer().setSeriesPaint(0, randomColor());
 			return hist;
 	}
 }
