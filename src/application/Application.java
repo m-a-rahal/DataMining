@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Iterator;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -40,6 +41,7 @@ import data.Type;
 import diagrammes.Diagrammes;
 import input_sources.FileManager;
 import input_sources.URLManager;
+import javax.swing.SwingConstants;
 
 public class Application {
 	private Application application;
@@ -61,6 +63,8 @@ public class Application {
 	private JComboBox comboBox_type_diagramme;
 	private JCheckBox chckbxOutliers;
 	private JTextField coeffCorel;
+	private JLabel label_correlation_info;
+	private JLabel label_symetrie_info;
 
 	/**
 	 * Launch the application.
@@ -425,6 +429,10 @@ public class Application {
 		
 		JLabel lblNewLabel_6 = new JLabel("Coeffitient de correlation");
 		
+		label_correlation_info = new JLabel(" ");
+		label_symetrie_info = new JLabel(" ");
+		label_symetrie_info.setHorizontalAlignment(SwingConstants.RIGHT);
+		
 		GroupLayout gl_panel_plots = new GroupLayout(panel_plots);
 		gl_panel_plots.setHorizontalGroup(
 			gl_panel_plots.createParallelGroup(Alignment.LEADING)
@@ -435,25 +443,33 @@ public class Application {
 							.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 789, Short.MAX_VALUE)
 							.addContainerGap())
 						.addGroup(gl_panel_plots.createSequentialGroup()
-							.addComponent(lblNewLabel_4)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_panel_plots.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel_plots.createSequentialGroup()
+							.addGroup(gl_panel_plots.createParallelGroup(Alignment.TRAILING)
+								.addGroup(Alignment.LEADING, gl_panel_plots.createSequentialGroup()
 									.addComponent(chckbxOutliers)
-									.addGap(18)
-									.addComponent(lblNewLabel_6)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE))
-								.addComponent(comboBox_type_diagramme, 0, 281, Short.MAX_VALUE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+									.addComponent(lblNewLabel_6)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
+									.addGap(10)
+									.addComponent(label_correlation_info, GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
+								.addGroup(gl_panel_plots.createSequentialGroup()
+									.addComponent(lblNewLabel_4)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(comboBox_type_diagramme, 0, 281, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(comboBox_attribut1, 0, 118, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(lblNewLabel_5_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(comboBox_attribut2, 0, 118, Short.MAX_VALUE)
-							.addGap(44))))
+							.addGroup(gl_panel_plots.createParallelGroup(Alignment.TRAILING)
+								.addGroup(gl_panel_plots.createSequentialGroup()
+									.addComponent(lblNewLabel_5_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(comboBox_attribut2, 0, 118, Short.MAX_VALUE)
+									.addGap(44))
+								.addGroup(gl_panel_plots.createSequentialGroup()
+									.addComponent(label_symetrie_info, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+									.addContainerGap())))))
 		);
 		gl_panel_plots.setVerticalGroup(
 			gl_panel_plots.createParallelGroup(Alignment.LEADING)
@@ -468,12 +484,14 @@ public class Application {
 							.addComponent(comboBox_attribut1, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
 							.addComponent(lblNewLabel_5_1)
 							.addComponent(comboBox_attribut2, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)))
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
-						.addComponent(chckbxOutliers)
 						.addComponent(lblNewLabel_6)
-						.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(chckbxOutliers)
+						.addComponent(label_correlation_info)
+						.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label_symetrie_info))
+					.addGap(6)
 					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
 					.addContainerGap())
 		);
@@ -529,7 +547,46 @@ public class Application {
 				panel_diagrammes.setChart(null);
 				break;
 		}
-	
+		
+		update_info_labels();
+	}
+
+	private void update_info_labels() {
+		// corrélation (positive/négative) [trés] [forte/faible]
+		double corr = Double.parseDouble(coeffCorel.getText());
+		double bornes[] = {0.1, 0.25, 0.75, 0.9, 1.0};
+		String[] descriptions = "trés faible,faible,moyenne,forte,trés forte".split(",");
+		String signe = corr > 0 ? "positive" : "négative";
+		String desc = "";
+		if (corr < 0) {corr = -corr;}
+		int i = 0;
+		for (double borne : bornes) {
+			if (corr <= borne) {
+				System.out.println(corr + " "+ i);
+				desc = descriptions[i]; break;
+			}
+			i++;
+		}
+		label_correlation_info.setText("corrélation " + signe + " "+ desc);
+		
+		// données [légèrement/fortement] (symétriques/asymétriques à (droite/gauche))
+		// si c'est le cas d'un seule attribut
+		if (comboBox_attribut1.isEnabled() && !comboBox_attribut2.isEnabled()) {
+			double skewness = dataset.skewness(comboBox_attribut1.getSelectedIndex());
+			descriptions = "symétriques,légèrement asymétriques,asymétriques,fortement asymétriques".split(",");
+			boolean asymetrique = false;
+			String direction = skewness < 0 ? "droite" : "gauche";
+			if (skewness < 0) {skewness = -skewness;}
+			i = 0;
+			for (double borne : bornes) {
+				if (skewness <= borne) {
+					if (i > 0) asymetrique = true;
+					desc = descriptions[i]; break;
+				}
+				i++;
+			}
+			label_symetrie_info.setText("données " + desc + (asymetrique ? " à " + direction : ""));
+		}
 	}
 
 	private JTable add_table_to(JPanel panel) {
