@@ -584,7 +584,7 @@ public class Application {
 			// si c'est le cas d'un seule attribut
 			// données [légèrement/fortement] (symétriques/asymétriques à (droite/gauche))
 			double skewness = dataset.skewness(comboBox_attribut1.getSelectedIndex());
-			descriptions = "symétriques,légèrement asymétriques,asymétriques,fortement asymétriques".split(",");
+			descriptions = "symétriques,légèrement asymétriques,asymétriques,fortement asymétriques,fortement asymétriques".split(",");
 			boolean asymetrique = false;
 			String direction = skewness < 0 ? "droite" : "gauche";
 			if (skewness < 0) {skewness = -skewness;}
