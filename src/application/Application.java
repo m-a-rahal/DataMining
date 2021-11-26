@@ -642,15 +642,15 @@ public class Application {
 	}
 
 	private void update_info_labels() {
-		// corrélation [trés] [forte/faible]
+		// corrélation (positive/négative) [trés] [forte/faible]
 		double corr = Double.parseDouble(coeffCorel.getText());
-		double bornes[] = {0.1, 0.25, 0.75, 0.9, 1.0};
-		String[] descriptions = "trés faible,faible,moyenne,forte,trés forte".split(",");
-		String signe = corr > 0 ? "corrélation" : "pas de corrélation";
+		String[] descriptions = "pas de,moyenne,forte,trés forte".split(",");
+		String signe = corr > 0 ? "positive" : "négative";
 		String desc = "";
 		int i;
 		// si c'est le cas de deux attributs
 		if (comboBox_attribut1.isEnabled() && comboBox_attribut2.isEnabled() && panel_diagrammes.getChart() != null) {
+			double bornes[] = {0.5, 0.75, 0.9, 1.0};
 			if (corr < 0) {
 				corr = -corr;
 			}
@@ -662,15 +662,11 @@ public class Application {
 				}
 				i++;
 			}
-			if(signe=="corrélation") {
-				label_info.setText(signe + " " + desc);
-			}else {
-				label_info.setText(signe );
-			}
-			
+			label_info.setText(desc+" corrélation " + (desc.equals("pas de") ? "" : signe));
 		} else if (comboBox_attribut1.isEnabled() && !comboBox_attribut2.isEnabled()) {
 			// si c'est le cas d'un seule attribut
 			// données [légèrement/fortement] (symétriques/asymétriques à (droite/gauche))
+			double bornes[] = {0.1, 0.25, 0.75, 0.9, 1.0};
 			double skewness = dataset.skewness(comboBox_attribut1.getSelectedIndex());
 			descriptions = "symétriques,légèrement asymétriques,asymétriques,fortement asymétriques,fortement asymétriques".split(",");
 			boolean asymetrique = false;
