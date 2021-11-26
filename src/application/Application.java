@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.DefaultComboBoxModel;
@@ -68,6 +69,8 @@ public class Application {
 	private JLabel label_coef_corr;
 	private JTextField nb_intervals;
 	private JLabel nbInterLabel;
+	private JCheckBox chckbxTrierLesDonns;
+	private String[] col_names_with_number;
 
 	/**
 	 * Launch the application.
@@ -151,7 +154,10 @@ public class Application {
 			public void actionPerformed(ActionEvent e) {
 				DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
 				model.addRow(new Double[model.getColumnCount()]);
-				table_dataset.changeSelection(model.getRowCount()-1, 0, true, false);
+				int last_row = model.getRowCount()-1;
+				// add count for this row
+				model.setValueAt(last_row+1, last_row, col_names_with_number.length-1);
+				table_dataset.changeSelection(last_row, 0, true, false);
 			}
 		});
 		
@@ -171,6 +177,8 @@ public class Application {
 				for (int i = 0; i < rows.length; i++) {
 					model.removeRow(rows[rows.length-i-1]);
 				}
+				// update row numbers
+				update_row_numbers_on_table(model);
 			}
 		});
 		
@@ -245,6 +253,18 @@ public class Application {
 		
 		textField_dest_file = new JTextField();
 		textField_dest_file.setColumns(10);
+		
+		chckbxTrierLesDonns = new JCheckBox("trier les donnés");
+		chckbxTrierLesDonns.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					load_dataset_on_table();
+				} catch (Exception e1) {
+
+					e1.printStackTrace();
+				}
+			}
+		});
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.TRAILING)
@@ -256,7 +276,7 @@ public class Application {
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(lblNewLabel)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+									.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 601, Short.MAX_VALUE)
 									.addPreferredGap(ComponentPlacement.UNRELATED))
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(btnNewButton)
@@ -265,13 +285,16 @@ public class Application {
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(btn_appliquer_changements)
 									.addGap(79)))
-							.addComponent(chckbxUrl)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnCharger))
+							.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+								.addGroup(gl_panel_1.createSequentialGroup()
+									.addComponent(chckbxUrl)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(btnCharger))
+								.addComponent(chckbxTrierLesDonns)))
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(textField_dest_file, GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
+							.addComponent(textField_dest_file, GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnSauvegarder, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
@@ -286,10 +309,12 @@ public class Application {
 						.addComponent(btnCharger)
 						.addComponent(chckbxUrl))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnNewButton)
-						.addComponent(btnSupprimerligne)
-						.addComponent(btn_appliquer_changements))
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+							.addComponent(btnNewButton)
+							.addComponent(btnSupprimerligne)
+							.addComponent(btn_appliquer_changements))
+						.addComponent(chckbxTrierLesDonns))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnSauvegarder)
@@ -658,17 +683,36 @@ public class Application {
 	public void load_dataset_on_table() throws Exception {
 		/** charger la dataset dans la table et afficher les mesures
 		 * */
+		col_names_with_number = new String[dataset.col_names.length+1]; for (int i = 0; i < dataset.col_names.length; i++) {col_names_with_number[i]=dataset.col_names[i];}; col_names_with_number[dataset.col_names.length] = "#";
+		
 		// load table in Jtabel
-		TableModel tableModel = new DefaultTableModel(dataset.col_names, dataset.n);
-		for (int i = 0; i < dataset.n; i++) {
+		TableModel tableModel = new DefaultTableModel(col_names_with_number, dataset.n);
+		if (chckbxTrierLesDonns.isSelected()) {// afficher les données triées
 			for (int j = 0; j < dataset.m; j++) {
-				tableModel.setValueAt(dataset.data[i][j], i, j);
+				ArrayList<Double> values = dataset.getSortedValues(j);
+				for (int i = 0; i < dataset.n; i++) {
+					tableModel.setValueAt(values.get(i), i, j);
+				}
+			}
+		} else { // afficher les données originales
+			for (int i = 0; i < dataset.n; i++) {
+				for (int j = 0; j < dataset.m; j++) {
+					tableModel.setValueAt(dataset.data[i][j], i, j);
+				}
 			}
 		}
+		// fill number of rows
+		update_row_numbers_on_table(tableModel);
 		table_dataset.setModel(tableModel);
-		
 		// load mesures and description
 		updateMesures();
+	}
+	
+	private void update_row_numbers_on_table(TableModel tableModel) {
+		// fill number of rows
+		for (int i = 0; i < tableModel.getRowCount(); i++) {
+			tableModel.setValueAt(i+1, i, dataset.m);
+		}
 	}
 	
 	private void updateMesures() throws Exception {
@@ -755,7 +799,7 @@ public class Application {
 			// recreate dataset from table
 			DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
 			dataset.n = model.getRowCount();
-			dataset.m = model.getColumnCount();
+			dataset.m = model.getColumnCount()-1; // -1 to remove last column (used for row count)
 			dataset.data = new Double[dataset.n][dataset.m];
 			dataset.types = new Type[dataset.m];
 			for (i = 0; i < dataset.n; i++) {
@@ -772,6 +816,8 @@ public class Application {
 			// update mesures and other stuff
 			updateMesures();
 			update_description_text();
+			// reload table
+			update_row_numbers_on_table(model);
 		} catch (Exception e1) {e1.printStackTrace();
 		afficherMessage("veillez corriger la valeure dans dans la position ("+i+", "+j+").\n(ou vérifier que vous avez déselectionné la case que vous êtes en train de remplir pour valider l'entrée)");
 		table_dataset.changeSelection(i, j, true, false);
@@ -780,7 +826,7 @@ public class Application {
 		table_dataset.setValueAt(value, i, j);
 		System.out.println(i + " "+ j);}
 	}
-	
+
 	// extra methods
 	private String getFilename() {
 		try {
