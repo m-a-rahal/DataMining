@@ -94,15 +94,13 @@ public class Dataset {
 		/** caculate quantile using R-2 approximation (averaging the two neighbors in case of conflict) (src = 'https://en.wikipedia.org/wiki/Quantile#:~:text=empirical%20distribution%20function.-,R%E2%80%912,-%2C%20SAS%E2%80%915%2C%20Maple')*/
 		if (q < 0 || q > 1)
 			throw new IllegalArgumentException("Le quantile doit être compris entre 0 et 1");
-		if (q == 0)
+		if (q == 0.0)
 			return min(indice_attribut);
-		if (q == 1)
+		if (q == 1.0)
 			return max(indice_attribut);
 		ArrayList<Double> valeurs = getSortedValues(indice_attribut);
-		double h = valeurs.size() * q + 0.5;
-		int left = (int) Math.ceil(h - 0.5); left = Math.min(left, valeurs.size()-1);
-		int right = (int) Math.floor(h + 0.5); right = Math.min(right, valeurs.size()-1);
-		return (valeurs.get(left) + valeurs.get(right)) / 2;
+		double h = valeurs.size() * q;
+		return valeurs.get((int) Math.floor(h));
 	}
 
 	public double variance(int indice_attribut) {
