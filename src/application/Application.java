@@ -531,6 +531,8 @@ public class Application {
 		chckbxOutliers_disc.setEnabled(false); // by default
 		coeffCorel.setVisible(false); // by default
 		label_coef_corr.setVisible(false); // by dafault
+		nb_intervals.setVisible(false);
+		nbInterLabel.setVisible(false);
 		switch(comboBox_type_diagramme.getSelectedIndex()) {
 			case 1 : // Histogramme
 				chckbxOutliers_disc.setVisible(true);
