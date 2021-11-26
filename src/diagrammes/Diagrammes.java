@@ -174,14 +174,15 @@ public class Diagrammes {
 	}*/
 
 
-		public JFreeChart histogram(int col, boolean discretiser) {
+		public JFreeChart histogram(int col, boolean discretiser, int nb_intervales) {
 			double[] d = new double[dataset.n];
 			HistogramDataset histdata = new HistogramDataset();
 			histdata.setType(HistogramType.FREQUENCY);
 			for (int i = 0; i < dataset.n; i++) {
 				d[i]=dataset.data[i][col];
 			}
-			int bins_count = discretiser ? (int) Math.round(5 * Math.log10(dataset.n)) : d.length;
+			//int bins_count = discretiser ? (int) Math.round(5 * Math.log10(dataset.n)) : d.length;
+			int bins_count = discretiser ? nb_intervales : d.length;
 			histdata.addSeries("", d, bins_count);
 			JFreeChart hist = ChartFactory.createHistogram("histogramme", dataset.col_names[col], "frequence", histdata);
 			//ChartPanel panel = new ChartPanel(hist);

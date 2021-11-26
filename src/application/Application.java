@@ -66,6 +66,8 @@ public class Application {
 	private JTextField coeffCorel;
 	private JLabel label_info;
 	private JLabel label_coef_corr;
+	private JTextField nb_intervals;
+	private JLabel nbInterLabel;
 
 	/**
 	 * Launch the application.
@@ -433,6 +435,20 @@ public class Application {
 		
 		label_info = new JLabel(" ");
 		label_info.setForeground(Color.RED);
+		
+		nb_intervals = new JTextField();
+		nb_intervals.setText("20");
+		nb_intervals.setColumns(10);
+		nb_intervals.setEnabled(false);
+		nb_intervals.setVisible(false);
+		nb_intervals.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				update_diagramme();
+			}
+		});
+		
+		nbInterLabel = new JLabel("nombre d'intervales");
+		nbInterLabel.setVisible(false);
 
 		
 		GroupLayout gl_panel_plots = new GroupLayout(panel_plots);
@@ -454,7 +470,7 @@ public class Application {
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
 									.addGap(10)
-									.addComponent(label_info, GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)))
+									.addComponent(label_info, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel_plots.createParallelGroup(Alignment.TRAILING)
 								.addGroup(gl_panel_plots.createSequentialGroup()
@@ -464,7 +480,12 @@ public class Application {
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(comboBox_attribut2, 0, 118, Short.MAX_VALUE)
 									.addGap(34))
-								.addComponent(chckbxOutliers_disc)))
+								.addGroup(gl_panel_plots.createSequentialGroup()
+									.addComponent(nbInterLabel)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(nb_intervals, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(chckbxOutliers_disc))))
 						.addComponent(panel_diagrammes, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 789, Short.MAX_VALUE))
 					.addContainerGap())
 		);
@@ -486,7 +507,9 @@ public class Application {
 						.addComponent(chckbxOutliers_disc)
 						.addComponent(label_coef_corr)
 						.addComponent(label_info)
-						.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(nb_intervals, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(nbInterLabel))
 					.addGap(6)
 					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
 					.addContainerGap())
@@ -514,7 +537,10 @@ public class Application {
 				chckbxOutliers_disc.setEnabled(true);
 				chckbxOutliers_disc.setText("discrétisation");
 				comboBox_attribut2.setEnabled(false); // disable attribut 2 for histogram
-				JFreeChart chart = diagrammes.histogram(attribut1, chckbxOutliers_disc.isSelected());
+				nb_intervals.setEnabled(true);
+				nb_intervals.setVisible(true);
+				nbInterLabel.setVisible(true);
+				JFreeChart chart = diagrammes.histogram(attribut1, chckbxOutliers_disc.isSelected(),Integer.parseInt(nb_intervals.getText()));
 				panel_diagrammes.setChart(chart);
 				break;
 				
