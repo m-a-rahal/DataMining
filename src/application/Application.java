@@ -71,6 +71,8 @@ public class Application {
 	private JLabel nbInterLabel;
 	private JCheckBox chckbxTrierLesDonns;
 	private String[] col_names_with_number;
+	private JButton btn_ajouter_ligne;
+	private JCheckBox chckbox_apply_before_sort;
 
 	/**
 	 * Launch the application.
@@ -149,8 +151,8 @@ public class Application {
 		);
 		
 		table_dataset = add_table_to(panel_2);
-		JButton btnNewButton = new JButton("ajouter ligne");
-		btnNewButton.addActionListener(new ActionListener() {
+		btn_ajouter_ligne = new JButton("ajouter ligne");
+		btn_ajouter_ligne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
 				model.addRow(new Double[model.getColumnCount()]);
@@ -164,6 +166,13 @@ public class Application {
 		JButton btn_appliquer_changements = new JButton("appliquer les modifications");
 		btn_appliquer_changements.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (chckbxTrierLesDonns.isSelected()) {
+					switch(JOptionPane.showConfirmDialog(frame, "voulez vous vraiment écraser les donnés avec les valeurs triés?")) {
+						case 0: // yes
+							appliquer_les_changements();
+					}
+					return;
+				}
 				appliquer_les_changements();
 			}
 		});
@@ -258,6 +267,18 @@ public class Application {
 		chckbxTrierLesDonns.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					if (chckbxTrierLesDonns.isSelected()) { // apply changes before sorting?
+						if (chckbox_apply_before_sort.isSelected()) {
+							appliquer_les_changements();
+						}
+						btnSupprimerligne.setEnabled(false);
+						btn_ajouter_ligne.setEnabled(false);
+						table_dataset.setEnabled(false);
+					} else {
+						btnSupprimerligne.setEnabled(true);
+						btn_ajouter_ligne.setEnabled(true);
+						table_dataset.setEnabled(true);
+					}
 					load_dataset_on_table();
 				} catch (Exception e1) {
 
@@ -265,6 +286,9 @@ public class Application {
 				}
 			}
 		});
+		
+		chckbox_apply_before_sort = new JCheckBox("appliquer les changements avant de trier");
+		chckbox_apply_before_sort.setSelected(true);
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.TRAILING)
@@ -279,18 +303,22 @@ public class Application {
 									.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 601, Short.MAX_VALUE)
 									.addPreferredGap(ComponentPlacement.UNRELATED))
 								.addGroup(gl_panel_1.createSequentialGroup()
-									.addComponent(btnNewButton)
+									.addComponent(btn_ajouter_ligne)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(btnSupprimerligne)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(btn_appliquer_changements)
 									.addGap(79)))
+							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(chckbxUrl)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
 									.addComponent(btnCharger))
-								.addComponent(chckbxTrierLesDonns)))
+								.addGroup(gl_panel_1.createSequentialGroup()
+									.addComponent(chckbox_apply_before_sort)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(chckbxTrierLesDonns))))
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -311,10 +339,12 @@ public class Application {
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-							.addComponent(btnNewButton)
+							.addComponent(btn_ajouter_ligne)
 							.addComponent(btnSupprimerligne)
 							.addComponent(btn_appliquer_changements))
-						.addComponent(chckbxTrierLesDonns))
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+							.addComponent(chckbxTrierLesDonns)
+							.addComponent(chckbox_apply_before_sort)))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnSauvegarder)
@@ -683,6 +713,7 @@ public class Application {
 	public void load_dataset_on_table() throws Exception {
 		/** charger la dataset dans la table et afficher les mesures
 		 * */
+		
 		col_names_with_number = new String[dataset.col_names.length+1]; for (int i = 0; i < dataset.col_names.length; i++) {col_names_with_number[i]=dataset.col_names[i];}; col_names_with_number[dataset.col_names.length] = "#";
 		
 		// load table in Jtabel
@@ -690,6 +721,9 @@ public class Application {
 		if (chckbxTrierLesDonns.isSelected()) {// afficher les données triées
 			for (int j = 0; j < dataset.m; j++) {
 				ArrayList<Double> values = dataset.getSortedValues(j);
+				while(values.size() < dataset.n) {
+					values.add(null);// ajouter null à la fin en cas de valeurs nuls
+				}
 				for (int i = 0; i < dataset.n; i++) {
 					tableModel.setValueAt(values.get(i), i, j);
 				}
