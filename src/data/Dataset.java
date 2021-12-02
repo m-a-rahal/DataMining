@@ -3,6 +3,7 @@ package data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -25,6 +26,19 @@ public class Dataset {
 		this.n = n;
 		this.m = m;
 		this.types = types;
+	}
+	
+	
+	public void normaliser_min_max(int indice_attribut,double nouveau_max, double nouveau_min) {
+		double max_value = max(indice_attribut);
+		double min_value = min(indice_attribut);
+		for (int i = 0; i < n; i++) {
+			data[i][indice_attribut] = (data[i][indice_attribut] - min_value)/(max_value - min_value)*(nouveau_max - nouveau_min) + nouveau_min;
+		}
+	}
+	
+	public void normaliser_min_max(int indice_attribut) {// par défaut, c entre 1 et 0
+		normaliser_min_max(indice_attribut, 1, 0);
 	}
 
 	private void extract_names(String[] names) {
