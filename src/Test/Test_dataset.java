@@ -25,7 +25,7 @@ public class Test_dataset {
 			dataset.normaliser_min_max();
 			dataset.discretiser_equal_width(4);
 			TableModel model = load_dataset_on_table(dataset);
-			Apriori apriori = new Apriori(model, 0.3, 0.6);
+			Apriori apriori = new Apriori(model, 0.2, 0.6,false);
 			discretiser(apriori);
 			System.out.println(apriori.run());
 		} catch (Exception e) {
@@ -92,7 +92,7 @@ public class Test_dataset {
 	
 	private static void discretiser(Apriori apriori) {
 		TableModel model = apriori.dataset;
-		for (int j = 0; j < apriori.nbr_colonnes-1; j++) {
+		for (int j = 0; j < apriori.nbr_colonnes; j++) {
 			for (int i = 0; i < apriori.nbr_lignes; i++) {
 				int k = (int) Math.floor((double) model.getValueAt(i, j));
 				model.setValueAt("I"+(j+1)+""+k, i, j);

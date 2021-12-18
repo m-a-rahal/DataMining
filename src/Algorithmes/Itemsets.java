@@ -6,15 +6,39 @@ public class Itemsets extends TreeSet<Itemsets.Itemset>{
 	
 	public static class Itemset extends TreeSet<String> implements Comparable<Itemset>{
 		private static final long serialVersionUID = 1L;
+		public int support;
 
 		public Itemset(String item) {
 			super();
 			this.add(item);
 		}
 		
+		public Itemset(Itemset itemset) {
+			super(itemset);
+		}
+
+		public Itemset(String[] items) {
+			super();
+			for (int i = 0; i < items.length; i++) {
+				add(items[i]);
+			}
+		}
+
+		public Itemset union(Itemset other) {
+			Itemset union = new Itemset(this);
+			union.addAll(other);
+			return union;
+		}
+		
+		public Itemset intersect(Itemset other) {
+			Itemset inter = new Itemset(this);
+			inter.retainAll(other);
+			return inter;
+		}
+		
 		@Override
 		public String toString() {
-			String text = "{";
+			String text = "{ ";
 			for (String item : this) {
 				text += item + " ";
 			}
@@ -30,7 +54,7 @@ public class Itemsets extends TreeSet<Itemsets.Itemset>{
 	
 	@Override
 	public String toString() {
-		String text = "{";
+		String text = "{ ";
 		for (Itemset itemset : this) {
 			text += itemset.toString() + " ";
 		}
