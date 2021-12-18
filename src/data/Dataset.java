@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -28,6 +30,24 @@ public class Dataset {
 		this.types = types;
 	}
 	
+	
+	public void discretiser_equal_width(int indice_attribut, int Q) { // Q = nobmbre intervalles
+		double min_value = min(indice_attribut);
+		double width = (max(indice_attribut) - min_value)/Q;
+		for (int i = 0; i < n; i++) {
+			double sup = min_value; int k;
+			for (k = 0; k < Q; k++) {
+				sup += width;
+				if (data[i][indice_attribut] < sup) {
+					data[i][indice_attribut] = (double) k+1;
+					break;
+				}
+			}
+			if (k == Q) {
+				data[i][indice_attribut] = (double) k;
+			}
+		}
+	}
 	
 	public void normaliser_min_max(int indice_attribut,double nouveau_max, double nouveau_min) {
 		double max_value = max(indice_attribut);
@@ -389,6 +409,15 @@ public class Dataset {
 		}
 		return counts;
 	}
+	
+	public Frequences frequences_de(int indice_attribut, int start, int end) {
+		Frequences counts = new Frequences();
+		for (int i = start; i < end; i++) {
+			if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
+			counts.ajouter(data[i][indice_attribut]);
+		}
+		return counts;
+	}
 
 	public String getType(int i) {
 		return types[i].toString();
@@ -408,4 +437,32 @@ public class Dataset {
 		}
 		System.out.println("loaded dataset has "+ n +" rows");
 	}
+	
+	// Classification Bayésinenne
+	public Set<Double> valeurs_possibles(int att) {
+		return frequences_de(att).keySet();
+	}
+	
+	public TreeMap<Double, Double> probas_attribut(int attribut, int classe) {
+		Frequences frequences = frequences_de(attribut, 20, 70);
+		TreeMap<Double, Double> probas = new TreeMap<Double,Double>();
+		for (Double valeur : frequences.keySet()) {
+			probas.put(valeur, frequences.get(valeur) / 50.0);
+		}
+		return probas;
+	}
+	
+	public double proba_instance(int attribut, int x, int classe) {
+		return probas_attribut(attribut, classe).get(x);
+	}
+	
+	public double proba_instance(int x, int classe) {
+		double p = 1;
+		for (int j = 0; j < m; j++) {
+			p *= proba_instance(j,  x, classe);
+		}
+		return p;
+	}
+	
+
 }

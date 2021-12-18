@@ -289,6 +289,36 @@ public class Application {
 		
 		chckbox_apply_before_sort = new JCheckBox("appliquer les changements avant de trier");
 		chckbox_apply_before_sort.setSelected(true);
+		
+		JButton btnNormaliser = new JButton("Normaliser");
+		btnNormaliser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				for (int i = 0; i < dataset.m-1; i++) {
+					dataset.normaliser_min_max(i);
+				}
+				try {
+					load_dataset_on_table();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		JButton btnNewButton = new JButton("discretiser");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				for (int i = 0; i < dataset.m-1; i++) {
+					dataset.discretiser_equal_width(i,4);
+				}
+				try {
+					load_dataset_on_table_disccrete();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.TRAILING)
@@ -300,8 +330,7 @@ public class Application {
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(lblNewLabel)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 601, Short.MAX_VALUE)
-									.addPreferredGap(ComponentPlacement.UNRELATED))
+									.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE))
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(btn_ajouter_ligne)
 									.addPreferredGap(ComponentPlacement.RELATED)
@@ -312,6 +341,10 @@ public class Application {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
 								.addGroup(gl_panel_1.createSequentialGroup()
+									.addComponent(btnNewButton)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(btnNormaliser)
+									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(chckbxUrl)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
 									.addComponent(btnCharger))
@@ -322,7 +355,7 @@ public class Application {
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(textField_dest_file, GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
+							.addComponent(textField_dest_file, GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnSauvegarder, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
@@ -335,7 +368,9 @@ public class Application {
 						.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
 						.addComponent(text_dataset_src, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnCharger)
-						.addComponent(chckbxUrl))
+						.addComponent(chckbxUrl)
+						.addComponent(btnNormaliser)
+						.addComponent(btnNewButton))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
@@ -704,6 +739,17 @@ public class Application {
 		panel.add(area, BorderLayout.CENTER);
 		panel.add(new JScrollPane(area));
 		return area;
+	}
+	
+	private void load_dataset_on_table_disccrete() throws Exception {
+		load_dataset_on_table();
+		TableModel model = table_dataset.getModel();
+		for (int j = 0; j < dataset.m-1; j++) {
+			for (int i = 0; i < dataset.n; i++) {
+				int k = (int) Math.floor((double) model.getValueAt(i, j));
+				model.setValueAt("I"+(j+1)+""+k, i, j);
+			}
+		}
 	}
 
 	public void load_dataset_on_table() throws Exception {

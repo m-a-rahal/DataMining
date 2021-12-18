@@ -9,7 +9,8 @@ import input_sources.URLManager;
 
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
-		testMesures();
+		Dataset dataset = FileManager.extract_dataset(null);
+		System.out.println(dataset.proba_instance(21, 2));
 	}
 	
 	/* utilisez le GUI pour tester les digrammes
