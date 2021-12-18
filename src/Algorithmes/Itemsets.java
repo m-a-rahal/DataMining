@@ -4,7 +4,7 @@ import java.util.TreeSet;
 public class Itemsets extends TreeSet<Itemsets.Itemset>{
 	private static final long serialVersionUID = 1L;
 	
-	public static class Itemset extends TreeSet<String> {
+	public static class Itemset extends TreeSet<String> implements Comparable<Itemset>{
 		private static final long serialVersionUID = 1L;
 
 		public Itemset(String item) {
@@ -19,6 +19,12 @@ public class Itemsets extends TreeSet<Itemsets.Itemset>{
 				text += item + " ";
 			}
 			return text + "}";
+		}
+
+		@Override
+		public int compareTo(Itemset other) {
+			// TODO Auto-generated method stub
+			return ((Integer)this.hashCode()).compareTo(other.hashCode());
 		}
 	}
 	

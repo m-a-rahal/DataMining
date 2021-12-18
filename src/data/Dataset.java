@@ -49,6 +49,12 @@ public class Dataset {
 		}
 	}
 	
+	public void discretiser_equal_width(int Q) {
+		for (int i = 0; i < m-1; i++) {
+			discretiser_equal_width(i,4);
+		}
+	}
+	
 	public void normaliser_min_max(int indice_attribut,double nouveau_max, double nouveau_min) {
 		double max_value = max(indice_attribut);
 		double min_value = min(indice_attribut);
@@ -59,6 +65,12 @@ public class Dataset {
 	
 	public void normaliser_min_max(int indice_attribut) {// par défaut, c entre 1 et 0
 		normaliser_min_max(indice_attribut, 1, 0);
+	}
+	
+	public void normaliser_min_max() {
+		for (int i = 0; i < m-1; i++) {
+			normaliser_min_max(i);
+		}
 	}
 
 	private void extract_names(String[] names) {

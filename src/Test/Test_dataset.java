@@ -1,7 +1,12 @@
 package Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+import Algorithmes.Apriori;
 import data.Dataset;
 import diagrammes.Diagrammes;
 import input_sources.FileManager;
@@ -10,7 +15,23 @@ import input_sources.URLManager;
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
 		Dataset dataset = FileManager.extract_dataset(null);
-		System.out.println(dataset.proba_instance(21, 2));
+		test_Apriori(dataset);
+		//System.out.println(dataset.proba_instance(21, 2));
+		
+	}
+	
+	private static void test_Apriori(Dataset dataset) {
+		try {
+			dataset.normaliser_min_max();
+			dataset.discretiser_equal_width(4);
+			TableModel model = load_dataset_on_table(dataset);
+			Apriori apriori = new Apriori(model, 0.3, 0.6);
+			discretiser(apriori);
+			System.out.println(apriori.run());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/* utilisez le GUI pour tester les digrammes
@@ -50,5 +71,32 @@ public class Test_dataset {
 	public static void testURL_extraction() throws IOException {
 		Dataset dataset = URLManager.extract_dataset(null);
 		dataset.show();
+	}
+	
+	private static TableModel load_dataset_on_table(Dataset dataset) throws Exception {
+		/** charger la dataset dans la table et afficher les mesures
+		 * */
+		
+		String[] col_names_with_number = new String[dataset.col_names.length+1]; for (int i = 0; i < dataset.col_names.length; i++) {col_names_with_number[i]=dataset.col_names[i];}; col_names_with_number[dataset.col_names.length] = "#";
+		
+		// load table in Jtabel
+		TableModel tableModel = new DefaultTableModel(col_names_with_number, dataset.n);
+		// afficher les données originales
+		for (int i = 0; i < dataset.n; i++) {
+			for (int j = 0; j < dataset.m; j++) {
+				tableModel.setValueAt(dataset.data[i][j], i, j);
+			}
+		}
+		return tableModel;
+	}
+	
+	private static void discretiser(Apriori apriori) {
+		TableModel model = apriori.dataset;
+		for (int j = 0; j < apriori.nbr_colonnes-1; j++) {
+			for (int i = 0; i < apriori.nbr_lignes; i++) {
+				int k = (int) Math.floor((double) model.getValueAt(i, j));
+				model.setValueAt("I"+(j+1)+""+k, i, j);
+			}
+		}
 	}
 }

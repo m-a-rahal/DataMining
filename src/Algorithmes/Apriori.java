@@ -2,23 +2,21 @@ package Algorithmes;
 
 import javax.swing.table.TableModel;
 
-import Algorithmes.Itemsets.Itemset;
-
 public class Apriori {
-	TableModel dataset;
-	double min_sup_pourcent;
-	double min_conf_pourcent;
-	int nbr_lignes, nbr_colonnes; // dimension du dataset;
+	public TableModel dataset;
+	public double min_sup_pourcent;
+	public double min_conf_pourcent;
+	public int nbr_lignes, nbr_colonnes; // dimension du dataset;
 	
 	public Apriori(TableModel dataset, double min_sup_pourcent, double min_conf_pourcent) {
 		this.dataset = dataset;
-		this.min_sup_pourcent = min_conf_pourcent;
+		this.min_sup_pourcent = min_sup_pourcent;
 		this.min_conf_pourcent = min_conf_pourcent; 
 		nbr_lignes = dataset.getRowCount();
 		nbr_colonnes = dataset.getColumnCount()-1; // inclure uniquement les données du dataset
 	}
 	
-	public void run() {
+	public Itemsets run() {
 		// associer a chaque element un support
 		Supports supports = new Supports();
 		for (int i = 0; i < nbr_lignes; i++) {
@@ -30,10 +28,12 @@ public class Apriori {
 		int min_sup = min_sup();
 		Itemsets L = new Itemsets();
 		for (String item : supports.keySet()) {
-			if (supports.get(item) > min_sup) {
+			if (supports.get(item) >= min_sup) {
 				L.add(new Itemsets.Itemset(item));
 			}
 		}
+		
+		return L;
 	}
 	
 	public int min_sup() {
@@ -41,7 +41,7 @@ public class Apriori {
 	}
 	
 	public String item(int i, int j) {
-		return (String) dataset.getValueAt(i, i);
+		return dataset.getValueAt(i, j).toString();
 	}
 	
 }
