@@ -1,18 +1,18 @@
 package Algorithmes;
-import java.util.ArrayList;
+
 import javax.swing.table.TableModel;
+
 import Algorithmes.Itemsets.Itemset;
 
-public class Apriori extends AlgoMotifsFrequents {
-	
-	
-	public Apriori(TableModel dataset, double min_sup_pourcent, double min_conf_pourcent) {
+public class Eclat extends AlgoMotifsFrequents{
+
+	public Eclat(TableModel dataset, double min_sup_pourcent, double min_conf_pourcent) {
 		super(dataset, min_sup_pourcent, min_conf_pourcent);
 	}
-	public Apriori(TableModel dataset, double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe) {
+	public Eclat(TableModel dataset, double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe) {
 		super(dataset, min_sup_pourcent, min_conf_pourcent, inclure_attrib_classe);
 	}
-	
+
 	public Itemsets itemsets_frequent() {
 		// associer a chaque element un support
 		Supports supports = file_manager.extraire_les_1_itmesets();
@@ -43,22 +43,6 @@ public class Apriori extends AlgoMotifsFrequents {
 		}
 		
 		return L;
-	}
-	
-	private Itemsets combiner_itmesets(Itemsets Lk) {
-		Itemsets Lk1 = new Itemsets();
-		ArrayList<Itemset> itemsets = new ArrayList<Itemset>(Lk);
-		for (int i = 0; i < itemsets.size(); i++) {
-			Itemset A = itemsets.get(i);
-			for (int j = i+1; j < itemsets.size(); j++) {
-				Itemset B = itemsets.get(j);
-				Itemset union = A.union(B);
-				if(union.size() == A.size() + 1) { // if it only adds one new elements
-					Lk1.add(union);
-				}
-			}
-		}
-		return Lk1;
 	}
 
 }

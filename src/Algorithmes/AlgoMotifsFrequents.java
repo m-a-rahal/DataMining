@@ -12,7 +12,7 @@ import javax.swing.table.TableModel;
 
 import Algorithmes.Itemsets.Itemset;
 
-public class AlgoMotifsFrequents {
+public abstract class AlgoMotifsFrequents {
 	public TableModel dataset;
 	public double min_sup_pourcent;
 	public double min_conf_pourcent;
@@ -34,6 +34,17 @@ public class AlgoMotifsFrequents {
 		if (!inclure_attrib_classe)
 			nbr_colonnes = dataset.getColumnCount()-2;
 	}
+	
+	public Itemsets run() {
+		file_manager.ecrir_dataset_dans_fichier();
+		try {
+			return itemsets_frequent();
+		} finally {
+			file_manager.delete_dataset_file();
+		}
+	}
+	
+	public abstract Itemsets itemsets_frequent();
 	
 	public String item(int i, int j) {
 		return dataset.getValueAt(i, j).toString();
@@ -135,5 +146,9 @@ public class AlgoMotifsFrequents {
 			}
 			return null;
 		}
+	}
+	
+	public int min_sup() {
+		return (int) Math.ceil(min_sup_pourcent*dataset.getRowCount());
 	}
 }
