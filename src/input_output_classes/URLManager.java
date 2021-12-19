@@ -1,4 +1,4 @@
-package input_sources;
+package input_output_classes;
 
 import java.io.IOException;
 import java.io.InputStream;

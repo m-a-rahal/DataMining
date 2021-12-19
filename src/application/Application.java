@@ -41,8 +41,9 @@ import data.Dataset;
 import data.Frequences;
 import data.Type;
 import diagrammes.Diagrammes;
-import input_sources.FileManager;
-import input_sources.URLManager;
+import input_output_classes.FileManager;
+import input_output_classes.URLManager;
+
 import javax.swing.SwingConstants;
 
 public class Application {

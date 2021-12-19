@@ -1,7 +1,5 @@
 package Algorithmes;
-import java.util.ArrayList;
 import javax.swing.table.TableModel;
-import Algorithmes.Itemsets.Itemset;
 
 public class Apriori extends AlgoMotifsFrequents {
 	
@@ -21,7 +19,7 @@ public class Apriori extends AlgoMotifsFrequents {
 		Itemsets L = new Itemsets(); // L = L1 dans cette étape
 		for (String item : supports.keySet()) {
 			if (supports.get(item) >= min_sup) {
-				L.add(new Itemset(item));
+				L.add(new Ensemble<String>(item));
 			};
 		}
 		
@@ -34,7 +32,7 @@ public class Apriori extends AlgoMotifsFrequents {
 			file_manager.calculer_supports(Lk_1);
 			//System.out.println(Lk_1.last());
 			Lk = new Itemsets();
-			for (Itemset itemset : Lk_1) {
+			for (Ensemble<String> itemset : Lk_1) {
 				if (itemset.support >= min_sup) {
 					Lk.add(itemset);
 				}
@@ -43,22 +41,6 @@ public class Apriori extends AlgoMotifsFrequents {
 		}
 		
 		return L;
-	}
-	
-	private Itemsets combiner_itmesets(Itemsets Lk) {
-		Itemsets Lk1 = new Itemsets();
-		ArrayList<Itemset> itemsets = new ArrayList<Itemset>(Lk);
-		for (int i = 0; i < itemsets.size(); i++) {
-			Itemset A = itemsets.get(i);
-			for (int j = i+1; j < itemsets.size(); j++) {
-				Itemset B = itemsets.get(j);
-				Itemset union = A.union(B);
-				if(union.size() == A.size() + 1) { // if it only adds one new elements
-					Lk1.add(union);
-				}
-			}
-		}
-		return Lk1;
 	}
 
 }

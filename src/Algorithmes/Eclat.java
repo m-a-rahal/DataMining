@@ -1,8 +1,6 @@
 package Algorithmes;
-
+import java.util.ArrayList;
 import javax.swing.table.TableModel;
-
-import Algorithmes.Itemsets.Itemset;
 
 public class Eclat extends AlgoMotifsFrequents{
 
@@ -14,28 +12,29 @@ public class Eclat extends AlgoMotifsFrequents{
 	}
 
 	public Itemsets itemsets_frequent() {
-		// associer a chaque element un support
-		Supports supports = file_manager.extraire_les_1_itmesets();
+			
 		// extraitre la liste des items (L1)
 		int min_sup = min_sup();
 		Itemsets L = new Itemsets(); // L = L1 dans cette étape
-		for (String item : supports.keySet()) {
-			if (supports.get(item) >= min_sup) {
-				L.add(new Itemset(item));
+		// calculer les IDsets des items du dataset
+		L.iDsets = file_manager.extraire_IDs_des_items();
+		for (String item : L.iDsets.keySet()) {
+			if (L.iDsets.support(item) >= min_sup) {
+				L.add(new Ensemble<String>(item));
 			};
 		}
 		
-		int k = 2;
 		Itemsets Lk = new Itemsets();
 		Lk.addAll(L);
+		Lk.iDsets = L.iDsets;
 		// construire la liste L2
 		while (!Lk.isEmpty()) {
 			Itemsets Lk_1 = combiner_itmesets(Lk);
-			file_manager.calculer_supports(Lk_1);
 			//System.out.println(Lk_1.last());
 			Lk = new Itemsets();
-			for (Itemset itemset : Lk_1) {
-				if (itemset.support >= min_sup) {
+			Lk.iDsets = Lk_1.iDsets;
+			for (Ensemble<String> itemset : Lk_1) {
+				if (Lk_1.iDsets.support(itemset.key()) >= min_sup) {
 					Lk.add(itemset);
 				}
 			}
@@ -43,6 +42,25 @@ public class Eclat extends AlgoMotifsFrequents{
 		}
 		
 		return L;
+	}
+	
+	@Override
+	protected Itemsets combiner_itmesets(Itemsets Lk) {
+		Itemsets Lk1 = new Itemsets();
+		Lk1.iDsets = new IDsets();
+		ArrayList<Ensemble<String>> itemsets = new ArrayList<Ensemble<String>>(Lk);
+		for (int i = 0; i < itemsets.size(); i++) {
+			Ensemble<String> A = itemsets.get(i);
+			for (int j = i+1; j < itemsets.size(); j++) {
+				Ensemble<String> B = itemsets.get(j);
+				Ensemble<String> union = A.union(B);
+				if(union.size() == A.size() + 1) { // if it only adds one new elements
+					Lk1.add(union);
+					Lk1.iDsets.put(union.key(), Lk.iDsets.get(A.key()).intersect(Lk.iDsets.get(B.key())));
+				}
+			}
+		}
+		return Lk1;
 	}
 
 }
