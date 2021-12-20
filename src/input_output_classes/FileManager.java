@@ -31,11 +31,7 @@ public class FileManager {
 		BufferedReader reader = new BufferedReader(new FileReader(dataset_file));
 		String line;
 		Integer format = detect_format(dataset_file);
-		String separator = "\t";
-		if (format == CSV_FILETYPE)
-			separator = ",";
-		else if (format == TXT_FILETYPE)
-			separator = "[\\s\\t]+";
+		String separator = detect_separator(dataset_file);
 		try {
 			ArrayList<String> datalines = new ArrayList<>();
 			while (true) {
@@ -60,7 +56,7 @@ public class FileManager {
 	
 	public static String detect_separator(String dataset_file) {
 		Integer format = detect_format(dataset_file);
-		String separator = "\t";
+		String separator = "[\\s\\t]+";
 		if (format == CSV_FILETYPE)
 			separator = ",";
 		else if (format == TXT_FILETYPE)

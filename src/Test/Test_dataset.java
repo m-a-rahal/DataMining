@@ -17,34 +17,34 @@ import input_output_classes.URLManager;
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
 		Dataset dataset = FileManager.extract_dataset(null);
-		test_Eclat(dataset, 0.2, 0.6, false);
-		test_Apriori(dataset, 0.2, 0.6, false);
+		test_Eclat(dataset, 0.2, 0.6, false, "resources/dataset_discret.txt");
+		test_Apriori(dataset, 0.2, 0.6, false, "resources/dataset_discret.txt");
 		//System.out.println(dataset.proba_instance(21, 2));
 		
 	}
 	
-	private static void test_Eclat(Dataset dataset,double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe) {
+	private static void test_Eclat(Dataset dataset,double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe, String file) {
 		try {
 			dataset.normaliser_min_max();
 			dataset.discretiser_equal_width(4);
 			TableModel model = load_dataset_on_table(dataset);
 			Eclat eclat = new Eclat(model, min_sup_pourcent, min_conf_pourcent,inclure_attrib_classe);
 			discretiser(eclat);
-			System.out.println(eclat.run("resources/dataset_discret.txt"));
+			System.out.println(eclat.run(file));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	private static void test_Apriori(Dataset dataset, double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe) {
+	private static void test_Apriori(Dataset dataset, double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe, String file) {
 		try {
 			dataset.normaliser_min_max();
 			dataset.discretiser_equal_width(4);
 			TableModel model = load_dataset_on_table(dataset);
 			Apriori apriori = new Apriori(model, min_sup_pourcent, min_conf_pourcent,inclure_attrib_classe);
 			discretiser(apriori);
-			System.out.println(apriori.run("resources/dataset_discret.txt"));
+			System.out.println(apriori.run(file));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
