@@ -1,6 +1,8 @@
 package Algorithmes;
 import javax.swing.table.TableModel;
 
+import input_output_classes.PatternFileManager;
+
 public class Apriori extends AlgoMotifsFrequents {
 	
 	
@@ -11,7 +13,8 @@ public class Apriori extends AlgoMotifsFrequents {
 		super(dataset, min_sup_pourcent, min_conf_pourcent, inclure_attrib_classe);
 	}
 	
-	public Itemsets itemsets_frequent() {
+	public Itemsets run(String file_path) {
+		file_manager = new PatternFileManager(file_path);
 		// associer a chaque element un support
 		Supports supports = file_manager.extraire_les_1_itmesets();
 		// extraitre la liste des items (L1)

@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.TableModel;
 
 import application.Application;
 import data.Dataset;
@@ -57,6 +58,16 @@ public class FileManager {
 		
 	}
 	
+	public static String detect_separator(String dataset_file) {
+		Integer format = detect_format(dataset_file);
+		String separator = "\t";
+		if (format == CSV_FILETYPE)
+			separator = ",";
+		else if (format == TXT_FILETYPE)
+			separator = "[\\s\\t]+";
+		return separator;
+	}
+	
 	private static Dataset interpretLines(ArrayList<String> datalines, String separator) {
 		/** extracts rows from space-separated lines (Strings)
 		 * eg: 1.5 1.45 156.2 --> [1.5, 1.45, 156.2]
@@ -84,7 +95,7 @@ public class FileManager {
 		return new Dataset(null,n,m, data, types);
 	}
 
-	public static void save_dataset(Dataset dataset, String dest_file) throws FileNotFoundException {
+	public static void save_dataset(TableModel model, int n, int m, String dest_file) throws FileNotFoundException {
 		if (dest_file==null) dest_file = default_dataset_save_file;
 		Integer format = detect_format(dest_file);
 		String separator = "\t";
@@ -93,12 +104,12 @@ public class FileManager {
 		else if (format == TXT_FILETYPE)
 			separator = "\t";
 		PrintWriter writer = new PrintWriter(dest_file);
-		for (int i=0; i<dataset.n; i++) {
-			for (int j=0; j<dataset.m; j++) {
-				writer.print(dataset.data[i][j]);
-				if (j<dataset.m-1) writer.print(separator); 
+		for (int i=0; i<n; i++) {
+			for (int j=0; j<m; j++) {
+				writer.print(model.getValueAt(i,j));
+				if (j<m-1) writer.print(separator); 
 			}
-			if (i<dataset.n-1) writer.print("\n");
+			if (i<n-1) writer.print("\n");
 		}
 		writer.close();
 	}

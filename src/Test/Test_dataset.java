@@ -30,7 +30,7 @@ public class Test_dataset {
 			TableModel model = load_dataset_on_table(dataset);
 			Eclat eclat = new Eclat(model, min_sup_pourcent, min_conf_pourcent,inclure_attrib_classe);
 			discretiser(eclat);
-			System.out.println(eclat.run());
+			System.out.println(eclat.run("resources/dataset_discret.txt"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -44,7 +44,7 @@ public class Test_dataset {
 			TableModel model = load_dataset_on_table(dataset);
 			Apriori apriori = new Apriori(model, min_sup_pourcent, min_conf_pourcent,inclure_attrib_classe);
 			discretiser(apriori);
-			System.out.println(apriori.run());
+			System.out.println(apriori.run("resources/dataset_discret.txt"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

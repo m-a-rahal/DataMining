@@ -15,37 +15,14 @@ import Algorithmes.Itemsets;
 import Algorithmes.Supports;
 
 public class PatternFileManager {
-	AlgoMotifsFrequents parent;
+	String dataset_file;
 	BufferedReader reader;
-	final String separator = ",";
+	String separator = ",";
 
 
-	public PatternFileManager(AlgoMotifsFrequents parent) {
-		this.parent = parent;
-	}
-	
-	public void ecrir_dataset_dans_fichier() {
-		try {
-			PrintWriter writer = new PrintWriter(parent.dataset_file);
-			for (int i=0; i< parent.nbr_lignes; i++) {
-				for (int j=0; j< parent.nbr_colonnes; j++) {
-					writer.print(parent.item(i, j));
-					if (j<parent.nbr_colonnes-1) writer.print(separator); 
-				}
-				if (i<parent.nbr_lignes-1) writer.print("\n");
-			}
-			writer.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void delete_dataset_file() {
-		try {
-			Files.delete(Paths.get(parent.dataset_file));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public PatternFileManager(String dataset_file) {
+		this.dataset_file = dataset_file;
+		separator = FileManager.detect_separator(dataset_file);
 	}
 
 	public void calculer_supports(Itemsets Lk) {
@@ -76,7 +53,7 @@ public class PatternFileManager {
 
 	private void start_reader() {
 		try {
-			reader = new BufferedReader(new FileReader(parent.dataset_file));
+			reader = new BufferedReader(new FileReader(dataset_file));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

@@ -248,7 +248,10 @@ public class Application {
 					textField_dest_file.setText(dest_file);
 				}
 				try {
-					FileManager.save_dataset(dataset, dest_file);
+					TableModel model = table_dataset.getModel();
+					int n = model.getRowCount();
+					int m = model.getColumnCount()-1;
+					FileManager.save_dataset(table_dataset.getModel(),n,m,  dest_file);
 				} catch (FileNotFoundException e1) {
 					e1.printStackTrace();
 					afficherMessage("Erreure lors de la sauvegarde!\n" + e.toString());

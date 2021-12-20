@@ -18,7 +18,6 @@ public abstract class AlgoMotifsFrequents {
 	public double min_sup_pourcent;
 	public double min_conf_pourcent;
 	public int nbr_lignes, nbr_colonnes; // dimension du dataset;
-	public static final String dataset_file = "_tmp_dataset.csv";
 	PatternFileManager file_manager;
 	
 	public AlgoMotifsFrequents(TableModel dataset, double min_sup_pourcent, double min_conf_pourcent) {
@@ -27,7 +26,6 @@ public abstract class AlgoMotifsFrequents {
 		this.min_conf_pourcent = min_conf_pourcent; 
 		nbr_lignes = dataset.getRowCount();
 		nbr_colonnes = dataset.getColumnCount()-1; // inclure uniquement les données du dataset
-		file_manager = new PatternFileManager(this);
 	}
 
 	public AlgoMotifsFrequents(TableModel dataset, double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe) {
@@ -36,16 +34,7 @@ public abstract class AlgoMotifsFrequents {
 			nbr_colonnes = dataset.getColumnCount()-2;
 	}
 	
-	public Itemsets run() {
-		file_manager.ecrir_dataset_dans_fichier();
-		try {
-			return itemsets_frequent();
-		} finally {
-			file_manager.delete_dataset_file();
-		}
-	}
-	
-	public abstract Itemsets itemsets_frequent();
+	public abstract Itemsets run(String file_path);
 	
 	protected Itemsets combiner_itmesets(Itemsets Lk) {
 		Itemsets Lk1 = new Itemsets();

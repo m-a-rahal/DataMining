@@ -2,6 +2,8 @@ package Algorithmes;
 import java.util.ArrayList;
 import javax.swing.table.TableModel;
 
+import input_output_classes.PatternFileManager;
+
 public class Eclat extends AlgoMotifsFrequents{
 
 	public Eclat(TableModel dataset, double min_sup_pourcent, double min_conf_pourcent) {
@@ -11,8 +13,9 @@ public class Eclat extends AlgoMotifsFrequents{
 		super(dataset, min_sup_pourcent, min_conf_pourcent, inclure_attrib_classe);
 	}
 
-	public Itemsets itemsets_frequent() {
-			
+	public Itemsets run(String file_path) {
+		file_manager = new PatternFileManager(file_path);
+		
 		// extraitre la liste des items (L1)
 		int min_sup = min_sup();
 		Itemsets L = new Itemsets(); // L = L1 dans cette étape
