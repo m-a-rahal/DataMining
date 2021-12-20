@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import Algorithmes.AlgoMotifsFrequents;
+import Algorithmes.Apriori;
+import Algorithmes.Eclat;
 import Algorithmes.Ensemble;
 import Algorithmes.IDsets;
 import Algorithmes.Itemsets;
@@ -63,16 +65,17 @@ public class PatternFileManager {
 		return reader.readLine();
 	}
 
-	public Supports extraire_les_1_itmesets() {
+	public Supports extraire_les_1_itmesets(Apriori apriori) {
 		try {
 			this.start_reader();
 			String line = next_line();
 			Supports supports = new Supports();
+			apriori.nbr_instaces = 0;
 			while(line != null) {
 				for(String item : line.split(separator)) {
 					supports.ajouter(item);
 				}
-				line = next_line();
+				line = next_line(); apriori.nbr_instaces++;
 			}
 			return supports;
 
@@ -88,7 +91,7 @@ public class PatternFileManager {
 		return null;
 	}
 
-	public IDsets extraire_IDs_des_items() {
+	public IDsets extraire_IDs_des_items(Eclat eclat) {
 		try {
 			this.start_reader();
 			int id = 0;
@@ -100,6 +103,7 @@ public class PatternFileManager {
 				}
 				line = next_line(); id++;
 			}
+			eclat.nbr_instaces = id-1;
 			return iDsets;
 
 		} catch (IOException e) {

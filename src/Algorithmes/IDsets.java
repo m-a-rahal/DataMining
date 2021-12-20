@@ -1,9 +1,10 @@
 package Algorithmes;
 
+import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class IDsets extends TreeMap<String, Ensemble<Integer>>{
+public class IDsets extends HashMap<String, Ensemble<Integer>>{
 	private static final long serialVersionUID = 1L;
 
 	public void ajouter(String item, int id) {

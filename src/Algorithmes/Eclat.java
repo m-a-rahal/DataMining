@@ -6,24 +6,25 @@ import input_output_classes.PatternFileManager;
 
 public class Eclat extends AlgoMotifsFrequents{
 
-	public Eclat(TableModel dataset, double min_sup_pourcent, double min_conf_pourcent) {
-		super(dataset, min_sup_pourcent, min_conf_pourcent);
+	public Eclat(double min_sup_pourcent, double min_conf_pourcent) {
+		super(min_sup_pourcent, min_conf_pourcent);
 	}
-	public Eclat(TableModel dataset, double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe) {
-		super(dataset, min_sup_pourcent, min_conf_pourcent, inclure_attrib_classe);
+	public Eclat(double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe) {
+		super(min_sup_pourcent, min_conf_pourcent, inclure_attrib_classe);
 	}
 
 	public Itemsets run(String file_path) {
 		file_manager = new PatternFileManager(file_path);
 		
 		// extraitre la liste des items (L1)
-		int min_sup = min_sup();
 		Itemsets L = new Itemsets(); // L = L1 dans cette étape
 		// calculer les IDsets des items du dataset
-		L.iDsets = file_manager.extraire_IDs_des_items();
+		L.iDsets = file_manager.extraire_IDs_des_items(this);
 		for (String item : L.iDsets.keySet()) {
-			if (L.iDsets.support(item) >= min_sup) {
-				L.add(new Ensemble<String>(item));
+			if (L.iDsets.support(item) >= min_sup()) {
+				Ensemble<String> itemset = new Ensemble<String>(item);
+				itemset.support = L.iDsets.support(item);
+				L.add(itemset);
 			};
 		}
 		
@@ -37,7 +38,9 @@ public class Eclat extends AlgoMotifsFrequents{
 			Lk = new Itemsets();
 			Lk.iDsets = Lk_1.iDsets;
 			for (Ensemble<String> itemset : Lk_1) {
-				if (Lk_1.iDsets.support(itemset.key()) >= min_sup) {
+				int sup = Lk_1.iDsets.support(itemset.key());
+				if (sup >= min_sup()) {
+					itemset.support = sup;
 					Lk.add(itemset);
 				}
 			}

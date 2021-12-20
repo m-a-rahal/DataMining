@@ -41,20 +41,17 @@ public class Ensemble<V> extends TreeSet<V> implements Comparable<Ensemble>{
 	
 	@Override
 	public String toString() {
-		String text = "{ ";
-		for (V item : this) {
-			text += item + " ";
-		}
-		return text + "}";
+		return "{" + String.join(",", (Iterable<? extends CharSequence>) this) + "}:"+support;
 	}
 
 	@Override
 	public int compareTo(Ensemble other) {
 		// TODO Auto-generated method stub
-		return ((Integer)this.hashCode()).compareTo(other.hashCode());
+		return this.key().compareTo(other.key());
 	}
 	
 	public String key() {
 		return String.join(" ", (Iterable<? extends CharSequence>) this);
 	}
+	
 }

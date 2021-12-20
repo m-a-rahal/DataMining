@@ -1,12 +1,9 @@
 package Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import Algorithmes.AlgoMotifsFrequents;
 import Algorithmes.Apriori;
 import Algorithmes.Eclat;
 import data.Dataset;
@@ -17,19 +14,15 @@ import input_output_classes.URLManager;
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
 		Dataset dataset = FileManager.extract_dataset(null);
-		test_Eclat(dataset, 0.2, 0.6, false, "resources/dataset_discret.txt");
-		test_Apriori(dataset, 0.2, 0.6, false, "resources/dataset_discret.txt");
+		test_Eclat(dataset, 0.44, 0.6, false, "resources/exemple_TD.txt");
+		test_Apriori(dataset, 0.44, 0.6, false, "resources/exemple_TD.txt");
 		//System.out.println(dataset.proba_instance(21, 2));
 		
 	}
 	
 	private static void test_Eclat(Dataset dataset,double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe, String file) {
 		try {
-			dataset.normaliser_min_max();
-			dataset.discretiser_equal_width(4);
-			TableModel model = load_dataset_on_table(dataset);
-			Eclat eclat = new Eclat(model, min_sup_pourcent, min_conf_pourcent,inclure_attrib_classe);
-			discretiser(eclat);
+			Eclat eclat = new Eclat(min_sup_pourcent, min_conf_pourcent,inclure_attrib_classe);
 			System.out.println(eclat.run(file));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -39,11 +32,7 @@ public class Test_dataset {
 	
 	private static void test_Apriori(Dataset dataset, double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe, String file) {
 		try {
-			dataset.normaliser_min_max();
-			dataset.discretiser_equal_width(4);
-			TableModel model = load_dataset_on_table(dataset);
-			Apriori apriori = new Apriori(model, min_sup_pourcent, min_conf_pourcent,inclure_attrib_classe);
-			discretiser(apriori);
+			Apriori apriori = new Apriori(min_sup_pourcent, min_conf_pourcent,inclure_attrib_classe);
 			System.out.println(apriori.run(file));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -105,15 +94,5 @@ public class Test_dataset {
 			}
 		}
 		return tableModel;
-	}
-	
-	private static void discretiser(AlgoMotifsFrequents algo) {
-		TableModel model = algo.dataset;
-		for (int j = 0; j < algo.nbr_colonnes; j++) {
-			for (int i = 0; i < algo.nbr_lignes; i++) {
-				int k = (int) Math.floor((double) model.getValueAt(i, j));
-				model.setValueAt("I"+(j+1)+""+k, i, j);
-			}
-		}
 	}
 }
