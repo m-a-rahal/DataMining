@@ -6,11 +6,8 @@ import input_output_classes.PatternFileManager;
 
 public class Eclat extends AlgoMotifsFrequents{
 
-	public Eclat(double min_sup_pourcent, double min_conf_pourcent) {
-		super(min_sup_pourcent, min_conf_pourcent);
-	}
-	public Eclat(double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe) {
-		super(min_sup_pourcent, min_conf_pourcent, inclure_attrib_classe);
+	public Eclat(double min_sup_pourcent) {
+		super(min_sup_pourcent);
 	}
 
 	public Itemsets run(String file_path) {
@@ -47,6 +44,8 @@ public class Eclat extends AlgoMotifsFrequents{
 			L.addAll(Lk);
 		}
 		
+		L.iDsets = null; // libérer l'espac mémoire
+		L.nbr_totale_instances = nbr_instances;
 		return L;
 	}
 	

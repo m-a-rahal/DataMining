@@ -12,4 +12,12 @@ public class Supports extends HashMap<String, Integer>{
 			put(item, sup+1);
 		}
 	}
+	
+	public void ajouter(Ensemble<String> itemset) {
+		put(itemset.key(), itemset.support);
+	}
+	
+	public Integer get(Ensemble<String> obj) {
+		return get(obj.key());
+	}
 }

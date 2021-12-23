@@ -2,15 +2,12 @@ package Algorithmes;
 import input_output_classes.PatternFileManager;
 
 public class Apriori extends AlgoMotifsFrequents {
+
 	
-	
-	public Apriori(double min_sup_pourcent, double min_conf_pourcent) {
-		super(min_sup_pourcent, min_conf_pourcent);
+	public Apriori(double min_sup_pourcent) {
+		super(min_sup_pourcent);
 	}
-	public Apriori(double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe) {
-		super(min_sup_pourcent, min_conf_pourcent, inclure_attrib_classe);
-	}
-	
+
 	public Itemsets run(String file_path) {
 		file_manager = new PatternFileManager(file_path);
 		// associer a chaque element un support
@@ -42,6 +39,7 @@ public class Apriori extends AlgoMotifsFrequents {
 			L.addAll(Lk);
 		}
 		
+		L.nbr_totale_instances = nbr_instances;
 		return L;
 	}
 

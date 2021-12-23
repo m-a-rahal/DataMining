@@ -7,6 +7,7 @@ import java.util.TreeSet;
 public class Itemsets extends HashSet<Ensemble<String>>{
 	private static final long serialVersionUID = 1L;
 	public IDsets iDsets; // utilisé dans l'algorithme ECLAT
+	public int nbr_totale_instances;
 	
 	@Override
 	public String toString() {

@@ -6,6 +6,8 @@ import javax.swing.table.TableModel;
 
 import Algorithmes.Apriori;
 import Algorithmes.Eclat;
+import Algorithmes.Itemsets;
+import Algorithmes.RegleAssociation;
 import data.Dataset;
 import diagrammes.Diagrammes;
 import input_output_classes.FileManager;
@@ -14,28 +16,33 @@ import input_output_classes.URLManager;
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
 		Dataset dataset = FileManager.extract_dataset(null);
-		test_Eclat(dataset, 0.44, 0.6, false, "resources/exemple_TD.txt");
-		test_Apriori(dataset, 0.44, 0.6, false, "resources/exemple_TD.txt");
+		Itemsets L = test_Eclat(dataset, 0.44, "resources/exemple_TD_2.txt");
+		test_Apriori(dataset, 0.44, "resources/exemple_TD_2.txt");
 		//System.out.println(dataset.proba_instance(21, 2));
-		
+		test_RegleAssociation(L);
 	}
 	
-	private static void test_Eclat(Dataset dataset,double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe, String file) {
+	private static void test_RegleAssociation(Itemsets L) {
+		System.out.println(RegleAssociation.extraitre_regles_association(L, 0.8));
+	}
+
+	private static Itemsets test_Eclat(Dataset dataset,double min_sup_pourcent, String file) {
 		try {
-			Eclat eclat = new Eclat(min_sup_pourcent, min_conf_pourcent,inclure_attrib_classe);
-			System.out.println(eclat.run(file));
+			Eclat eclat = new Eclat(min_sup_pourcent);
+			Itemsets L = eclat.run(file);
+			System.out.println(L);
+			return L;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
-	private static void test_Apriori(Dataset dataset, double min_sup_pourcent, double min_conf_pourcent, boolean inclure_attrib_classe, String file) {
+	private static void test_Apriori(Dataset dataset, double min_sup_pourcent, String file) {
 		try {
-			Apriori apriori = new Apriori(min_sup_pourcent, min_conf_pourcent,inclure_attrib_classe);
+			Apriori apriori = new Apriori(min_sup_pourcent);
 			System.out.println(apriori.run(file));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -77,22 +84,5 @@ public class Test_dataset {
 	public static void testURL_extraction() throws IOException {
 		Dataset dataset = URLManager.extract_dataset(null);
 		dataset.show();
-	}
-	
-	private static TableModel load_dataset_on_table(Dataset dataset) throws Exception {
-		/** charger la dataset dans la table et afficher les mesures
-		 * */
-		
-		String[] col_names_with_number = new String[dataset.col_names.length+1]; for (int i = 0; i < dataset.col_names.length; i++) {col_names_with_number[i]=dataset.col_names[i];}; col_names_with_number[dataset.col_names.length] = "#";
-		
-		// load table in Jtabel
-		TableModel tableModel = new DefaultTableModel(col_names_with_number, dataset.n);
-		// afficher les données originales
-		for (int i = 0; i < dataset.n; i++) {
-			for (int j = 0; j < dataset.m; j++) {
-				tableModel.setValueAt(dataset.data[i][j], i, j);
-			}
-		}
-		return tableModel;
 	}
 }

@@ -70,12 +70,12 @@ public class PatternFileManager {
 			this.start_reader();
 			String line = next_line();
 			Supports supports = new Supports();
-			apriori.nbr_instaces = 0;
+			apriori.nbr_instances = 0;
 			while(line != null) {
 				for(String item : line.split(separator)) {
 					supports.ajouter(item);
 				}
-				line = next_line(); apriori.nbr_instaces++;
+				line = next_line(); apriori.nbr_instances++;
 			}
 			return supports;
 
@@ -103,7 +103,7 @@ public class PatternFileManager {
 				}
 				line = next_line(); id++;
 			}
-			eclat.nbr_instaces = id-1;
+			eclat.nbr_instances = id-1;
 			return iDsets;
 
 		} catch (IOException e) {
