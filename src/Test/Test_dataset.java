@@ -1,9 +1,12 @@
 package Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import javax.sound.midi.Soundbank;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import Classification_baysienne.ClassifieurBaysien;
 import data.Dataset;
 import diagrammes.Diagrammes;
 import input_output_classes.FileManager;
@@ -15,6 +18,19 @@ import motifs_frequents_et_regles.Regle;
 
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
+		Dataset dataset = FileManager.extract_dataset(null);
+		dataset.normaliser_min_max();
+		int n,m;
+		n = dataset.n;
+		m = dataset.m;
+		TableModel model = model_from_table(dataset);
+		discretiser(model);
+		ClassifieurBaysien classifieur = new ClassifieurBaysien(model,n,m);
+		System.out.println(classifieur.index);
+	}
+	
+	@SuppressWarnings("unused")
+	private static void test_motifs_frequents() throws FileNotFoundException {
 		Dataset dataset = FileManager.extract_dataset(null);
 		Itemsets L = test_Eclat(dataset, 0.03, "resources/Market_Basket_Optimisation.csv");
 		test_Apriori(dataset, 0.44, "resources/exemple_TD_2.txt");
@@ -89,5 +105,31 @@ public class Test_dataset {
 	public static void testURL_extraction() throws IOException {
 		Dataset dataset = URLManager.extract_dataset(null);
 		dataset.show();
+	}
+	
+	private static TableModel model_from_table(Dataset dataset) throws Exception {
+		/** charger la dataset dans la table et afficher les mesures
+		 * */
+		
+		String[] col_names_with_number = new String[dataset.col_names.length+1]; for (int i = 0; i < dataset.col_names.length; i++) {col_names_with_number[i]=dataset.col_names[i];}; col_names_with_number[dataset.col_names.length] = "#";
+		
+		// load table in Jtabel
+		TableModel tableModel = new DefaultTableModel(col_names_with_number, dataset.n);
+		// afficher les données originales
+		for (int i = 0; i < dataset.n; i++) {
+			for (int j = 0; j < dataset.m; j++) {
+				tableModel.setValueAt(dataset.data[i][j], i, j);
+			}
+		}
+		return tableModel;
+	}
+	
+	private static void discretiser(TableModel model) {
+		for (int j = 0; j < model.getColumnCount()-2; j++) {
+			for (int i = 0; i < model.getRowCount(); i++) {
+				int k = (int) Math.floor((double) model.getValueAt(i, j));
+				model.setValueAt("I"+(j+1)+""+k, i, j);
+			}
+		}
 	}
 }
