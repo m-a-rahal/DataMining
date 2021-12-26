@@ -8,13 +8,13 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import Algorithmes.AlgoMotifsFrequents;
-import Algorithmes.Apriori;
-import Algorithmes.Eclat;
-import Algorithmes.Ensemble;
-import Algorithmes.IDsets;
-import Algorithmes.Itemsets;
-import Algorithmes.Supports;
+import motifs_frequents_et_regles.AlgoMotifsFrequents;
+import motifs_frequents_et_regles.Apriori;
+import motifs_frequents_et_regles.Eclat;
+import motifs_frequents_et_regles.Ensemble;
+import motifs_frequents_et_regles.IDsets;
+import motifs_frequents_et_regles.Itemsets;
+import motifs_frequents_et_regles.Supports;
 
 public class PatternFileManager {
 	String dataset_file;

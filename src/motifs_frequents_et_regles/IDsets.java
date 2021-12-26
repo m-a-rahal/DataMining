@@ -1,4 +1,4 @@
-package Algorithmes;
+package motifs_frequents_et_regles;
 
 import java.util.HashMap;
 import java.util.TreeMap;

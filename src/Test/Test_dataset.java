@@ -4,14 +4,14 @@ import java.io.IOException;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import Algorithmes.Apriori;
-import Algorithmes.Eclat;
-import Algorithmes.Itemsets;
-import Algorithmes.Regle;
 import data.Dataset;
 import diagrammes.Diagrammes;
 import input_output_classes.FileManager;
 import input_output_classes.URLManager;
+import motifs_frequents_et_regles.Apriori;
+import motifs_frequents_et_regles.Eclat;
+import motifs_frequents_et_regles.Itemsets;
+import motifs_frequents_et_regles.Regle;
 
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {

@@ -1,4 +1,4 @@
-package Algorithmes;
+package motifs_frequents_et_regles;
 import input_output_classes.PatternFileManager;
 
 public class Apriori extends AlgoMotifsFrequents {

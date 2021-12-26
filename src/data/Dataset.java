@@ -449,32 +449,4 @@ public class Dataset {
 		}
 		System.out.println("loaded dataset has "+ n +" rows");
 	}
-	
-	// Classification Bayésinenne
-	public Set<Double> valeurs_possibles(int att) {
-		return frequences_de(att).keySet();
-	}
-	
-	public TreeMap<Double, Double> probas_attribut(int attribut, int classe) {
-		Frequences frequences = frequences_de(attribut, 20, 70);
-		TreeMap<Double, Double> probas = new TreeMap<Double,Double>();
-		for (Double valeur : frequences.keySet()) {
-			probas.put(valeur, frequences.get(valeur) / 50.0);
-		}
-		return probas;
-	}
-	
-	public double proba_instance(int attribut, int x, int classe) {
-		return probas_attribut(attribut, classe).get(x);
-	}
-	
-	public double proba_instance(int x, int classe) {
-		double p = 1;
-		for (int j = 0; j < m; j++) {
-			p *= proba_instance(j,  x, classe);
-		}
-		return p;
-	}
-	
-
 }
