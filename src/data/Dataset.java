@@ -344,7 +344,7 @@ public class Dataset {
 		return outlier;
 	}
 	
-	public double arrondi(double val) {
+	public static double arrondi(double val) {
 		return Math.round(val * 10000.0)/10000.0;
 	}
 	

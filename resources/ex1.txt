@@ -1,0 +1,6 @@
+Eggs    Bacon   Soup
+Eggs    Bacon   Apple
+Eggs    Bacon   Apple
+Soup    Bacon   Banana
+Banana  Butter
+Butter

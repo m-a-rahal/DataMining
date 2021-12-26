@@ -7,7 +7,7 @@ import javax.swing.table.TableModel;
 import Algorithmes.Apriori;
 import Algorithmes.Eclat;
 import Algorithmes.Itemsets;
-import Algorithmes.RegleAssociation;
+import Algorithmes.Regle;
 import data.Dataset;
 import diagrammes.Diagrammes;
 import input_output_classes.FileManager;
@@ -16,14 +16,19 @@ import input_output_classes.URLManager;
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
 		Dataset dataset = FileManager.extract_dataset(null);
-		Itemsets L = test_Eclat(dataset, 0.44, "resources/exemple_TD_2.txt");
+		Itemsets L = test_Eclat(dataset, 0.03, "resources/Market_Basket_Optimisation.csv");
 		test_Apriori(dataset, 0.44, "resources/exemple_TD_2.txt");
 		//System.out.println(dataset.proba_instance(21, 2));
-		test_RegleAssociation(L);
+		test_RegleAssociation_corr(L,0.2);
 	}
 	
-	private static void test_RegleAssociation(Itemsets L) {
-		System.out.println(RegleAssociation.extraitre_regles_association(L, 0.8));
+	private static void test_RegleAssociation_corr(Itemsets L, double min_conf) {
+		System.out.println("-- règles association -----------------------------------------------------------------");
+		System.out.println(Regle.regles_association(L, min_conf));
+		System.out.println("-- règles association positivement corrélées ------------------------------------------");
+		System.out.println(Regle.regles_correlation(L, min_conf, +1));
+		System.out.println("-- règles association négativement corrélées ------------------------------------------");
+		System.out.println(Regle.regles_correlation(L, min_conf, -1));
 	}
 
 	private static Itemsets test_Eclat(Dataset dataset,double min_sup_pourcent, String file) {
