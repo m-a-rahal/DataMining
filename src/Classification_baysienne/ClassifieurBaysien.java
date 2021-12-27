@@ -1,7 +1,10 @@
 package Classification_baysienne;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeMap;
 
 import javax.swing.table.TableModel;
 
@@ -9,13 +12,23 @@ import javax.swing.table.TableModel;
 public class ClassifieurBaysien{
 	public Index index;
 	public int n,m;
-	public ClassifieurBaysien(TableModel model, int n, int m) {
+	private int taille_echantillon_apprentissage;
+	public ClassifieurBaysien(TableModel model, int n, int m, int taille_echantillon_apprentissage) {
 		this.n = n; this.m = m;
-		this.index = analyser(model);
+		this.taille_echantillon_apprentissage = taille_echantillon_apprentissage;
+		this.index = apprendre(model);
 	}
 	
 	public double p_classe(String classe) {
-		return index.taille(classe)/(double)n;
+		return index.taille(classe)/(double)index.taille_totale();
+	}
+	
+	public double p(Instance instance, String classe) {
+		double p = 1;
+		for(String x : instance) {
+			p *= p(x, classe);
+		}
+		return p;
 	}
 	
 	public double p(String x, String classe) {
@@ -26,23 +39,81 @@ public class ClassifieurBaysien{
 		return (index.taille(x, classe) + 1)/(double)(index.taille(classe) + index.valeurs_possibles.get(x).size());
 	}
 
-	private Index analyser(TableModel model) {
-		Index index = new Index();
+	private Index apprendre(TableModel model) {
+		Index index = new Index(m);
 		for (int i = 0; i < n; i++) {
 			String classe = model.getValueAt(i, m-1).toString();
-			index.incrementer(classe); // compter la taille de la classe
-			for (int j = 0; j < m-1; j++) {
-				String x = model.getValueAt(i, j).toString();
-				index.incrementer(x, classe); // compter la taille de l'attribut dans la classe
+			if (index.taille(classe) < taille_echantillon_apprentissage) { 
+				index.valeurs_possibles.ajouter(m, classe);
+				index.incrementer(classe); // compter la taille de la classe
+				for (int j = 0; j < m-1; j++) {
+					String x = model.getValueAt(i, j).toString();
+					index.incrementer(x, classe); // compter la taille de l'attribut dans la classe
+				}
 			}
 		}
 		return index;
 	}
 	
+	public ArrayList<Instance> instances_de_test(TableModel model) {
+		// par défaut les instances sont prises du dataset (table)
+		ArrayList<Instance> instances = new ArrayList<>();
+		// construire les instances
+		Index compteur = new Index(m);
+		for (int i = 0; i < n; i++) {
+			String classe = model.getValueAt(i, m-1).toString();
+			compteur.incrementer(classe); // compter la taille de la classe
+			if (compteur.taille(classe) > taille_echantillon_apprentissage) {// prendre uniquement les échantillons de test
+				Instance instance =  new Instance(i+1);
+				for (int j = 0; j < m-1; j++) {
+					String x = model.getValueAt(i, j).toString();
+					instance.add(x);
+				}
+				instances.add(instance);
+			}
+		}
+		return instances;
+	}
+	
+	public TreeMap<Integer, String> tester(ArrayList<Instance> instances) {
+		TreeMap<Integer, String> classifications = new TreeMap<>();
+		for(Instance instance : instances) {
+			classifications.put(instance.numero_instance, classifier(instance));
+		}
+		return classifications;
+	}
+	
+	private String classifier(Instance instance) {
+		HashMap<String, Double> poids = new HashMap<>();
+		for(String classe : index.valeurs_possibles.get(m)) {// pour chaque classe
+			poids.put(classe, p(instance, classe));
+		}
+		double max_poids = Collections.max(poids.values());
+		ArrayList<String> classifications = new ArrayList<String>();
+		for(String classe : poids.keySet()) {// pour chaque classe
+			if (poids.get(classe) >= max_poids) {
+				classifications.add(classe);
+			}
+		}
+		if(classifications.size() == 1) return classifications.get(0);
+		else return "{"+String.join(",", classifications)+"}";
+	}
+
 	public static class Index extends HashMap<String, Integer> {
+		int m;
+		public Index(int m) {
+			this.m = m;
+		}
 		public ValeursPossibles valeurs_possibles = new ValeursPossibles();
 		private static final long serialVersionUID = 1L;
 		public Integer taille(String x, String classe) {return taille(key(x,classe));}
+		public double taille_totale() {
+			int taille = 0;
+			for(String classe : valeurs_possibles.get(m)) {
+				taille += taille(classe);
+			}
+			return taille;
+		}
 		public Integer taille(String classe) {
 			Integer val = super.get(classe);
 			if (val == null) return 0;
@@ -78,7 +149,7 @@ public class ClassifieurBaysien{
 		}
 
 		public void ajouter(int j, String x) {
-			HashSet<String> valeurs = get(x);
+			HashSet<String> valeurs = get(j);
 			if (valeurs == null) {
 				valeurs = new HashSet<>();
 				put(j, valeurs);
@@ -88,6 +159,21 @@ public class ClassifieurBaysien{
 		
 		public Integer attribut_de(String x) {
 			return Integer.parseInt(""+x.charAt(1));
+		}
+	}
+	
+	public static class Instance extends ArrayList<String> {
+		private static final long serialVersionUID = 1L;
+		public int numero_instance;
+		
+		public Instance(int numero_instance) {
+			super();
+			this.numero_instance = numero_instance;
+		}
+
+		@Override
+		public String toString() {
+			return "#"+numero_instance+"=\"" + String.join(" ", this)+"\"";
 		}
 	}
 }

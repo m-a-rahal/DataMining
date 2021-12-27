@@ -26,8 +26,13 @@ public class Test_dataset {
 		m = dataset.m;
 		TableModel model = model_from_table(dataset);
 		discretiser(model);
-		ClassifieurBaysien classifieur = new ClassifieurBaysien(model,n,m);
+		int taille_echantillon_apprentissage = 50;
+		ClassifieurBaysien classifieur = new ClassifieurBaysien(model,n,m, taille_echantillon_apprentissage);
+		System.out.println(classifieur.p_classe("2.0"));
+		System.out.println(classifieur.index.taille("1.0"));
+		System.out.println(classifieur.p("I12", "1.0"));
 		System.out.println(classifieur.p_laplace("I12", "1.0"));
+		System.out.println(classifieur.tester(classifieur.instances_de_test(model)));
 	}
 	
 	@SuppressWarnings("unused")
