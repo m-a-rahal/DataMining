@@ -20,13 +20,14 @@ public class Test_dataset {
 	public static void main(String[] args) throws Exception {
 		Dataset dataset = FileManager.extract_dataset(null);
 		dataset.normaliser_min_max();
+		dataset.discretiser_equal_width(4);
 		int n,m;
 		n = dataset.n;
 		m = dataset.m;
 		TableModel model = model_from_table(dataset);
 		discretiser(model);
 		ClassifieurBaysien classifieur = new ClassifieurBaysien(model,n,m);
-		System.out.println(classifieur.index);
+		System.out.println(classifieur.p_laplace("I12", "1.0"));
 	}
 	
 	@SuppressWarnings("unused")

@@ -40,7 +40,7 @@ public class ClassifieurBaysien{
 	}
 	
 	public static class Index extends HashMap<String, Integer> {
-		ValeursPossibles valeurs_possibles = new ValeursPossibles();
+		public ValeursPossibles valeurs_possibles = new ValeursPossibles();
 		private static final long serialVersionUID = 1L;
 		public Integer taille(String x, String classe) {return taille(key(x,classe));}
 		public Integer taille(String classe) {
@@ -60,7 +60,7 @@ public class ClassifieurBaysien{
 		}
 		private String key(String x, String classe) {return x+" "+classe;}
 	}
-	static class ValeursPossibles extends HashMap<Integer, HashSet<String>> {
+	public static class ValeursPossibles extends HashMap<Integer, HashSet<String>> {
 		private static final long serialVersionUID = 1L;
 
 		public void ajouter(String x) {
@@ -71,6 +71,10 @@ public class ClassifieurBaysien{
 		public HashSet<String> get(String x) {
 			// TODO Auto-generated method stub
 			return super.get(attribut_de(x));
+		}
+		public HashSet<String> get(int attribut) {
+			// TODO Auto-generated method stub
+			return super.get(attribut);
 		}
 
 		public void ajouter(int j, String x) {
