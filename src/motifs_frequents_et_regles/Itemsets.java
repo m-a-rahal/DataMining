@@ -11,7 +11,7 @@ public class Itemsets extends HashSet<Ensemble<String>>{
 	
 	@Override
 	public String toString() {
-		String text = "{ ";
+		String text = "";
 		ArrayList<Ensemble<String>> liste = new ArrayList<>(this);
 		liste.sort(new Comparator<Ensemble<String>>() {
 			@Override
@@ -20,9 +20,9 @@ public class Itemsets extends HashSet<Ensemble<String>>{
 			}
 		});
 		for (Ensemble<String> itemset : liste) {
-			text += itemset.toString() + " ";
+			text += itemset.toString() + "\n";
 		}
-		return text + "}";
+		return text;
 	}
 	
 	// Pour l'algrorithme ECLAT

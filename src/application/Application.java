@@ -43,8 +43,17 @@ import data.Type;
 import diagrammes.Diagrammes;
 import input_output_classes.FileManager;
 import input_output_classes.URLManager;
+import motifs_frequents_et_regles.Apriori;
+import motifs_frequents_et_regles.Eclat;
+import motifs_frequents_et_regles.Itemsets;
+import motifs_frequents_et_regles.Regle;
+import motifs_frequents_et_regles.Regle.Regles;
 
 import javax.swing.SwingConstants;
+import java.awt.Font;
+import javax.swing.JTextPane;
+import javax.swing.JScrollBar;
+import java.awt.Component;
 
 public class Application {
 	private Application application;
@@ -74,6 +83,19 @@ public class Application {
 	private String[] col_names_with_number;
 	private JButton btn_ajouter_ligne;
 	private JCheckBox chckbox_apply_before_sort;
+	private JTextField textField_Q;
+	private JTextField textField_min;
+	private JTextField textField_max;
+	private JComboBox comboBox_type_discretisation;
+	private JComboBox comboBox_type_normalisation;
+	private JTextField textField_fichier_datasetdiscret;
+	private JTextField textField_min_sup;
+	private JTextArea area_res_motifs_freq;
+	private JLabel label_tmps_exec_motifs_freq;
+	Itemsets motifs_frequents;
+	private JTextField textField_confidence;
+	private JTextArea area_regles;
+	private JLabel label_tmps_exec_regles;
 
 	/**
 	 * Launch the application.
@@ -137,17 +159,17 @@ public class Application {
 				.addGroup(gl_panel_dataset.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-						.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
+						.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 789, Short.MAX_VALUE)
+						.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_panel_dataset.setVerticalGroup(
-			gl_panel_dataset.createParallelGroup(Alignment.LEADING)
+			gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel_dataset.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
+					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 121, GroupLayout.PREFERRED_SIZE)
+					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
 					.addGap(10))
 		);
 		
@@ -297,13 +319,29 @@ public class Application {
 		JButton btnNormaliser = new JButton("Normaliser");
 		btnNormaliser.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				double nouv_max, nouv_min;
+				try {
+					nouv_min = Double.parseDouble(textField_min.getText());
+					nouv_max = Double.parseDouble(textField_max.getText());
+				} catch (Exception e2) {
+					afficherMessage("La valeur du min ou du max est éronnée");
+					return;
+				}
+				if (nouv_max <= nouv_min) {
+					afficherMessage("La valeur du min doit être inférieure strictement à celle du max");
+					return;
+				}
 				for (int i = 0; i < dataset.m-1; i++) {
-					dataset.normaliser_min_max(i);
+					if( comboBox_type_normalisation.getSelectedIndex() == 0 ) {
+						dataset.normaliser_min_max(i,nouv_max,nouv_min);
+					} else {
+						//#### norm z score
+						System.out.println("z-score non impémenté");
+					};
 				}
 				try {
 					load_dataset_on_table();
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -312,69 +350,141 @@ public class Application {
 		JButton btnNewButton = new JButton("discretiser");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				int Q;
+				try {
+					Q = Integer.parseInt(textField_Q.getText());
+				} catch (Exception e2) {
+					afficherMessage("La valeur de Q (entier) est éronnée");
+					return;
+				}
+				if (Q <= 0 ) {
+					afficherMessage("La valeur de Q doir être positive non nulle");
+					return;
+				}
 				for (int i = 0; i < dataset.m-1; i++) {
-					dataset.discretiser_equal_width(i,4);
+					dataset.discretiser_equal_width(i,Q);
 				}
 				try {
 					load_dataset_on_table_disccrete();
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
 		});
+		
+		comboBox_type_discretisation = new JComboBox();
+		comboBox_type_discretisation.setModel(new DefaultComboBoxModel(new String[] {"Discrétisation en classes d'amplitudes égales", "Discrétisation d'effectifs égaux"}));
+		
+		comboBox_type_normalisation = new JComboBox();
+		comboBox_type_normalisation.setModel(new DefaultComboBoxModel(new String[] {"normalisation avec Min-Max", "normalisation avec Z-score "}));
+		
+		textField_Q = new JTextField();
+		textField_Q.setHorizontalAlignment(SwingConstants.CENTER);
+		textField_Q.setText("4");
+		textField_Q.setToolTipText("le chemin (ou l'url) du dataset ...");
+		textField_Q.setColumns(10);
+		
+		JLabel lblQ = new JLabel("Q");
+		lblQ.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		textField_min = new JTextField();
+		textField_min.setText("0");
+		textField_min.setHorizontalAlignment(SwingConstants.CENTER);
+		textField_min.setToolTipText("le chemin (ou l'url) du dataset ...");
+		textField_min.setColumns(10);
+		
+		textField_max = new JTextField();
+		textField_max.setHorizontalAlignment(SwingConstants.CENTER);
+		textField_max.setText("1");
+		textField_max.setToolTipText("le chemin (ou l'url) du dataset ...");
+		textField_max.setColumns(10);
+		
+		JLabel lblMax = new JLabel("min");
+		lblMax.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		JLabel lblMax_1 = new JLabel("max");
+		lblMax_1.setHorizontalAlignment(SwingConstants.CENTER);
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
-			gl_panel_1.createParallelGroup(Alignment.TRAILING)
+			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(textField_dest_file, GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnSauvegarder, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addComponent(btn_ajouter_ligne, GroupLayout.PREFERRED_SIZE, 120, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnSupprimerligne, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btn_appliquer_changements, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(chckbox_apply_before_sort)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(chckbxTrierLesDonns))
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(lblNewLabel)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE))
-								.addGroup(gl_panel_1.createSequentialGroup()
-									.addComponent(btn_ajouter_ligne)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(btnSupprimerligne)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(btn_appliquer_changements)
-									.addGap(79)))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+									.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
+									.addGap(22))
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(btnNewButton)
 									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(comboBox_type_discretisation, 0, 177, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(lblQ, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(textField_Q, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(btnNormaliser)
 									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(comboBox_type_normalisation, 0, 173, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(lblMax, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+									.addGap(4)))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+								.addGroup(gl_panel_1.createSequentialGroup()
+									.addComponent(textField_min, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(lblMax_1, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(textField_max, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(chckbxUrl)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(btnCharger))
-								.addGroup(gl_panel_1.createSequentialGroup()
-									.addComponent(chckbox_apply_before_sort)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(chckbxTrierLesDonns))))
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(textField_dest_file, GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnSauvegarder, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)))
+									.addComponent(btnCharger)))))
 					.addContainerGap())
 		);
 		gl_panel_1.setVerticalGroup(
-			gl_panel_1.createParallelGroup(Alignment.LEADING)
+			gl_panel_1.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGap(15)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
 						.addComponent(text_dataset_src, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnCharger)
-						.addComponent(chckbxUrl)
-						.addComponent(btnNormaliser)
-						.addComponent(btnNewButton))
+						.addComponent(chckbxUrl))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+							.addComponent(btnNewButton)
+							.addComponent(comboBox_type_discretisation, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(textField_min, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
+							.addComponent(comboBox_type_normalisation, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblQ, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
+							.addComponent(textField_Q, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnNormaliser)
+							.addComponent(lblMax, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+							.addComponent(textField_max, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblMax_1, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
@@ -389,7 +499,7 @@ public class Application {
 						.addComponent(btnSauvegarder)
 						.addComponent(lblNewLabel_1)
 						.addComponent(textField_dest_file, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(17, Short.MAX_VALUE))
+					.addContainerGap())
 		);
 		panel_1.setLayout(gl_panel_1);
 		panel_dataset.setLayout(gl_panel_dataset);
@@ -609,6 +719,295 @@ public class Application {
 					.addContainerGap())
 		);
 		panel_plots.setLayout(gl_panel_plots);
+		
+		JPanel panel_6 = new JPanel();
+		tabbedPane.addTab("Motifs fréquents et règles", null, panel_6, null);
+		
+		JPanel panel_7 = new JPanel();
+		panel_7.setBorder(new LineBorder(Color.BLACK));
+		
+		JPanel panel_8 = new JPanel();
+		panel_8.setBorder(new LineBorder(Color.BLACK));
+		GroupLayout gl_panel_6 = new GroupLayout(panel_6);
+		gl_panel_6.setHorizontalGroup(
+			gl_panel_6.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_6.createSequentialGroup()
+					.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_8, GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE))
+		);
+		gl_panel_6.setVerticalGroup(
+			gl_panel_6.createParallelGroup(Alignment.LEADING)
+				.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
+				.addComponent(panel_8, GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
+		);
+		
+		JLabel lblNewLabel_6_1 = new JLabel("Règles d'association / de corrélation");
+		lblNewLabel_6_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_6_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		
+		JLabel lblNewLabel_11 = new JLabel("confidence min");
+		
+		textField_confidence = new JTextField();
+		textField_confidence.setText("90");
+		textField_confidence.setHorizontalAlignment(SwingConstants.CENTER);
+		textField_confidence.setColumns(10);
+		
+		JButton btnNewButton_1 = new JButton("règles de corrélation");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				double min_conf;
+				try {
+					min_conf = Double.parseDouble(textField_confidence.getText());
+				} catch (Exception e2) {
+					afficherMessage("La valeur de min confidence est éronnée");
+					return;
+				}
+				min_conf /= 100.0;
+				if (min_conf < 0 || min_conf > 100) {
+					afficherMessage("La valeur du confidence min doit être entre 0 et 100");
+					return;
+				}
+				if (motifs_frequents == null) {
+					afficherMessage("Veuillez d'abbord extraire les motifs fréquents");
+					return;
+				}
+				Regles regles_pos, regles_neg;
+				try {
+					double start = System.currentTimeMillis();
+					regles_pos = Regle.regles_correlation(motifs_frequents, min_conf, +1);
+					regles_neg = Regle.regles_correlation(motifs_frequents, min_conf, -1);
+					label_tmps_exec_regles.setText("temps d'execution = "+(System.currentTimeMillis() - start)+" ms");
+					area_regles.setText("règles de corrélation positives:\n"+
+										 regles_pos.toString()+
+										"\nrègles de corrélation négatives:\n"+
+										 regles_neg.toString());
+					
+				} catch (Exception e2) {
+					afficherMessage("L'extraction de règles de corrélation a échoué !" + e2);
+					e2.printStackTrace();
+					return;
+				}
+			}
+		});
+		
+		JLabel lblNewLabel_12 = new JLabel("%");
+		
+		JButton btnNewButton_2 = new JButton("règles d'association");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				double min_conf;
+				try {
+					min_conf = Double.parseDouble(textField_confidence.getText());
+				} catch (Exception e2) {
+					afficherMessage("La valeur de min confidence est éronnée");
+					return;
+				}
+				min_conf /= 100.0;
+				if (min_conf < 0 || min_conf > 100) {
+					afficherMessage("La valeur du confidence min doit être entre 0 et 100");
+					return;
+				}
+				if (motifs_frequents == null) {
+					afficherMessage("Veuillez d'abbord extraire les motifs fréquents");
+					return;
+				}
+				Regles regles;
+				try {
+					double start = System.currentTimeMillis();
+					regles = Regle.regles_association(motifs_frequents, min_conf);
+					label_tmps_exec_regles.setText("temps d'execution = "+(System.currentTimeMillis() - start)+" ms");
+					area_regles.setText(regles.toString());
+					
+				} catch (Exception e2) {
+					afficherMessage("L'extraction de règles d'accosiation a échoué !" + e2);
+					e2.printStackTrace();
+					return;
+				}
+				
+			}
+		});
+		
+		JScrollPane scrollPane_1 = new JScrollPane((Component) null);
+		
+		label_tmps_exec_regles = new JLabel("");
+		label_tmps_exec_regles.setHorizontalAlignment(SwingConstants.CENTER);
+		label_tmps_exec_regles.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		GroupLayout gl_panel_8 = new GroupLayout(panel_8);
+		gl_panel_8.setHorizontalGroup(
+			gl_panel_8.createParallelGroup(Alignment.LEADING)
+				.addComponent(lblNewLabel_6_1, GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
+				.addGroup(gl_panel_8.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblNewLabel_11)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(textField_confidence, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblNewLabel_12)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnNewButton_2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGap(10))
+				.addGroup(gl_panel_8.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(label_tmps_exec_regles, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+					.addContainerGap())
+				.addGroup(gl_panel_8.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		gl_panel_8.setVerticalGroup(
+			gl_panel_8.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_8.createSequentialGroup()
+					.addComponent(lblNewLabel_6_1, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_11)
+						.addComponent(textField_confidence, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnNewButton_1)
+						.addComponent(lblNewLabel_12)
+						.addComponent(btnNewButton_2))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(label_tmps_exec_regles, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
+		);
+		
+		area_regles = new JTextArea();
+		scrollPane_1.setViewportView(area_regles);
+		panel_8.setLayout(gl_panel_8);
+		
+		JLabel lblNewLabel_6 = new JLabel("Motifs fréquents");
+		lblNewLabel_6.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblNewLabel_6.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		JLabel lblNewLabel_7 = new JLabel("dataset des instances");
+		
+		textField_fichier_datasetdiscret = new JTextField();
+		textField_fichier_datasetdiscret.setText("resources/dataset_discret.txt");
+		textField_fichier_datasetdiscret.setColumns(10);
+		
+		JButton btn_choisir_ficher_instaces_discret = new JButton("choisir");
+		btn_choisir_ficher_instaces_discret.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JLabel lblNewLabel_8 = new JLabel("algorithme");
+		
+		JComboBox comboBox_algorithme = new JComboBox();
+		comboBox_algorithme.setModel(new DefaultComboBoxModel(new String[] {"Aprioi", "Eclat"}));
+		
+		JLabel lblNewLabel_9 = new JLabel("support minimale");
+		
+		textField_min_sup = new JTextField();
+		textField_min_sup.setHorizontalAlignment(SwingConstants.CENTER);
+		textField_min_sup.setText("20");
+		textField_min_sup.setColumns(10);
+		
+		JLabel lblNewLabel_10 = new JLabel("%");
+		
+		JButton btn_lancer_motif_freq = new JButton("lancer");
+		btn_lancer_motif_freq.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				double min_sup;
+				try {
+					min_sup = Double.parseDouble(textField_min_sup.getText());
+				} catch (Exception e2) {
+					afficherMessage("La valeur de min support est éronnée");
+					return;
+				}
+				min_sup /= 100.0;
+				if (min_sup < 0 || min_sup > 100) {
+					afficherMessage("La valeur du support min doit être entre 0 et 100");
+					return;
+				}
+
+				try {
+					double start = System.currentTimeMillis();
+					if (comboBox_algorithme.getSelectedIndex() == 0) { // apriori
+						motifs_frequents = new Apriori(min_sup).run(textField_fichier_datasetdiscret.getText());
+					} else {
+						motifs_frequents = new Eclat(min_sup).run(textField_fichier_datasetdiscret.getText());
+					}
+					area_res_motifs_freq.setText(motifs_frequents.toString());
+					label_tmps_exec_motifs_freq.setText("temps d'execution = "+(System.currentTimeMillis() - start)+" ms");
+				} catch (Exception e2) {
+					afficherMessage("L'extraction des motifs fréquents à échoué !" + e2);
+					return;
+				}
+			}
+		});
+		
+		JScrollPane scrollPane = new JScrollPane((Component) null);
+		
+		label_tmps_exec_motifs_freq = new JLabel("");
+		label_tmps_exec_motifs_freq.setHorizontalAlignment(SwingConstants.CENTER);
+		label_tmps_exec_motifs_freq.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		GroupLayout gl_panel_7 = new GroupLayout(panel_7);
+		gl_panel_7.setHorizontalGroup(
+			gl_panel_7.createParallelGroup(Alignment.LEADING)
+				.addComponent(lblNewLabel_6, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
+				.addGroup(gl_panel_7.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblNewLabel_7)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(textField_fichier_datasetdiscret, GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btn_choisir_ficher_instaces_discret)
+					.addContainerGap())
+				.addGroup(gl_panel_7.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblNewLabel_8)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(comboBox_algorithme, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblNewLabel_9)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(textField_min_sup, GroupLayout.PREFERRED_SIZE, 64, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblNewLabel_10)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btn_lancer_motif_freq, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
+				.addGroup(gl_panel_7.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
+					.addContainerGap())
+				.addComponent(label_tmps_exec_motifs_freq, GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
+		);
+		gl_panel_7.setVerticalGroup(
+			gl_panel_7.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_7.createSequentialGroup()
+					.addComponent(lblNewLabel_6, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_7.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_7)
+						.addComponent(textField_fichier_datasetdiscret, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btn_choisir_ficher_instaces_discret))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_7.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_8)
+						.addComponent(comboBox_algorithme, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_9)
+						.addComponent(textField_min_sup, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_10)
+						.addComponent(btn_lancer_motif_freq))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(label_tmps_exec_motifs_freq, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
+		);
+		
+		area_res_motifs_freq = new JTextArea();
+		area_res_motifs_freq.setEditable(false);
+		scrollPane.setViewportView(area_res_motifs_freq);
+		panel_7.setLayout(gl_panel_7);
+		panel_6.setLayout(gl_panel_6);
 		panel.setLayout(gl_panel);
 		frame.getContentPane().setLayout(groupLayout);
 	}

@@ -25,7 +25,7 @@ public class Regle {
 		assert signe == POSITIVE || signe == NEGATIVE : "le signe doit être soit 1 pour les règles positives ou -1 pour les règles négatives";
 		Regles regles_corr = new Regles(regles.nbr_totale_instances);
 		for(Regle regle : regles_correlation(regles)) {
-			if ((regle.lift > 1 && signe == POSITIVE) || (regle.lift < 1 && signe == NEGATIVE)) {
+			if ((regle.lift > 1.0 && signe == POSITIVE) || (regle.lift < 1.0 && signe == NEGATIVE)) {
 				regles_corr.add(regle);
 			}
 		}
@@ -35,7 +35,7 @@ public class Regle {
 	public static Regles regles_correlation(Regles regles) {
 		Regles regles_corr = new Regles(regles.nbr_totale_instances);
 		for(Regle regle : regles) {
-			if (regle.lift > 1 || regle.lift < 1) {
+			if (regle.lift > 1.0 || regle.lift < 1.0) {
 				regles_corr.add(regle);
 			}
 		}
