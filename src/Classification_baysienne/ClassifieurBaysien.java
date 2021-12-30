@@ -8,6 +8,8 @@ import java.util.TreeMap;
 
 import javax.swing.table.TableModel;
 
+import motifs_frequents_et_regles.Ensemble;
+
 
 public class ClassifieurBaysien{
 	public Index index;
@@ -75,10 +77,10 @@ public class ClassifieurBaysien{
 		return instances;
 	}
 	
-	public TreeMap<Integer, String> tester(ArrayList<Instance> instances) {
-		TreeMap<Integer, String> classifications = new TreeMap<>();
+	public Classification tester(ArrayList<Instance> instances) {
+		Classification classifications = new Classification();
 		for(Instance instance : instances) {
-			classifications.put(instance.numero_instance, classifier(instance));
+			classifications.ajouter(instance, classifier(instance));
 		}
 		return classifications;
 	}
@@ -165,6 +167,7 @@ public class ClassifieurBaysien{
 	public static class Instance extends ArrayList<String> {
 		private static final long serialVersionUID = 1L;
 		public int numero_instance;
+		public String classe;
 		
 		public Instance(int numero_instance) {
 			super();
@@ -174,6 +177,25 @@ public class ClassifieurBaysien{
 		@Override
 		public String toString() {
 			return "#"+numero_instance+"=\"" + String.join(" ", this)+"\"";
+		}
+	}
+	
+	public static class Classification extends TreeMap<Integer, Instance> {
+		private static final long serialVersionUID = 1L;
+
+		public void ajouter(Instance instance, String classe) {
+			instance.classe = classe;
+			put(instance.numero_instance, instance);
+		}
+		
+		@Override
+		public String toString() {
+			String text = "";
+			for (Integer num_instance : this.keySet()) {
+				Instance instance = get(num_instance);
+				text += num_instance+ " = "+instance.classe + "\n";
+			}
+			return text;
 		}
 	}
 }

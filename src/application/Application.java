@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -37,6 +38,8 @@ import javax.swing.table.TableModel;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
+import Classification_baysienne.ClassifieurBaysien;
+import Classification_baysienne.ClassifieurBaysien.Classification;
 import data.Dataset;
 import data.Frequences;
 import data.Type;
@@ -54,6 +57,7 @@ import java.awt.Font;
 import javax.swing.JTextPane;
 import javax.swing.JScrollBar;
 import java.awt.Component;
+import javax.swing.BoxLayout;
 
 public class Application {
 	private Application application;
@@ -96,6 +100,9 @@ public class Application {
 	private JTextField textField_confidence;
 	private JTextArea area_regles;
 	private JLabel label_tmps_exec_regles;
+	private JTextField textField_taille_echantillion_testbays;
+	private JTextArea area_res_class_bays;
+	private JTextArea area_instances_bays;
 
 	/**
 	 * Launch the application.
@@ -723,23 +730,8 @@ public class Application {
 		tabbedPane.addTab("Motifs fréquents et règles", null, panel_6, null);
 		
 		JPanel panel_7 = new JPanel();
-		panel_7.setBorder(new LineBorder(Color.BLACK));
 		
 		JPanel panel_8 = new JPanel();
-		panel_8.setBorder(new LineBorder(Color.BLACK));
-		GroupLayout gl_panel_6 = new GroupLayout(panel_6);
-		gl_panel_6.setHorizontalGroup(
-			gl_panel_6.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_6.createSequentialGroup()
-					.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_8, GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE))
-		);
-		gl_panel_6.setVerticalGroup(
-			gl_panel_6.createParallelGroup(Alignment.LEADING)
-				.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
-				.addComponent(panel_8, GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
-		);
 		
 		JLabel lblNewLabel_6_1 = new JLabel("Règles d'association / de corrélation");
 		lblNewLabel_6_1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -940,6 +932,7 @@ public class Application {
 				}
 			}
 		});
+		panel_6.setLayout(new BoxLayout(panel_6, BoxLayout.X_AXIS));
 		
 		JScrollPane scrollPane = new JScrollPane((Component) null);
 		
@@ -1006,7 +999,139 @@ public class Application {
 		area_res_motifs_freq.setEditable(false);
 		scrollPane.setViewportView(area_res_motifs_freq);
 		panel_7.setLayout(gl_panel_7);
-		panel_6.setLayout(gl_panel_6);
+		panel_6.add(panel_7);
+		panel_6.add(panel_8);
+		
+		JPanel panel_9 = new JPanel();
+		tabbedPane.addTab("Classification", null, panel_9, null);
+		panel_9.setLayout(new BoxLayout(panel_9, BoxLayout.X_AXIS));
+		
+		JPanel panel_10 = new JPanel();
+		panel_9.add(panel_10);
+		
+		JLabel lblNewLabel_6_2 = new JLabel("Classification Baysiénne");
+		lblNewLabel_6_2.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_6_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		
+		JLabel lblNewLabel_13 = new JLabel("Instances");
+		
+		JButton btn_evaluer_instances = new JButton("evaluer instances");
+		btn_evaluer_instances.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JButton btn_tester_dataset = new JButton("lancer le test");
+		btn_tester_dataset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int nbr_instances_apprentissge;
+				try {
+					nbr_instances_apprentissge = Integer.parseInt(textField_taille_echantillion_testbays.getText());
+				} catch (Exception e2) {
+					afficherMessage("Le nombre d'instances d'appentissage est éronée (doit être un entier)");
+					return;
+				}
+				if (nbr_instances_apprentissge <= 0) {
+					afficherMessage("Le nombre d'instances d'appentissage doit être strictement positive");
+					return;
+				}
+				try {
+					TableModel model = table_dataset.getModel();
+					ClassifieurBaysien classifieur = new ClassifieurBaysien(model, dataset.n, dataset.m, nbr_instances_apprentissge);
+					Classification resultat = classifieur.tester(classifieur.instances_de_test(model));
+					area_res_class_bays.setText(resultat.toString());
+				} catch (Exception e1) {
+					afficherMessage("La classification baysiénne a échoué!");
+					e1.printStackTrace();
+					return;
+				}
+			}
+		});
+		
+		JScrollPane scrollBar = new JScrollPane();
+		
+		JScrollPane scrollBar_1 = new JScrollPane();
+		
+		JLabel lblNewLabel_14 = new JLabel("nombre instances d'apprentissage");
+		
+		textField_taille_echantillion_testbays = new JTextField();
+		textField_taille_echantillion_testbays.setText("50");
+		textField_taille_echantillion_testbays.setHorizontalAlignment(SwingConstants.CENTER);
+		textField_taille_echantillion_testbays.setColumns(10);
+		GroupLayout gl_panel_10 = new GroupLayout(panel_10);
+		gl_panel_10.setHorizontalGroup(
+			gl_panel_10.createParallelGroup(Alignment.LEADING)
+				.addComponent(lblNewLabel_6_2, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
+				.addGroup(gl_panel_10.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblNewLabel_13, GroupLayout.PREFERRED_SIZE, 59, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
+					.addComponent(btn_evaluer_instances)
+					.addContainerGap())
+				.addGroup(gl_panel_10.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+					.addContainerGap())
+				.addGroup(gl_panel_10.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblNewLabel_14)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(textField_taille_echantillion_testbays, GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
+					.addGap(13)
+					.addComponent(btn_tester_dataset, GroupLayout.PREFERRED_SIZE, 121, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
+				.addGroup(gl_panel_10.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		gl_panel_10.setVerticalGroup(
+			gl_panel_10.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_10.createSequentialGroup()
+					.addComponent(lblNewLabel_6_2, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_13)
+						.addComponent(btn_evaluer_instances))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_14)
+						.addComponent(btn_tester_dataset)
+						.addComponent(textField_taille_echantillion_testbays, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		
+		area_res_class_bays = new JTextArea();
+		scrollBar_1.setViewportView(area_res_class_bays);
+		
+		area_instances_bays = new JTextArea();
+		scrollBar.setViewportView(area_instances_bays);
+		panel_10.setLayout(gl_panel_10);
+		
+		JPanel panel_11 = new JPanel();
+		panel_9.add(panel_11);
+		
+		JLabel lblNewLabel_6_2_1 = new JLabel("");
+		lblNewLabel_6_2_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_6_2_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		GroupLayout gl_panel_11 = new GroupLayout(panel_11);
+		gl_panel_11.setHorizontalGroup(
+			gl_panel_11.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_11.createSequentialGroup()
+					.addComponent(lblNewLabel_6_2_1, GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
+					.addGap(20))
+		);
+		gl_panel_11.setVerticalGroup(
+			gl_panel_11.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_11.createSequentialGroup()
+					.addComponent(lblNewLabel_6_2_1, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(391, Short.MAX_VALUE))
+		);
+		panel_11.setLayout(gl_panel_11);
 		panel.setLayout(gl_panel);
 		frame.getContentPane().setLayout(groupLayout);
 	}
