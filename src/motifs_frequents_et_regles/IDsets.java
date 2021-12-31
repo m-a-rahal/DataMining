@@ -1,8 +1,6 @@
 package motifs_frequents_et_regles;
 
 import java.util.HashMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 public class IDsets extends HashMap<String, Ensemble<Integer>>{
 	private static final long serialVersionUID = 1L;
@@ -10,7 +8,7 @@ public class IDsets extends HashMap<String, Ensemble<Integer>>{
 	public void ajouter(String item, int id) {
 		Ensemble<Integer> ids = get(item);
 		if (ids == null) {
-			ids = new Ensemble<Integer>();
+			ids = new Ensemble<>();
 			put(item, ids);
 		}
 		ids.add(id);
@@ -19,7 +17,7 @@ public class IDsets extends HashMap<String, Ensemble<Integer>>{
 	public int support(String item) {
 		return get(item).size();
 	}
-	
+
 	@Override
 	public String toString() {
 		String text = "{ ";
@@ -29,5 +27,5 @@ public class IDsets extends HashMap<String, Ensemble<Integer>>{
 		}
 		return text + "}";
 	}
-	
+
 }

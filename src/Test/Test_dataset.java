@@ -2,7 +2,6 @@ package Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.sound.midi.Soundbank;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -34,7 +33,7 @@ public class Test_dataset {
 		System.out.println(classifieur.p_laplace("I12", "1.0"));
 		System.out.println(classifieur.tester(classifieur.instances_de_test(model)));
 	}
-	
+
 	@SuppressWarnings("unused")
 	private static void test_motifs_frequents() throws FileNotFoundException {
 		Dataset dataset = FileManager.extract_dataset(null);
@@ -43,7 +42,7 @@ public class Test_dataset {
 		//System.out.println(dataset.proba_instance(21, 2));
 		test_RegleAssociation_corr(L,0.2);
 	}
-	
+
 	private static void test_RegleAssociation_corr(Itemsets L, double min_conf) {
 		System.out.println("-- règles association -----------------------------------------------------------------");
 		System.out.println(Regle.regles_association(L, min_conf));
@@ -64,7 +63,7 @@ public class Test_dataset {
 		}
 		return null;
 	}
-	
+
 	private static void test_Apriori(Dataset dataset, double min_sup_pourcent, String file) {
 		try {
 			Apriori apriori = new Apriori(min_sup_pourcent);
@@ -73,21 +72,21 @@ public class Test_dataset {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/* utilisez le GUI pour tester les digrammes
 	private static void test_histogram() throws FileNotFoundException {
 		Dataset dataset = FileManager.extract_dataset(null);
 		Diagrammes diag = new Diagrammes(dataset);
 		diag.histogram(0);
 	}*/
-	
+
 	@SuppressWarnings("unused")
 	private static void test_dispersion_diag() throws FileNotFoundException {
 		Dataset dataset = FileManager.extract_dataset(null);
 		Diagrammes diag = new Diagrammes(dataset, null);
 		diag.diagramme_disperssion(5, 6);
 	}
-	
+
 	@SuppressWarnings("unused")
 	private static void testMoyenneTronquee() throws FileNotFoundException {
 		Dataset dataset = FileManager.extract_dataset(null);
@@ -95,30 +94,30 @@ public class Test_dataset {
 			System.out.println(dataset.moyenne_tronqee(0,i/100.0));
 		}
 	}
-	
+
 	public static void testMesures() throws Exception {
 		Dataset dataset = FileManager.extract_dataset(null);
 		System.out.println(dataset.mesures_string());
 		// exemple d'utilisation
 		dataset.ecartType(0);
 	}
-	
+
 	public static void testFile_extraction() throws IOException {
 		Dataset dataset = FileManager.extract_dataset(null);
 		dataset.show();
 	}
-	
+
 	public static void testURL_extraction() throws IOException {
 		Dataset dataset = URLManager.extract_dataset(null);
 		dataset.show();
 	}
-	
+
 	private static TableModel model_from_table(Dataset dataset) throws Exception {
 		/** charger la dataset dans la table et afficher les mesures
 		 * */
-		
-		String[] col_names_with_number = new String[dataset.col_names.length+1]; for (int i = 0; i < dataset.col_names.length; i++) {col_names_with_number[i]=dataset.col_names[i];}; col_names_with_number[dataset.col_names.length] = "#";
-		
+
+		String[] col_names_with_number = new String[dataset.col_names.length+1]; for (int i = 0; i < dataset.col_names.length; i++) {col_names_with_number[i]=dataset.col_names[i];} col_names_with_number[dataset.col_names.length] = "#";
+
 		// load table in Jtabel
 		TableModel tableModel = new DefaultTableModel(col_names_with_number, dataset.n);
 		// afficher les données originales
@@ -129,7 +128,7 @@ public class Test_dataset {
 		}
 		return tableModel;
 	}
-	
+
 	private static void discretiser(TableModel model) {
 		for (int j = 0; j < model.getColumnCount()-2; j++) {
 			for (int i = 0; i < model.getRowCount(); i++) {

@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.TreeMap;
 
 import javax.swing.table.TableModel;
-
-import motifs_frequents_et_regles.Ensemble;
 
 
 public class ClassifieurBaysien extends Classifieur {
@@ -20,11 +17,11 @@ public class ClassifieurBaysien extends Classifieur {
 		this.taille_echantillon_apprentissage = taille_echantillon_apprentissage;
 		this.index = apprendre(model);
 	}
-	
+
 	public double p_classe(String classe) {
-		return index.taille(classe)/(double)index.taille_totale();
+		return index.taille(classe)/index.taille_totale();
 	}
-	
+
 	public double p(Instance instance, String classe) {
 		double p = 1;
 		for(String x : instance) {
@@ -32,11 +29,11 @@ public class ClassifieurBaysien extends Classifieur {
 		}
 		return p;
 	}
-	
+
 	public double p(String x, String classe) {
 		return index.taille(x, classe)/(double)index.taille(classe);
 	}
-	
+
 	public double p_laplace(String x, String classe) {
 		return (index.taille(x, classe) + 1)/(double)(index.taille(classe) + index.valeurs_possibles.get(x).size());
 	}
@@ -45,7 +42,7 @@ public class ClassifieurBaysien extends Classifieur {
 		Index index = new Index(m);
 		for (int i = 0; i < n; i++) {
 			String classe = model.getValueAt(i, m-1).toString();
-			if (index.taille(classe) < taille_echantillon_apprentissage) { 
+			if (index.taille(classe) < taille_echantillon_apprentissage) {
 				index.valeurs_possibles.ajouter(m, classe);
 				index.incrementer(classe); // compter la taille de la classe
 				for (int j = 0; j < m-1; j++) {
@@ -56,7 +53,7 @@ public class ClassifieurBaysien extends Classifieur {
 		}
 		return index;
 	}
-	
+
 	public ArrayList<Instance> instances_de_test(TableModel model) {
 		// par défaut les instances sont prises du dataset (table)
 		ArrayList<Instance> instances = new ArrayList<>();
@@ -76,7 +73,7 @@ public class ClassifieurBaysien extends Classifieur {
 		}
 		return instances;
 	}
-	
+
 	public Classification tester(ArrayList<Instance> instances) {
 		Classification classifications = new Classification(index.valeurs_possibles.get(m));
 		for(Instance instance : instances) {
@@ -84,14 +81,14 @@ public class ClassifieurBaysien extends Classifieur {
 		}
 		return classifications;
 	}
-	
+
 	private String classifier(Instance instance) {
 		HashMap<String, Double> poids = new HashMap<>();
 		for(String classe : index.valeurs_possibles.get(m)) {// pour chaque classe
 			poids.put(classe, p(instance, classe));
 		}
 		double max_poids = Collections.max(poids.values());
-		ArrayList<String> classifications = new ArrayList<String>();
+		ArrayList<String> classifications = new ArrayList<>();
 		for(String classe : poids.keySet()) {// pour chaque classe
 			if (poids.get(classe) >= max_poids) {
 				classifications.add(classe);
@@ -140,7 +137,7 @@ public class ClassifieurBaysien extends Classifieur {
 			int j = attribut_de(x); // détecter l'attribut
 			ajouter(j, x);
 		}
-		
+
 		public HashSet<String> get(String x) {
 			// TODO Auto-generated method stub
 			return super.get(attribut_de(x));
@@ -158,7 +155,7 @@ public class ClassifieurBaysien extends Classifieur {
 			}
 			valeurs.add(x);
 		}
-		
+
 		public Integer attribut_de(String x) {
 			return Integer.parseInt(""+x.charAt(1));
 		}

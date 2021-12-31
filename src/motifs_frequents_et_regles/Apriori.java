@@ -3,11 +3,12 @@ import input_output_classes.PatternFileManager;
 
 public class Apriori extends AlgoMotifsFrequents {
 
-	
+
 	public Apriori(double min_sup_pourcent) {
 		super(min_sup_pourcent);
 	}
 
+	@Override
 	public Itemsets run(String file_path) {
 		file_manager = new PatternFileManager(file_path);
 		// associer a chaque element un support
@@ -16,12 +17,12 @@ public class Apriori extends AlgoMotifsFrequents {
 		Itemsets L = new Itemsets(); // L = L1 dans cette étape
 		for (String item : supports.keySet()) {
 			if (supports.get(item) >= min_sup()) {
-				Ensemble<String> itemset = new Ensemble<String>(item);
+				Ensemble<String> itemset = new Ensemble<>(item);
 				itemset.support = supports.get(item);
 				L.add(itemset);
-			};
+			}
 		}
-		
+
 		int k = 2;
 		Itemsets Lk = new Itemsets();
 		Lk.addAll(L);
@@ -38,7 +39,7 @@ public class Apriori extends AlgoMotifsFrequents {
 			}
 			L.addAll(Lk);
 		}
-		
+
 		L.nbr_totale_instances = nbr_instances;
 		return L;
 	}

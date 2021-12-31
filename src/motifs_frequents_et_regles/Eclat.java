@@ -1,6 +1,5 @@
 package motifs_frequents_et_regles;
 import java.util.ArrayList;
-import javax.swing.table.TableModel;
 
 import input_output_classes.PatternFileManager;
 
@@ -10,21 +9,22 @@ public class Eclat extends AlgoMotifsFrequents{
 		super(min_sup_pourcent);
 	}
 
+	@Override
 	public Itemsets run(String file_path) {
 		file_manager = new PatternFileManager(file_path);
-		
+
 		// extraitre la liste des items (L1)
 		Itemsets L = new Itemsets(); // L = L1 dans cette étape
 		// calculer les IDsets des items du dataset
 		L.iDsets = file_manager.extraire_IDs_des_items(this);
 		for (String item : L.iDsets.keySet()) {
 			if (L.iDsets.support(item) >= min_sup()) {
-				Ensemble<String> itemset = new Ensemble<String>(item);
+				Ensemble<String> itemset = new Ensemble<>(item);
 				itemset.support = L.iDsets.support(item);
 				L.add(itemset);
-			};
+			}
 		}
-		
+
 		Itemsets Lk = new Itemsets();
 		Lk.addAll(L);
 		Lk.iDsets = L.iDsets;
@@ -43,17 +43,17 @@ public class Eclat extends AlgoMotifsFrequents{
 			}
 			L.addAll(Lk);
 		}
-		
+
 		L.iDsets = null; // libérer l'espac mémoire
 		L.nbr_totale_instances = nbr_instances;
 		return L;
 	}
-	
+
 	@Override
 	protected Itemsets combiner_itmesets(Itemsets Lk) {
 		Itemsets Lk1 = new Itemsets();
 		Lk1.iDsets = new IDsets();
-		ArrayList<Ensemble<String>> itemsets = new ArrayList<Ensemble<String>>(Lk);
+		ArrayList<Ensemble<String>> itemsets = new ArrayList<>(Lk);
 		for (int i = 0; i < itemsets.size(); i++) {
 			Ensemble<String> A = itemsets.get(i);
 			for (int j = i+1; j < itemsets.size(); j++) {

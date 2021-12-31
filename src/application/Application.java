@@ -2,16 +2,18 @@ package application;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.TreeMap;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -29,6 +31,8 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -38,10 +42,10 @@ import javax.swing.table.TableModel;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
+import Classification.Classifieur.Classification;
 import Classification.ClassifieurBaysien;
 import Classification.Evaluation;
 import Classification.Evaluation.Evaluations;
-import Classification.Classifieur.Classification;
 import data.Dataset;
 import data.Frequences;
 import data.Type;
@@ -53,13 +57,6 @@ import motifs_frequents_et_regles.Eclat;
 import motifs_frequents_et_regles.Itemsets;
 import motifs_frequents_et_regles.Regle;
 import motifs_frequents_et_regles.Regle.Regles;
-
-import javax.swing.SwingConstants;
-import java.awt.Font;
-import javax.swing.JTextPane;
-import javax.swing.JScrollBar;
-import java.awt.Component;
-import javax.swing.BoxLayout;
 
 public class Application {
 	private Application application;
@@ -113,11 +110,12 @@ public class Application {
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					Application window = new Application();
 					// Maximizer la fenêtre et l'afficher
-					window.frame.setExtendedState(window.frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+					window.frame.setExtendedState(window.frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -133,8 +131,8 @@ public class Application {
 		application = this; // self reference, needed later
 		frame = new JFrame();
 		frame.setBounds(100, 100, 830, 482);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
 		JPanel panel = new JPanel();
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
@@ -145,8 +143,8 @@ public class Application {
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
 		);
-		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+
+		JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -156,13 +154,13 @@ public class Application {
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
 		);
-		
+
 		JPanel panel_dataset = new JPanel();
 		tabbedPane.addTab("Dataset", null, panel_dataset, null);
-		
+
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new LineBorder(Color.GRAY));
-		
+
 		JPanel panel_2 = new JPanel();
 		GroupLayout gl_panel_dataset = new GroupLayout(panel_dataset);
 		gl_panel_dataset.setHorizontalGroup(
@@ -183,10 +181,11 @@ public class Application {
 					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
 					.addGap(10))
 		);
-		
+
 		table_dataset = add_table_to(panel_2);
 		btn_ajouter_ligne = new JButton("ajouter ligne");
 		btn_ajouter_ligne.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
 				model.addRow(new Double[model.getColumnCount()]);
@@ -196,9 +195,10 @@ public class Application {
 				table_dataset.changeSelection(last_row, 0, true, false);
 			}
 		});
-		
+
 		JButton btn_appliquer_changements = new JButton("appliquer les modifications");
 		btn_appliquer_changements.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (chckbxTrierLesDonns.isSelected()) {
 					switch(JOptionPane.showConfirmDialog(frame, "voulez vous vraiment écraser les donnés avec les valeurs triés?")) {
@@ -210,10 +210,11 @@ public class Application {
 				appliquer_les_changements();
 			}
 		});
-		
+
 		JButton btnSupprimerligne = new JButton("supprimer lignes");
 		btnSupprimerligne.setToolTipText("supprimer les lignes sélectionnées");
 		btnSupprimerligne.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				DefaultTableModel model = (DefaultTableModel) table_dataset.getModel();
 				int[] rows = table_dataset.getSelectedRows();
@@ -224,18 +225,19 @@ public class Application {
 				update_row_numbers_on_table(model);
 			}
 		});
-		
+
 		JLabel lblNewLabel = new JLabel("Dataset");
-		
+
 		text_dataset_src = new JTextField();
 		text_dataset_src.setToolTipText("le chemin (ou l'url) du dataset ...");
 		text_dataset_src.setColumns(10);
-		
+
 		JCheckBox chckbxUrl = new JCheckBox("url");
 		chckbxUrl.setToolTipText("spécifier si vous voulez récupérer votre dataset depuis un url sur internet ou localement avec son chemin d'emplacement");
-		
+
 		JButton btnCharger = new JButton("charger");
 		btnCharger.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(! chckbxUrl.isSelected()) {
 		            try {
@@ -260,11 +262,12 @@ public class Application {
 				}
 			}
 
-			
+
 		});
-		
+
 		JButton btnSauvegarder = new JButton("sauvegarder");
 		btnSauvegarder.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				switch(JOptionPane.showConfirmDialog(frame, "voulez vous appliquer les changements avant de sauvegarder le dataset?")) {
 					case 0: // yes
@@ -294,14 +297,15 @@ public class Application {
 			}
 
 		});
-		
+
 		JLabel lblNewLabel_1 = new JLabel("Destination");
-		
+
 		textField_dest_file = new JTextField();
 		textField_dest_file.setColumns(10);
-		
+
 		chckbxTrierLesDonns = new JCheckBox("trier les donnés");
 		chckbxTrierLesDonns.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					if (chckbxTrierLesDonns.isSelected()) { // apply changes before sorting?
@@ -323,12 +327,13 @@ public class Application {
 				}
 			}
 		});
-		
+
 		chckbox_apply_before_sort = new JCheckBox("appliquer les changements avant de trier");
 		chckbox_apply_before_sort.setSelected(true);
-		
+
 		JButton btnNormaliser = new JButton("Normaliser");
 		btnNormaliser.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				double nouv_max, nouv_min;
 				try {
@@ -348,7 +353,7 @@ public class Application {
 					} else {
 						//#### norm z score
 						System.out.println("z-score non impémenté");
-					};
+					}
 				}
 				try {
 					load_dataset_on_table();
@@ -357,9 +362,10 @@ public class Application {
 				}
 			}
 		});
-		
+
 		JButton btnNewButton = new JButton("discretiser");
 		btnNewButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				int Q;
 				try {
@@ -382,37 +388,37 @@ public class Application {
 				}
 			}
 		});
-		
+
 		comboBox_type_discretisation = new JComboBox();
 		comboBox_type_discretisation.setModel(new DefaultComboBoxModel(new String[] {"Discrétisation en classes d'amplitudes égales", "Discrétisation d'effectifs égaux"}));
-		
+
 		comboBox_type_normalisation = new JComboBox();
 		comboBox_type_normalisation.setModel(new DefaultComboBoxModel(new String[] {"normalisation avec Min-Max", "normalisation avec Z-score "}));
-		
+
 		textField_Q = new JTextField();
 		textField_Q.setHorizontalAlignment(SwingConstants.CENTER);
 		textField_Q.setText("4");
 		textField_Q.setToolTipText("le chemin (ou l'url) du dataset ...");
 		textField_Q.setColumns(10);
-		
+
 		JLabel lblQ = new JLabel("Q");
 		lblQ.setHorizontalAlignment(SwingConstants.CENTER);
-		
+
 		textField_min = new JTextField();
 		textField_min.setText("0");
 		textField_min.setHorizontalAlignment(SwingConstants.CENTER);
 		textField_min.setToolTipText("le chemin (ou l'url) du dataset ...");
 		textField_min.setColumns(10);
-		
+
 		textField_max = new JTextField();
 		textField_max.setHorizontalAlignment(SwingConstants.CENTER);
 		textField_max.setText("1");
 		textField_max.setToolTipText("le chemin (ou l'url) du dataset ...");
 		textField_max.setColumns(10);
-		
+
 		JLabel lblMax = new JLabel("min");
 		lblMax.setHorizontalAlignment(SwingConstants.CENTER);
-		
+
 		JLabel lblMax_1 = new JLabel("max");
 		lblMax_1.setHorizontalAlignment(SwingConstants.CENTER);
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
@@ -513,24 +519,25 @@ public class Application {
 		);
 		panel_1.setLayout(gl_panel_1);
 		panel_dataset.setLayout(gl_panel_dataset);
-		
+
 		JPanel panel_desc_mesures = new JPanel();
 		tabbedPane.addTab("Description et mesures", null, panel_desc_mesures, null);
-		
+
 		JLabel lblNewLabel_2 = new JLabel("Description du dataset");
-		
+
 		textArea_description = new JTextArea();
-		
+
 		JLabel lblNewLabel_2_1 = new JLabel("Mesures");
 		JPanel panel_3 = new JPanel();
 		table_mesures = add_table_to(panel_3);
-		
+
 		JLabel lblNewLabel_3 = new JLabel("Pourcentage à trouquer");
 		label_pourcentage_moy_tronquee = new JLabel("10%");
-		
+
 		slider_moy_tronquee = new JSlider();
 		slider_moy_tronquee.setValue(10);
 		slider_moy_tronquee.addChangeListener(new ChangeListener() {
+			@Override
 			public void stateChanged(ChangeEvent e) {
 				int seuil = slider_moy_tronquee.getValue();
 				label_pourcentage_moy_tronquee.setText(seuil+"%");
@@ -539,13 +546,13 @@ public class Application {
 		});
 		slider_moy_tronquee.setMinorTickSpacing(1);
 		slider_moy_tronquee.setMaximum(49);
-		
+
 		JPanel panel_4 = new JPanel();
 		textArea_description = add_textArea_to(panel_4);
-		
+
 		JPanel panel_5 = new JPanel();
 		table_attributs = add_table_to(panel_5);
-		
+
 		GroupLayout gl_panel_desc_mesures = new GroupLayout(panel_desc_mesures);
 		gl_panel_desc_mesures.setHorizontalGroup(
 			gl_panel_desc_mesures.createParallelGroup(Alignment.TRAILING)
@@ -591,80 +598,85 @@ public class Application {
 					.addGap(21))
 		);
 		panel_desc_mesures.setLayout(gl_panel_desc_mesures);
-		
+
 		JPanel panel_plots = new JPanel();
 		tabbedPane.addTab("Diagrammes", null, panel_plots, null);
-		
+
 		JLabel lblNewLabel_4 = new JLabel("Type du diagramme");
-		
+
 		comboBox_type_diagramme = new JComboBox();
 		comboBox_type_diagramme.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				update_diagramme();
 			}
 		});
 		comboBox_type_diagramme.setModel(new DefaultComboBoxModel(new String[] {"","Histogramme", "Boite à moustache", "Q-Q Plot", "ScatterPlot", "tous les Boites à moustache"}));
-		
+
 		panel_diagrammes = new ChartPanel(null);
 		panel_diagrammes.setBorder(new LineBorder(new Color(0, 0, 0)));
-		
+
 		JLabel lblNewLabel_5 = new JLabel("attribut 1");
-		
+
 		comboBox_attribut1 = new JComboBox();
 		comboBox_attribut1.setModel(new DefaultComboBoxModel(new String[] {"area", "perimeter", "compactness", "length of kernel", "width of kernel", "asymmetry coefficient", "length of kernel groove", "class"}));
 		comboBox_attribut1.setSelectedIndex(0);
 		comboBox_attribut1.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				update_diagramme();
 			}
 		});
-		
-		
+
+
 		JLabel lblNewLabel_5_1 = new JLabel("attribut 2");
-		
+
 		comboBox_attribut2 = new JComboBox();
 		comboBox_attribut2.setModel(new DefaultComboBoxModel(new String[] {"area", "perimeter", "compactness", "length of kernel", "width of kernel", "asymmetry coefficient", "length of kernel groove", "class"}));
 		comboBox_attribut2.setSelectedIndex(1);
 		comboBox_attribut2.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				update_diagramme();
 			}
 		});
-		
+
 		chckbxOutliers_disc = new JCheckBox("Outliers");
 		chckbxOutliers_disc.setToolTipText("");
 		chckbxOutliers_disc.setEnabled(false);
 		chckbxOutliers_disc.setSelected(true);
 		chckbxOutliers_disc.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				update_diagramme();
 			}
 		});
-		
+
 		coeffCorel = new JTextField();
 		coeffCorel.setEditable(false);
 		coeffCorel.setColumns(10);
-		
+
 		label_coef_corr = new JLabel("Coeffitient de correlation");
-		
+
 		label_info = new JLabel(" ");
 		label_info.setForeground(Color.RED);
-		
+
 		nb_intervals = new JTextField();
 		nb_intervals.setText("20");
 		nb_intervals.setColumns(10);
 		nb_intervals.setEnabled(false);
 		nb_intervals.setVisible(false);
 		nb_intervals.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				update_diagramme();
 			}
 		});
-		
+
 		nbInterLabel = new JLabel("nombre d'intervales");
 		nbInterLabel.setVisible(false);
 
-		
+
 		GroupLayout gl_panel_plots = new GroupLayout(panel_plots);
 		gl_panel_plots.setHorizontalGroup(
 			gl_panel_plots.createParallelGroup(Alignment.LEADING)
@@ -729,27 +741,28 @@ public class Application {
 					.addContainerGap())
 		);
 		panel_plots.setLayout(gl_panel_plots);
-		
+
 		JPanel panel_6 = new JPanel();
 		tabbedPane.addTab("Motifs fréquents et règles", null, panel_6, null);
-		
+
 		JPanel panel_7 = new JPanel();
-		
+
 		JPanel panel_8 = new JPanel();
-		
+
 		JLabel lblNewLabel_6_1 = new JLabel("Règles d'association / de corrélation");
 		lblNewLabel_6_1.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_6_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		
+
 		JLabel lblNewLabel_11 = new JLabel("confidence min");
-		
+
 		textField_confidence = new JTextField();
 		textField_confidence.setText("90");
 		textField_confidence.setHorizontalAlignment(SwingConstants.CENTER);
 		textField_confidence.setColumns(10);
-		
+
 		JButton btnNewButton_1 = new JButton("règles de corrélation");
 		btnNewButton_1.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				double min_conf;
 				try {
@@ -777,7 +790,7 @@ public class Application {
 										 regles_pos.toString()+
 										"\nrègles de corrélation négatives:\n"+
 										 regles_neg.toString());
-					
+
 				} catch (Exception e2) {
 					afficherMessage("L'extraction de règles de corrélation a échoué !" + e2);
 					e2.printStackTrace();
@@ -785,11 +798,12 @@ public class Application {
 				}
 			}
 		});
-		
+
 		JLabel lblNewLabel_12 = new JLabel("%");
-		
+
 		JButton btnNewButton_2 = new JButton("règles d'association");
 		btnNewButton_2.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				double min_conf;
 				try {
@@ -813,18 +827,18 @@ public class Application {
 					regles = Regle.regles_association(motifs_frequents, min_conf);
 					label_tmps_exec_regles.setText("temps d'execution = "+(System.currentTimeMillis() - start)+" ms");
 					area_regles.setText(regles.toString());
-					
+
 				} catch (Exception e2) {
 					afficherMessage("L'extraction de règles d'accosiation a échoué !" + e2);
 					e2.printStackTrace();
 					return;
 				}
-				
+
 			}
 		});
-		
+
 		JScrollPane scrollPane_1 = new JScrollPane((Component) null);
-		
+
 		label_tmps_exec_regles = new JLabel("");
 		label_tmps_exec_regles.setHorizontalAlignment(SwingConstants.CENTER);
 		label_tmps_exec_regles.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -870,43 +884,45 @@ public class Application {
 					.addComponent(label_tmps_exec_regles, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
-		
+
 		area_regles = new JTextArea();
 		scrollPane_1.setViewportView(area_regles);
 		panel_8.setLayout(gl_panel_8);
-		
+
 		JLabel lblNewLabel_6 = new JLabel("Motifs fréquents");
 		lblNewLabel_6.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblNewLabel_6.setHorizontalAlignment(SwingConstants.CENTER);
-		
+
 		JLabel lblNewLabel_7 = new JLabel("dataset des instances");
-		
+
 		textField_fichier_datasetdiscret = new JTextField();
 		textField_fichier_datasetdiscret.setText("resources/dataset_discret.txt");
 		textField_fichier_datasetdiscret.setColumns(10);
-		
+
 		JButton btn_choisir_ficher_instaces_discret = new JButton("choisir");
 		btn_choisir_ficher_instaces_discret.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		
+
 		JLabel lblNewLabel_8 = new JLabel("algorithme");
-		
+
 		JComboBox comboBox_algorithme = new JComboBox();
 		comboBox_algorithme.setModel(new DefaultComboBoxModel(new String[] {"Aprioi", "Eclat"}));
-		
+
 		JLabel lblNewLabel_9 = new JLabel("support minimale");
-		
+
 		textField_min_sup = new JTextField();
 		textField_min_sup.setHorizontalAlignment(SwingConstants.CENTER);
 		textField_min_sup.setText("20");
 		textField_min_sup.setColumns(10);
-		
+
 		JLabel lblNewLabel_10 = new JLabel("%");
-		
+
 		JButton btn_lancer_motif_freq = new JButton("lancer");
 		btn_lancer_motif_freq.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				double min_sup;
 				try {
@@ -937,9 +953,9 @@ public class Application {
 			}
 		});
 		panel_6.setLayout(new BoxLayout(panel_6, BoxLayout.X_AXIS));
-		
+
 		JScrollPane scrollPane = new JScrollPane((Component) null);
-		
+
 		label_tmps_exec_motifs_freq = new JLabel("");
 		label_tmps_exec_motifs_freq.setHorizontalAlignment(SwingConstants.CENTER);
 		label_tmps_exec_motifs_freq.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -998,35 +1014,37 @@ public class Application {
 					.addComponent(label_tmps_exec_motifs_freq, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
-		
+
 		area_res_motifs_freq = new JTextArea();
 		area_res_motifs_freq.setEditable(false);
 		scrollPane.setViewportView(area_res_motifs_freq);
 		panel_7.setLayout(gl_panel_7);
 		panel_6.add(panel_7);
 		panel_6.add(panel_8);
-		
+
 		JPanel panel_9 = new JPanel();
 		tabbedPane.addTab("Classification", null, panel_9, null);
 		panel_9.setLayout(new BoxLayout(panel_9, BoxLayout.X_AXIS));
-		
+
 		JPanel panel_10 = new JPanel();
 		panel_9.add(panel_10);
-		
+
 		JLabel lblNewLabel_6_2 = new JLabel("Classification Baysiénne");
 		lblNewLabel_6_2.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_6_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		
+
 		JLabel lblNewLabel_13 = new JLabel("Instances");
-		
+
 		JButton btn_evaluer_instances = new JButton("evaluer instances");
 		btn_evaluer_instances.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		
+
 		JButton btn_tester_dataset = new JButton("lancer le test");
 		btn_tester_dataset.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				int nbr_instances_apprentissge;
 				try {
@@ -1096,13 +1114,13 @@ public class Application {
 				table_mesures_bays.setModel(model);
 			}
 		});
-		
+
 		JScrollPane scrollBar = new JScrollPane();
-		
+
 		JScrollPane scrollBar_1 = new JScrollPane();
-		
+
 		JLabel lblNewLabel_14 = new JLabel("nombre instances d'apprentissage");
-		
+
 		textField_taille_echantillion_testbays = new JTextField();
 		textField_taille_echantillion_testbays.setText("50");
 		textField_taille_echantillion_testbays.setHorizontalAlignment(SwingConstants.CENTER);
@@ -1153,27 +1171,27 @@ public class Application {
 					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
 					.addContainerGap())
 		);
-		
+
 		area_res_class_bays = new JTextArea();
 		scrollBar_1.setViewportView(area_res_class_bays);
-		
+
 		area_instances_bays = new JTextArea();
 		scrollBar.setViewportView(area_instances_bays);
 		panel_10.setLayout(gl_panel_10);
-		
+
 		JPanel panel_11 = new JPanel();
 		panel_9.add(panel_11);
-		
+
 		JLabel lblNewLabel_6_2_1 = new JLabel("");
 		lblNewLabel_6_2_1.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_6_2_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		
+
 		JLabel lblNewLabel_15 = new JLabel("Mesures");
-		
+
 		JScrollPane scrollPane_2 = new JScrollPane();
-		
+
 		JLabel lblNewLabel_16 = new JLabel("Mesures moyennes");
-		
+
 		JScrollPane scrollPane_3 = new JScrollPane();
 		GroupLayout gl_panel_11 = new GroupLayout(panel_11);
 		gl_panel_11.setHorizontalGroup(
@@ -1210,23 +1228,23 @@ public class Application {
 					.addComponent(scrollPane_3, GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
 					.addContainerGap())
 		);
-		
+
 		table_mesures_bays__moyennes = new JTable();
 		scrollPane_3.setViewportView(table_mesures_bays__moyennes);
-		
+
 		table_mesures_bays = new JTable();
 		scrollPane_2.setViewportView(table_mesures_bays);
 		panel_11.setLayout(gl_panel_11);
 		panel.setLayout(gl_panel);
 		frame.getContentPane().setLayout(groupLayout);
 	}
-	
+
 	public void update_diagramme() {
 		Diagrammes diagrammes = new Diagrammes(dataset, this);
 		int attribut1 = comboBox_attribut1.getSelectedIndex();
 		int attribut2 = comboBox_attribut2.getSelectedIndex();
 		boolean attribut3 = chckbxOutliers_disc.isSelected();
-		coeffCorel.setText(""+dataset.arrondi(dataset.coeffitient_de_correlation(attribut1, attribut2)));
+		coeffCorel.setText(""+Dataset.arrondi(dataset.coeffitient_de_correlation(attribut1, attribut2)));
 		comboBox_attribut1.setEnabled(true); // by default
 		chckbxOutliers_disc.setVisible(false); // by default
 		chckbxOutliers_disc.setText("Outliers"); // by default
@@ -1247,44 +1265,44 @@ public class Application {
 				JFreeChart chart = diagrammes.histogram(attribut1, chckbxOutliers_disc.isSelected(),Integer.parseInt(nb_intervals.getText()));
 				panel_diagrammes.setChart(chart);
 				break;
-				
+
 			case 2 : // boxplot
 				chckbxOutliers_disc.setEnabled(true);
 				chckbxOutliers_disc.setVisible(true);
 				Diagrammes.FORCE_SHOW_OUTLIERS = attribut3; // make this chagable from interface
-				comboBox_attribut2.setEnabled(false); 
+				comboBox_attribut2.setEnabled(false);
 				panel_diagrammes.setChart(diagrammes.boxplot(attribut1));
 				break;
-			
+
 			case 3 : // qqplot
 				label_coef_corr.setVisible(true);
 				coeffCorel.setVisible(true);
 				comboBox_attribut2.setEnabled(true); // enable attribut 2
 				panel_diagrammes.setChart(diagrammes.qqplot(attribut1,attribut2));
 				break;
-				
+
 			case 4 : // scatterplot
 				label_coef_corr.setVisible(true);
 				coeffCorel.setVisible(true);
 				comboBox_attribut2.setEnabled(true); // enable attribut 2
 				panel_diagrammes.setChart(diagrammes.diagramme_disperssion(attribut1,attribut2));
 				break;
-			
+
 			case 5 : // all box plots
 				chckbxOutliers_disc.setEnabled(true);
 				chckbxOutliers_disc.setVisible(true);
 				Diagrammes.FORCE_SHOW_OUTLIERS = attribut3; // make this chagable from interface
 				comboBox_attribut1.setEnabled(false); // disable all, this will show all box plpots
-				comboBox_attribut2.setEnabled(false); 
+				comboBox_attribut2.setEnabled(false);
 				panel_diagrammes.setChart(diagrammes.boxplot());
 				break;
-			
+
 			default:
 				comboBox_attribut2.setEnabled(true); // enable attribut 2 by default
 				panel_diagrammes.setChart(null);
 				break;
 		}
-		
+
 		update_info_labels();
 	}
 
@@ -1343,7 +1361,7 @@ public class Application {
 		panel.add(new JScrollPane(table));
 		return table;
 	}
-	
+
 	private JTextArea add_textArea_to(JPanel panel) {
 		panel.setLayout(new BorderLayout(0,0));
 		JTextArea area = new JTextArea();
@@ -1352,7 +1370,7 @@ public class Application {
 		panel.add(new JScrollPane(area));
 		return area;
 	}
-	
+
 	private void load_dataset_on_table_disccrete() throws Exception {
 		load_dataset_on_table();
 		TableModel model = table_dataset.getModel();
@@ -1367,9 +1385,9 @@ public class Application {
 	public void load_dataset_on_table() throws Exception {
 		/** charger la dataset dans la table et afficher les mesures
 		 * */
-		
-		col_names_with_number = new String[dataset.col_names.length+1]; for (int i = 0; i < dataset.col_names.length; i++) {col_names_with_number[i]=dataset.col_names[i];}; col_names_with_number[dataset.col_names.length] = "#";
-		
+
+		col_names_with_number = new String[dataset.col_names.length+1]; for (int i = 0; i < dataset.col_names.length; i++) {col_names_with_number[i]=dataset.col_names[i];} col_names_with_number[dataset.col_names.length] = "#";
+
 		// load table in Jtabel
 		TableModel tableModel = new DefaultTableModel(col_names_with_number, dataset.n);
 		if (chckbxTrierLesDonns.isSelected()) {// afficher les données triées
@@ -1395,14 +1413,14 @@ public class Application {
 		// load mesures and description
 		updateMesures();
 	}
-	
+
 	private void update_row_numbers_on_table(TableModel tableModel) {
 		// fill number of rows
 		for (int i = 0; i < tableModel.getRowCount(); i++) {
 			tableModel.setValueAt(i+1, i, dataset.m);
 		}
 	}
-	
+
 	private void updateMesures() throws Exception {
 		String names [] = new String[dataset.m+1];
 		for (int i = 1; i <= dataset.m; i++) {
@@ -1410,29 +1428,29 @@ public class Application {
 		}
 		names[0] = "Mesures";
 		final int NOMBRE_DE_MESURES = 18; // 17 est le nombre de mesures a afficher ! il faut le mettre a jour
-		TableModel model_mesures = new DefaultTableModel(names, NOMBRE_DE_MESURES); 
+		TableModel model_mesures = new DefaultTableModel(names, NOMBRE_DE_MESURES);
 		int i = 1;
-		model_mesures.setValueAt("moyenne",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne(j)), i, j+1); i++;
-		model_mesures.setValueAt("mediane",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mediane(j)), i, j+1); i++;
+		model_mesures.setValueAt("moyenne",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(Dataset.arrondi(dataset.moyenne(j)), i, j+1); i++;
+		model_mesures.setValueAt("mediane",i,0);   for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(Dataset.arrondi(dataset.mediane(j)), i, j+1); i++;
 		model_mesures.setValueAt("mode",i,0);      for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.mode(j), i, j+1); i++;
 		//model_mesures.setValueAt("mode discrèt",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.mode_discret(j)), i, j+1); i++;
 		model_mesures.setValueAt("max",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.max(j), i, j+1); i++;
 		model_mesures.setValueAt("min",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.min(j), i, j+1); i++;
-		model_mesures.setValueAt("etendu",i,0);    for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.etendu(j)), i, j+1); i++;
-		model_mesures.setValueAt("mi_etendu",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.milieu_etendu(j)), i, j+1); i++;
-		model_mesures.setValueAt("ecartType",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.ecartType(j)), i, j+1); i++;
-		model_mesures.setValueAt("variance",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.variance(j)), i, j+1); i++;
+		model_mesures.setValueAt("etendu",i,0);    for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(Dataset.arrondi(dataset.etendu(j)), i, j+1); i++;
+		model_mesures.setValueAt("mi_etendu",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(Dataset.arrondi(dataset.milieu_etendu(j)), i, j+1); i++;
+		model_mesures.setValueAt("ecartType",i,0); for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(Dataset.arrondi(dataset.ecartType(j)), i, j+1); i++;
+		model_mesures.setValueAt("variance",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(Dataset.arrondi(dataset.variance(j)), i, j+1); i++;
 		model_mesures.setValueAt("Q1",i,0);        for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.quartile(j,1), i, j+1); i++;
 		model_mesures.setValueAt("Q2",i,0);        for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.quartile(j,2), i, j+1); i++;
 		model_mesures.setValueAt("Q3",i,0);        for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.quartile(j,3), i, j+1); i++;
-		model_mesures.setValueAt("IQR",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.IQR(j)), i, j+1); i++;
+		model_mesures.setValueAt("IQR",i,0);       for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(Dataset.arrondi(dataset.IQR(j)), i, j+1); i++;
 		model_mesures.setValueAt("outliers",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.outliers(j), i, j+1); i++;
-		model_mesures.setValueAt("skewness",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.skewness(j)), i, j+1); i++;
+		model_mesures.setValueAt("skewness",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(Dataset.arrondi(dataset.skewness(j)), i, j+1); i++;
 
 		// moyenne tronquée
 		position_moy_tronquee = i = 0; // save this position for later
 		double q = slider_moy_tronquee.getValue()/100.0;
-		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
+		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(Dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
 		table_mesures.setModel(model_mesures);
 	}
 
@@ -1443,26 +1461,26 @@ public class Application {
 		int i = position_moy_tronquee;
 		double q = slider_moy_tronquee.getValue()/100.0;
 		TableModel model_mesures = table_mesures.getModel();
-		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
+		model_mesures.setValueAt("moy tronquée",i,0);  for (int j = 0; j < dataset.m; j++) model_mesures.setValueAt(Dataset.arrondi(dataset.moyenne_tronqee(j, q)), i, j+1); i++;
 		table_mesures.setModel(model_mesures);
 	}
-	
+
 	public void update_description_text() {
 		String description = "dataset : \"" + getFilename() + "\" :\n";
 		description += "- nombre d'instances = " + dataset.n + "\n";
 		description += "- nombre d'attributs = " + dataset.m + "\n";
 		description += "- nombre de classes  = " + dataset.getClassCount() + "\n";
 		description += "- classes :\n";
-		
+
 		Frequences f = dataset.frequences_de(dataset.m-1); // frequences du dernier attribut
 		for (int i = 0; i < Dataset.classes.length; i++) {
 			double k = i+1;
-			description += "\t"+(i+1)+". " + Dataset.classes[i] + "("+k+") : "+ f.frequence_de(k) +" instances ("+ dataset.arrondi(100*f.pourcentage(k))+"%)\n";
+			description += "\t"+(i+1)+". " + Dataset.classes[i] + "("+k+") : "+ f.frequence_de(k) +" instances ("+ Dataset.arrondi(100*f.pourcentage(k))+"%)\n";
 		}
 		remplir_table_attributs();
 		textArea_description.setText(description);
 	}
-	
+
 	private void remplir_table_attributs() {
 		int i;
 		DefaultTableModel model = new DefaultTableModel(" ,attribut,type,nombre de valeurs manquantes, valeurs possibles".split(","), dataset.m);
@@ -1470,9 +1488,9 @@ public class Application {
 			int j = 0;
 			model.setValueAt(i+1, i, j++);
 			model.setValueAt(dataset.col_names[i], i, j++);
-			if (i<dataset.m-1) 
+			if (i<dataset.m-1)
 			model.setValueAt("continu | numérique | quantitatif", i, j++);
-			else 
+			else
 			model.setValueAt("discret | numérique | quantitatif", i, j++);
 			model.setValueAt(dataset.nombre_de_cases_vides(i), i, j++);
 			model.setValueAt("[ "+dataset.min(i)+" , "+dataset.max(i)+" ]", i, j++);
@@ -1495,7 +1513,7 @@ public class Application {
 					Double x = null;
 					Object tmp = table_dataset.getValueAt(i,j);
 					String str_value = tmp == null ? "": tmp.toString();
-					try {x = Double.parseDouble(str_value);} catch(Exception e) {};
+					try {x = Double.parseDouble(str_value);} catch(Exception e) {}
 					dataset.types[j] = Type.parse(str_value).combine(dataset.types[j]);
 					dataset.data[i][j] = x;
 				}
@@ -1522,18 +1540,18 @@ public class Application {
 		} catch (Exception e) {
 			return text_dataset_src.getText();
 		}
-		
+
 	}
-	
+
 	public String get_attribut1() {
 		return comboBox_attribut1.getSelectedItem().toString();
 	}
-	
+
 	public String get_attribut2() {
 		return comboBox_attribut2.getSelectedItem().toString();
 	}
-	
-	
+
+
 	public void afficherMessage(String message) {
 		JOptionPane.showMessageDialog(frame, message);
 	}

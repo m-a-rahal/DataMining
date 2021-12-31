@@ -24,10 +24,10 @@ public class FileManager {
 	private static final Integer DEFAULT_FILETYPE = TXT_FILETYPE;
 	public static String default_dataset_file = "resources/seeds_dataset.txt";
 	public static String default_dataset_save_file = "saved_dataset.txt";
-	
+
 	public static Dataset extract_dataset(String dataset_file) throws FileNotFoundException {
 		if (dataset_file==null) dataset_file = default_dataset_file;
-		
+
 		BufferedReader reader = new BufferedReader(new FileReader(dataset_file));
 		String line;
 		Integer format = detect_format(dataset_file);
@@ -40,8 +40,8 @@ public class FileManager {
 			}
 			reader.close();
 			return interpretLines(datalines, separator);
-			
-			
+
+
 		} catch (IOException e) {
 			try {
 				reader.close();
@@ -51,9 +51,9 @@ public class FileManager {
 			e.printStackTrace();
 		}
 		return null;
-		
+
 	}
-	
+
 	public static String detect_separator(String dataset_file) {
 		Integer format = detect_format(dataset_file);
 		String separator = "[\\s\\t]+";
@@ -63,7 +63,7 @@ public class FileManager {
 			separator = "[\\s\\t]+";
 		return separator;
 	}
-	
+
 	private static Dataset interpretLines(ArrayList<String> datalines, String separator) {
 		/** extracts rows from space-separated lines (Strings)
 		 * eg: 1.5 1.45 156.2 --> [1.5, 1.45, 156.2]
@@ -72,7 +72,7 @@ public class FileManager {
 		int n = datalines.size();
 		int m = datalines.get(0).split(separator).length;
 		// create JTable
-		
+
 		Type[] types = new Type[m];
 		// allocate data matrix
 		Double data[][] = new Double[n][m];
@@ -82,7 +82,7 @@ public class FileManager {
 			int j = 0;
 			for (String str_value : line.split(separator)) {
 				Double value = null;
-				try {value = Double.parseDouble(str_value);} catch(Exception e) {};
+				try {value = Double.parseDouble(str_value);} catch(Exception e) {}
 				types[j] = Type.parse(str_value).combine(types[j]);
 				data[i][j++] = value;
 			}i++;
@@ -103,13 +103,13 @@ public class FileManager {
 		for (int i=0; i<n; i++) {
 			for (int j=0; j<m; j++) {
 				writer.print(model.getValueAt(i,j));
-				if (j<m-1) writer.print(separator); 
+				if (j<m-1) writer.print(separator);
 			}
 			if (i<n-1) writer.print("\n");
 		}
 		writer.close();
 	}
-	
+
 	public static Integer detect_format(String file_path) {
 		//file_path.replaceAll("\\", "/"); // using the / as separator
 		String fileparts[] = file_path.split("/");
@@ -124,13 +124,13 @@ public class FileManager {
 		}
 		return DEFAULT_FILETYPE;
 	}
-	
+
 	public static Matcher match(String pattern,String text) {
 	    Pattern p = Pattern.compile(pattern);
 		Matcher matcher = p.matcher(text);
 		return matcher.find() ? matcher : null;
 	}
-	
+
 	// file chooser
 	public static String ChooseFileWindow() {
 		JFileChooser fileChooser = new JFileChooser();
@@ -140,7 +140,7 @@ public class FileManager {
         fileChooser.showOpenDialog(null);
         return fileChooser.getSelectedFile().getAbsolutePath();
 	}
-	
+
 	public static String SaveFileWindow() {
 		JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
@@ -151,7 +151,7 @@ public class FileManager {
         fileChooser.showOpenDialog(null);
         return fileChooser.getSelectedFile().getAbsolutePath();
 	}
-	
+
 	public static String ChooseFileWindow(Application application) {
 		try {
 			return ChooseFileWindow();

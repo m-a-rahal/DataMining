@@ -18,27 +18,27 @@ public class Type {
 //	public static final int _ASYM     	= ~SYM;
 	public static final int _CONTINUE  	= ~DISCRET;
 	public static final int _QUALITATIF = ~QUANTITATIF;
-	
+
 	public Type(Integer type) {
 		if (type != null) {
 			this.type = type;
 		}
 	}
-	
+
 	public static Type parse(String str_value) {
 		int type = 0;
 		if (isLike(str_value, "[0-9]+")) {
 			//System.out.println(str_value);
 			return new Type(0); // entier
 		}
-		if (isLike(str_value, "[0-9]*\\.[0-9]+")) 
+		if (isLike(str_value, "[0-9]*\\.[0-9]+"))
 			return new Type(NUMERIQUE | QUANTITATIF); // réel
 		if (str_value.toLowerCase().equals("null") || str_value.equals(""))
 			return new Type(NUMERIQUE | QUANTITATIF | DISCRET);
-		
+
 		return new Type(0); // String
 	}
-	
+
 	@Override
 	public String toString() {
 		String type_str = "";
@@ -65,7 +65,7 @@ public class Type {
 	}
 
 	public Type combine(Type other) {
-		/** retourne le type dominant : 
+		/** retourne le type dominant :
 		 * continu + discret -> continu
 		 * quantitatif + qualificatif -> qualificatif
 		 */

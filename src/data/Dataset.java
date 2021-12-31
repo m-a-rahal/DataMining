@@ -3,9 +3,6 @@ package data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeMap;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -21,7 +18,7 @@ public class Dataset {
 	private static final String default_names = "area,perimeter,compactness,length of kernel,width of kernel,asymmetry coefficient,length of kernel groove,class";
 	//private static final String default_short_names = "area,perim,compact,len-kern,width-kern,asym-coeff,len-ker-groov,class";
 	public static final String classes [] = new String[] {"Kama", "Rosa", "Canadian"};
-	
+
 	public Dataset(String[] names, int n, int m, Double[][] data, Type[] types) {
 		extract_names(names);
 		this.data = data;
@@ -29,8 +26,8 @@ public class Dataset {
 		this.m = m;
 		this.types = types;
 	}
-	
-	
+
+
 	public void discretiser_equal_width(int indice_attribut, int Q) { // Q = nobmbre intervalles
 		double min_value = min(indice_attribut);
 		double width = (max(indice_attribut) - min_value)/Q;
@@ -48,13 +45,13 @@ public class Dataset {
 			}
 		}
 	}
-	
+
 	public void discretiser_equal_width(int Q) {
 		for (int i = 0; i < m-1; i++) {
 			discretiser_equal_width(i,4);
 		}
 	}
-	
+
 	public void normaliser_min_max(int indice_attribut,double nouveau_max, double nouveau_min) {
 		double max_value = max(indice_attribut);
 		double min_value = min(indice_attribut);
@@ -62,11 +59,11 @@ public class Dataset {
 			data[i][indice_attribut] = (data[i][indice_attribut] - min_value)/(max_value - min_value)*(nouveau_max - nouveau_min) + nouveau_min;
 		}
 	}
-	
+
 	public void normaliser_min_max(int indice_attribut) {// par défaut, c entre 1 et 0
 		normaliser_min_max(indice_attribut, 1, 0);
 	}
-	
+
 	public void normaliser_min_max() {
 		for (int i = 0; i < m-1; i++) {
 			normaliser_min_max(i);
@@ -97,7 +94,7 @@ public class Dataset {
 			System.out.println(""); // line break
 		}
 	}
-	
+
 	//==================================================================================================
 	//=== Mesure ==================================================================================================
 	//==================================================================================================
@@ -112,7 +109,7 @@ public class Dataset {
 		}
 		return moy / count;
 	}
-	
+
 
 	public double moyenne_tronqee(int indice_attribut, double quantile) {
 			if (quantile >= 0.5) {
@@ -132,10 +129,10 @@ public class Dataset {
 					count++;
 				}
 			}
-			
+
 			return somme / count;
 		}
-	
+
 	public double quantile(int indice_attribut, double q) {
 		/** caculate quantile using R-2 approximation (averaging the two neighbors in case of conflict) (src = 'https://en.wikipedia.org/wiki/Quantile#:~:text=empirical%20distribution%20function.-,R%E2%80%912,-%2C%20SAS%E2%80%915%2C%20Maple')*/
 		if (q < 0 || q > 1)
@@ -166,7 +163,7 @@ public class Dataset {
 	public double ecartType(int indice_attribut) {
 		return Math.sqrt(variance(indice_attribut));
 	}
-	
+
 	public double coeffitient_de_correlation(int attribut1, int attribut2) {
 		double moy1 = moyenne(attribut1);
 		double moy2 = moyenne(attribut2);
@@ -182,18 +179,18 @@ public class Dataset {
 		cov /= count;
 		return cov / (Math.sqrt(var1) * Math.sqrt(var2));
 	}
-	
+
 	public double milieu(int indice_attribut) {
 		return (max(indice_attribut)+min(indice_attribut))/2;
 	}
-	
+
 	public ArrayList<Double> mode(int indice_attribut) throws Exception {
 		Double mod = null;
 		Integer mod_freq = null;
 		Frequences frequences = new Frequences();
 		Double val = null;
 		Integer freq = null;
-		ArrayList<Double> modes = new ArrayList<Double>();
+		ArrayList<Double> modes = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
 			if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
 			val = data[i][indice_attribut];
@@ -203,7 +200,7 @@ public class Dataset {
 				mod_freq = freq;
 				continue;
 			}
-			
+
 		}
 		for (int i = 0; i < n; i++) {
 			if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
@@ -264,10 +261,10 @@ public class Dataset {
 		Collections.sort(vecteur);
 		return vecteur;
 	}
-	
+
 	public ArrayList<Double> getValues(int indice_attribut) {
 		new ArrayList<>(n);
-		ArrayList<Double> vecteur = new ArrayList<Double>();
+		ArrayList<Double> vecteur = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
 			if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
 			vecteur.add(data[i][indice_attribut]);
@@ -296,20 +293,20 @@ public class Dataset {
 		}
 		return max;
 	}
-	
+
 	public double etendu(int indice_attribut) {
 		return max(indice_attribut)-min(indice_attribut);
 	}
-	
+
 	public double milieu_etendu(int indice_attribut) {
 		return (min(indice_attribut)+max(indice_attribut))/2;
 	}
-	
+
 	public double quartile(int indice_attribut, int q) {
 		if(q>3 | q<1) {
 			throw new IllegalArgumentException("Le quartile doit être compris entre 1 et 3");
 		}
-		ArrayList<Double> vecteur = new ArrayList<Double>();
+		ArrayList<Double> vecteur = new ArrayList<>();
 		vecteur = getSortedValues(indice_attribut);
 		int n = vecteur.size();
 		if(q==1) {
@@ -319,16 +316,16 @@ public class Dataset {
 		}else {
 			return vecteur.get(3*n/4);
 		}
-		
+
 	}
-	
+
 	public double IQR(int indice_attribut) {
 		return quartile(indice_attribut,3)-quartile(indice_attribut,1);
 	}
-	
+
 	public ArrayList<Double> outliers(int indice_attribut) {
-		ArrayList<Double> vecteur = new ArrayList<Double>();
-		ArrayList<Double> outlier = new ArrayList<Double>();
+		ArrayList<Double> vecteur = new ArrayList<>();
+		ArrayList<Double> outlier = new ArrayList<>();
 		int i;
 		double Q1 = quartile(indice_attribut, 1);
 		double Q3 = quartile(indice_attribut, 3);
@@ -343,15 +340,15 @@ public class Dataset {
 
 		return outlier;
 	}
-	
+
 	public static double arrondi(double val) {
 		return Math.round(val * 10000.0)/10000.0;
 	}
-	
+
 
 	public String mesures_string() {
 		String text = "";
-		for (int indice_attribut = 0; indice_attribut<m; indice_attribut++) {	
+		for (int indice_attribut = 0; indice_attribut<m; indice_attribut++) {
 			text += "\n"+col_names[indice_attribut] + ":\n";
 			try {
 				text += "\t - moyenne   = " + arrondi(moyenne(indice_attribut)) + "\n";
@@ -370,14 +367,14 @@ public class Dataset {
 				text += "\t - outliers  = " + outliers(indice_attribut) + "\n";
 				text += "\t - ecartType = " + arrondi(ecartType(indice_attribut)) + "\n";
 				text += "\t - variance  = " + arrondi(variance(indice_attribut)) + "\n";
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 		return text;
 	}
-	
+
 	private double m(int indice_attribut, int k) {
 		/** used to calulate skewness(), ref = "https://pyshark.com/skewness-in-python/"
 		 * */
@@ -391,16 +388,16 @@ public class Dataset {
 		}
 		return m / count;
 	}
-	
+
 	public double skewness(int indice_attribut) {
 		/** using Fisher-Pearson coefficient of skewness, ref = "https://pyshark.com/skewness-in-python/"
 		 * skewness = m3 / (m2 ^ (1.5))*/
 		return m(indice_attribut, 3) / Math.pow(m(indice_attribut, 2), 1.5);
 	}
-	
+
 	//==================================================================================================
 	//==================================================================================================
-	
+
 	public int nombre_de_cases_vides(int indice_attribut) {
 		int count = 0;
 		for (int i = 0; i < n; i++) {
@@ -408,11 +405,11 @@ public class Dataset {
 		}
 		return count;
 	}
-		
+
 	public int getClassCount() {
 		return frequences_de(m-1).keySet().size();
 	}
-	
+
 	public Frequences frequences_de(int indice_attribut) {
 		Frequences counts = new Frequences();
 		for (int i = 0; i < n; i++) {
@@ -421,7 +418,7 @@ public class Dataset {
 		}
 		return counts;
 	}
-	
+
 	public Frequences frequences_de(int indice_attribut, int start, int end) {
 		Frequences counts = new Frequences();
 		for (int i = start; i < end; i++) {
@@ -434,7 +431,7 @@ public class Dataset {
 	public String getType(int i) {
 		return types[i].toString();
 	}
-	
+
 	public void data_from_table(JTable table) {
 		DefaultTableModel model = (DefaultTableModel) table.getModel();
 		n = model.getRowCount();
@@ -443,7 +440,7 @@ public class Dataset {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				Double x = null;
-				try {x = Double.parseDouble(table.getValueAt(i,j).toString());} catch(Exception e) {};
+				try {x = Double.parseDouble(table.getValueAt(i,j).toString());} catch(Exception e) {}
 				data[i][j] = x;
 			}
 		}

@@ -4,11 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
-import motifs_frequents_et_regles.AlgoMotifsFrequents;
 import motifs_frequents_et_regles.Apriori;
 import motifs_frequents_et_regles.Eclat;
 import motifs_frequents_et_regles.Ensemble;
@@ -29,11 +25,11 @@ public class PatternFileManager {
 
 	public void calculer_supports(Itemsets Lk) {
 		try {
-			
+
 			this.start_reader();
 			String line = next_line();
 			while(line != null) {
-				Ensemble<String> pattern = new Ensemble<String>(line.split(separator));
+				Ensemble<String> pattern = new Ensemble<>(line.split(separator));
 				for (Ensemble<String> itemset : Lk) {
 					if (pattern.containsAll(itemset)) {
 						itemset.support++;
@@ -41,7 +37,7 @@ public class PatternFileManager {
 				}
 				line = next_line();
 			}
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {

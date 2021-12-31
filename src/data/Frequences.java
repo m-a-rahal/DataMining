@@ -5,7 +5,7 @@ public class Frequences extends HashMap<Double, Integer>{
 	/** cette classe s'agit d'un dictionnaire pour stocker des valeurs et leurs frequences
 	 * */
 	private static final long serialVersionUID = 1L;
-	
+
 	public Double[] pourcentages() {
 		/** retournes les frequences en terme de pourcentages, exemple:
 		 * [10,20,10,5,5] ---> [20%,40%,20%,10%,10%]
@@ -22,7 +22,7 @@ public class Frequences extends HashMap<Double, Integer>{
 		}
 		return p;
 	}
-	
+
 	public Double pourcentage(Double val) {
 		/** retournes le pourcentage de la valeure val*/
 		double somme = 0;
@@ -39,7 +39,7 @@ public class Frequences extends HashMap<Double, Integer>{
 		put(val, frequence);
 		return frequence;
 	}
-	
+
 	public Integer frequence_de(double val) {
 		/** retourne la fréquence de l'element val, ou 0 si il n'existe pas*/
 		Integer freq = get(val);

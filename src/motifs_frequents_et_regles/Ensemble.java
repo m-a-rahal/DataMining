@@ -10,16 +10,16 @@ public class Ensemble<V> extends TreeSet<V> implements Comparable<Ensemble>{
 	public Ensemble(Ensemble<V> ensemble) {
 		super(ensemble);
 	}
-	
+
 	public Ensemble(V item) {
 		super();
 		this.add(item);
 	}
-	
+
 	public Ensemble(V[] items) {
 		super();
-		for (int i = 0; i < items.length; i++) {
-			add(items[i]);
+		for (V item : items) {
+			add(item);
 		}
 	}
 
@@ -29,29 +29,29 @@ public class Ensemble<V> extends TreeSet<V> implements Comparable<Ensemble>{
 	}
 
 	public Ensemble<V> union(Ensemble<V> other) {
-		Ensemble<V> union = new Ensemble<V>(this);
+		Ensemble<V> union = new Ensemble<>(this);
 		union.addAll(other);
 		return union;
 	}
-	
+
 	public Ensemble<V> intersect(Ensemble<V> other) {
-		Ensemble<V> inter = new Ensemble<V>(this);
+		Ensemble<V> inter = new Ensemble<>(this);
 		inter.retainAll(other);
 		return inter;
 	}
-	
+
 	public Ensemble<V> substract(Ensemble<V> other) {
-		Ensemble<V> sub = new Ensemble<V>(this);
+		Ensemble<V> sub = new Ensemble<>(this);
 		sub.removeAll(other);
 		return sub;
 	}
-	
+
 	public ArrayList<Ensemble<V>> sousEnsembles(){
-		ArrayList<Ensemble<V>> sousEnsembles = new ArrayList<Ensemble<V>>();
-		ArrayList<V> this_ens = new ArrayList<V>(this);
+		ArrayList<Ensemble<V>> sousEnsembles = new ArrayList<>();
+		ArrayList<V> this_ens = new ArrayList<>(this);
 		int n = size();
 		for (int i = 0; i < (1<<n); i++){
-			Ensemble<V> current = new Ensemble<V>();
+			Ensemble<V> current = new Ensemble<>();
 			for (int j = 0; j < n; j++)
 				if ((i & (1 << j)) > 0)
 					current.add(this_ens.get(j));
@@ -60,12 +60,12 @@ public class Ensemble<V> extends TreeSet<V> implements Comparable<Ensemble>{
 		}
 		return sousEnsembles;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "{" + String.join(",", (Iterable<? extends CharSequence>) this) + "}:"+support;
 	}
-	
+
 	public String toString_simple() { // ne pas afficher support
 		return "{" + String.join(",", (Iterable<? extends CharSequence>) this) + "}";
 	}
@@ -75,7 +75,7 @@ public class Ensemble<V> extends TreeSet<V> implements Comparable<Ensemble>{
 		// TODO Auto-generated method stub
 		return this.key().compareTo(other.key());
 	}
-	
+
 	public String key() {
 		return String.join(" ", (Iterable<? extends CharSequence>) this);
 	}
