@@ -39,6 +39,8 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
 import Classification.ClassifieurBaysien;
+import Classification.Evaluation;
+import Classification.Evaluation.Evaluations;
 import Classification.Classifieur.Classification;
 import data.Dataset;
 import data.Frequences;
@@ -103,6 +105,8 @@ public class Application {
 	private JTextField textField_taille_echantillion_testbays;
 	private JTextArea area_res_class_bays;
 	private JTextArea area_instances_bays;
+	private JTable table_mesures_bays;
+	private JTable table_mesures_bays__moyennes;
 
 	/**
 	 * Launch the application.
@@ -1038,13 +1042,58 @@ public class Application {
 				try {
 					TableModel model = table_dataset.getModel();
 					ClassifieurBaysien classifieur = new ClassifieurBaysien(model, dataset.n, dataset.m, nbr_instances_apprentissge);
-					Classification resultat = classifieur.tester(classifieur.instances_de_test(model));
-					area_res_class_bays.setText(resultat.toString());
+					Classification resultats = classifieur.tester(classifieur.instances_de_test(model));
+					area_res_class_bays.setText(resultats.toString());
+					Evaluations mesures = classifieur.evaluer(resultats);
+					update_table_mesures_bays(mesures);
+					update_table_mesures_bays_moyennes(mesures);
 				} catch (Exception e1) {
 					afficherMessage("La classification baysiénne a échoué!");
 					e1.printStackTrace();
 					return;
 				}
+			}
+
+			private void update_table_mesures_bays_moyennes(Evaluations mesures) {
+
+				DefaultTableModel model = new DefaultTableModel(new String[] {"Mesure", "Moyenne"}, 4+6); //TP+FN+... //acc+sens+spec+P+R+F
+				TableModel data = table_mesures_bays.getModel();
+				for (int i = 0; i < data.getRowCount(); i++) {
+					double moy = 0;
+					for (int j = 1; j < data.getColumnCount(); j++) {
+						try {
+							moy += Double.parseDouble(data.getValueAt(i,j).toString());
+						} catch (Exception e) {
+							continue;
+						}
+					}
+					moy /= data.getColumnCount() - 1;
+					model.setValueAt(data.getValueAt(i, 0), i, 0); // copier titre
+					model.setValueAt(moy, i, 1); // mettre valeure de la moyenne
+				}
+				table_mesures_bays__moyennes.setModel(model);
+			}
+
+			private void update_table_mesures_bays(Evaluations mesures) {
+				String [] titres = new String[mesures.size() + 1];
+				int i = 0;
+				titres[i] = "Mesure";
+				for(Evaluation e : mesures) {
+					titres[++i] = e.classe;
+				}
+				DefaultTableModel model = new DefaultTableModel(titres, 4+6); //TP+FN+... //acc+sens+spec+P+R+F
+				i = 0;
+				model.setValueAt("TP",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).TP,i,j+1); i++;
+				model.setValueAt("TN",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).TN,i,j+1); i++;
+				model.setValueAt("FP",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).FP,i,j+1); i++;
+				model.setValueAt("FN",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).FN,i,j+1); i++;
+                model.setValueAt("Accuracy",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).accuracy()),i,j+1); i++;
+                model.setValueAt("Sensitivity",i,0);   for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).sensitivity()),i,j+1); i++;
+                model.setValueAt("Specificity",i,0);   for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).specificity()),i,j+1); i++;
+                model.setValueAt("Precision",i,0);     for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).precision()),i,j+1); i++;
+                model.setValueAt("Rappel",i,0);        for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).rappel()),i,j+1); i++;
+                model.setValueAt("F-score",i,0);       for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).f_mesure()),i,j+1); i++;
+				table_mesures_bays.setModel(model);
 			}
 		});
 		
@@ -1118,19 +1167,55 @@ public class Application {
 		JLabel lblNewLabel_6_2_1 = new JLabel("");
 		lblNewLabel_6_2_1.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_6_2_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		
+		JLabel lblNewLabel_15 = new JLabel("Mesures");
+		
+		JScrollPane scrollPane_2 = new JScrollPane();
+		
+		JLabel lblNewLabel_16 = new JLabel("Mesures moyennes");
+		
+		JScrollPane scrollPane_3 = new JScrollPane();
 		GroupLayout gl_panel_11 = new GroupLayout(panel_11);
 		gl_panel_11.setHorizontalGroup(
 			gl_panel_11.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_11.createSequentialGroup()
-					.addComponent(lblNewLabel_6_2_1, GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
-					.addGap(20))
+					.addContainerGap()
+					.addGroup(gl_panel_11.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_11.createSequentialGroup()
+							.addComponent(lblNewLabel_15)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblNewLabel_6_2_1, GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
+							.addGap(20))
+						.addGroup(gl_panel_11.createSequentialGroup()
+							.addComponent(lblNewLabel_16)
+							.addContainerGap(355, Short.MAX_VALUE))
+						.addGroup(Alignment.TRAILING, gl_panel_11.createSequentialGroup()
+							.addGroup(gl_panel_11.createParallelGroup(Alignment.TRAILING)
+								.addComponent(scrollPane_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
+								.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE))
+							.addContainerGap())))
 		);
 		gl_panel_11.setVerticalGroup(
 			gl_panel_11.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_11.createSequentialGroup()
-					.addComponent(lblNewLabel_6_2_1, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(391, Short.MAX_VALUE))
+					.addContainerGap()
+					.addGroup(gl_panel_11.createParallelGroup(Alignment.TRAILING)
+						.addComponent(lblNewLabel_15)
+						.addComponent(lblNewLabel_6_2_1, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblNewLabel_16)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane_3, GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+					.addContainerGap())
 		);
+		
+		table_mesures_bays__moyennes = new JTable();
+		scrollPane_3.setViewportView(table_mesures_bays__moyennes);
+		
+		table_mesures_bays = new JTable();
+		scrollPane_2.setViewportView(table_mesures_bays);
 		panel_11.setLayout(gl_panel_11);
 		panel.setLayout(gl_panel);
 		frame.getContentPane().setLayout(groupLayout);

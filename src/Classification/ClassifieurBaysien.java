@@ -78,7 +78,7 @@ public class ClassifieurBaysien extends Classifieur {
 	}
 	
 	public Classification tester(ArrayList<Instance> instances) {
-		Classification classifications = new Classification();
+		Classification classifications = new Classification(index.valeurs_possibles.get(m));
 		for(Instance instance : instances) {
 			classifications.ajouter(instance, classifier(instance));
 		}
