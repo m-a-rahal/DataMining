@@ -1,4 +1,4 @@
-package Classification_baysienne;
+package Classification;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +11,7 @@ import javax.swing.table.TableModel;
 import motifs_frequents_et_regles.Ensemble;
 
 
-public class ClassifieurBaysien{
+public class ClassifieurBaysien extends Classifieur {
 	public Index index;
 	public int n,m;
 	private int taille_echantillon_apprentissage;
@@ -66,7 +66,7 @@ public class ClassifieurBaysien{
 			String classe = model.getValueAt(i, m-1).toString();
 			compteur.incrementer(classe); // compter la taille de la classe
 			if (compteur.taille(classe) > taille_echantillon_apprentissage) {// prendre uniquement les échantillons de test
-				Instance instance =  new Instance(i+1);
+				Instance instance =  new Instance(i+1, classe);
 				for (int j = 0; j < m-1; j++) {
 					String x = model.getValueAt(i, j).toString();
 					instance.add(x);
@@ -161,41 +161,6 @@ public class ClassifieurBaysien{
 		
 		public Integer attribut_de(String x) {
 			return Integer.parseInt(""+x.charAt(1));
-		}
-	}
-	
-	public static class Instance extends ArrayList<String> {
-		private static final long serialVersionUID = 1L;
-		public int numero_instance;
-		public String classe;
-		
-		public Instance(int numero_instance) {
-			super();
-			this.numero_instance = numero_instance;
-		}
-
-		@Override
-		public String toString() {
-			return "#"+numero_instance+"=\"" + String.join(" ", this)+"\"";
-		}
-	}
-	
-	public static class Classification extends TreeMap<Integer, Instance> {
-		private static final long serialVersionUID = 1L;
-
-		public void ajouter(Instance instance, String classe) {
-			instance.classe = classe;
-			put(instance.numero_instance, instance);
-		}
-		
-		@Override
-		public String toString() {
-			String text = "";
-			for (Integer num_instance : this.keySet()) {
-				Instance instance = get(num_instance);
-				text += num_instance+ " = "+instance.classe + "\n";
-			}
-			return text;
 		}
 	}
 }

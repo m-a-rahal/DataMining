@@ -1,4 +1,4 @@
-package Classification_KNN;
+package Classification;
 
 public class Classifieur_KNN {
 

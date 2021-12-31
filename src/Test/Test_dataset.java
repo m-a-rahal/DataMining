@@ -6,7 +6,7 @@ import javax.sound.midi.Soundbank;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import Classification_baysienne.ClassifieurBaysien;
+import Classification.ClassifieurBaysien;
 import data.Dataset;
 import diagrammes.Diagrammes;
 import input_output_classes.FileManager;

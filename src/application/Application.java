@@ -38,8 +38,8 @@ import javax.swing.table.TableModel;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
-import Classification_baysienne.ClassifieurBaysien;
-import Classification_baysienne.ClassifieurBaysien.Classification;
+import Classification.ClassifieurBaysien;
+import Classification.Classifieur.Classification;
 import data.Dataset;
 import data.Frequences;
 import data.Type;
