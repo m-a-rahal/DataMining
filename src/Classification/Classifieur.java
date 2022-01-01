@@ -49,6 +49,16 @@ public abstract class Classifieur {
 		}
 		return instances;
 	}
+	
+	public abstract void apprendre(TableModel model);
+
+	public Classification tester(ArrayList<Instance> instances) {
+		Classification classifications = new Classification(classes_possibles);
+		for(Instance instance : instances) {
+			classifications.ajouter(instance, classifier(instance));
+		}
+		return classifications;
+	}
 
 	public static class Instance extends ArrayList<String> {
 		private static final long serialVersionUID = 1L;
@@ -102,13 +112,6 @@ public abstract class Classifieur {
 		}
 	}
 	
-	public Classification tester(ArrayList<Instance> instances) {
-		Classification classifications = new Classification(classes_possibles);
-		for(Instance instance : instances) {
-			classifications.ajouter(instance, classifier(instance));
-		}
-		return classifications;
-	}
 
 	public abstract String classifier(Instance instance);
 

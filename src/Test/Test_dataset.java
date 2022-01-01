@@ -23,6 +23,10 @@ import motifs_frequents_et_regles.Regle;
 
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
+		tester_classif_KNN();
+	}
+	
+	private static void tester_classif_KNN() throws Exception {
 		Dataset dataset = FileManager.extract_dataset(null);
 		dataset.normaliser_min_max();
 		dataset.discretiser_equal_width(4);
@@ -69,6 +73,7 @@ public class Test_dataset {
 			classification.ajouter(instances.get(i), classifieur.classifier(instances.get(i)));
 		}
 		System.out.println(classification);
+	
 	}
 	
 	private static void testerClassifBays() throws Exception {

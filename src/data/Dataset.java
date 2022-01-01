@@ -1,8 +1,10 @@
 package data;
 
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -27,6 +29,33 @@ public class Dataset {
 		this.types = types;
 	}
 
+	public void discretiser_effectifs_egaux(int indice_attribut, int Q) { // Q = nobmbre intervalles
+		ArrayList<Double> valeurs_tries = getSortedValues(indice_attribut); 
+		for (int i = 0; i < n; i++) {
+			int k;
+			int pos_sup;
+			for (k = 0; k < Q; k++) {
+				pos_sup = (int) round(n/(double)Q*k);
+				if (data[i][indice_attribut] < valeurs_tries.get(pos_sup)) {
+					data[i][indice_attribut] = (double) k+1;
+					break;
+				}
+			}
+			if (k == Q) {
+				data[i][indice_attribut] = (double) k;
+			}
+		}
+	}
+	
+	public static int round(double value) {
+		double decimal_reminder = value - Math.floor(value);
+		System.out.println(decimal_reminder);
+		int rounded = (int) Math.floor(value);
+		if (decimal_reminder > 0.5) {
+			rounded++;
+		}
+		return rounded;
+	}
 
 	public void discretiser_equal_width(int indice_attribut, int Q) { // Q = nobmbre intervalles
 		double min_value = min(indice_attribut);
@@ -49,6 +78,14 @@ public class Dataset {
 	public void discretiser_equal_width(int Q) {
 		for (int i = 0; i < m-1; i++) {
 			discretiser_equal_width(i,4);
+		}
+	}
+	
+	public void normaliser_z_score(int indice_attribut) {
+		double moyenne = moyenne(indice_attribut);
+		double S = ecartAbsolue(indice_attribut);
+		for (int i = 0; i < n; i++) {
+			data[i][indice_attribut] = (data[i][indice_attribut] - moyenne)/S;
 		}
 	}
 
@@ -162,6 +199,20 @@ public class Dataset {
 
 	public double ecartType(int indice_attribut) {
 		return Math.sqrt(variance(indice_attribut));
+	}
+	
+	public double ecartAbsolue(int indice_attribut) {
+		double ecart_absolue;
+		double moyenne = moyenne(indice_attribut);
+		ecart_absolue = 0.0;
+		int count = 0;
+		for (int i = 0; i < n; i++) {
+			if (data[i][indice_attribut] == null) continue; // pour eviter les cases vides
+			ecart_absolue += Math.abs(data[i][indice_attribut] - moyenne);
+			count++;
+		}
+		ecart_absolue /= count;
+		return ecart_absolue;
 	}
 
 	public double coeffitient_de_correlation(int attribut1, int attribut2) {

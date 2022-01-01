@@ -14,7 +14,7 @@ public class ClassifieurBaysien extends Classifieur {
 	public Index index;
 	public ClassifieurBaysien(TableModel model, int n, int m, int taille_echantillon_apprentissage) {
 		super(n,m,taille_echantillon_apprentissage);
-		this.index = apprendre(model);
+		apprendre(model);
 	}
 
 	public double p_classe(String classe) {
@@ -37,9 +37,9 @@ public class ClassifieurBaysien extends Classifieur {
 		return (index.taille(x, classe) + 1)/(double)(index.taille(classe) + index.valeurs_possibles.get(x).size());
 	}
 
-	private Index apprendre(TableModel model) {
+	public void apprendre(TableModel model) {
 		TreeSet<String> classes_possibles = new TreeSet<>();
-		Index index = new Index(this.classes_possibles);
+		index = new Index(this.classes_possibles);
 		for (int i = 0; i < n; i++) {
 			String classe = model.getValueAt(i, m-1).toString();
 			if (index.taille(classe) < taille_echantillon_apprentissage) {
@@ -52,7 +52,6 @@ public class ClassifieurBaysien extends Classifieur {
 			}
 		}
 		this.classes_possibles = new ArrayList<>(classes_possibles);
-		return index;
 	}
 
 	public String classifier(Instance instance) {

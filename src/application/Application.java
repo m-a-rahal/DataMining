@@ -48,6 +48,7 @@ import Classification.Classifieur.Instance;
 import Classification.ClassifieurBaysien;
 import Classification.Classifieur_KNN;
 import Classification.Evaluation;
+import Classification.MatriceConfusion;
 import Classification.Evaluation.Evaluations;
 import data.Dataset;
 import data.Frequences;
@@ -111,6 +112,7 @@ public class Application {
 	private JComboBox comboBox_algorithme_classif;
 	private JCheckBox chckbxUrl;
 	private JLabel label_info_classif;
+	private JTable table_matrice_confusion;
 
 	/**
 	 * Launch the application.
@@ -339,8 +341,7 @@ public class Application {
 					if( comboBox_type_normalisation.getSelectedIndex() == 0 ) {
 						dataset.normaliser_min_max(i,nouv_max,nouv_min);
 					} else {
-						//#### norm z score
-						System.out.println("z-score non impémenté");
+						dataset.normaliser_z_score(i);
 					}
 				}
 				try {
@@ -367,7 +368,11 @@ public class Application {
 					return;
 				}
 				for (int i = 0; i < dataset.m-1; i++) {
-					dataset.discretiser_equal_width(i,Q);
+					if(comboBox_type_discretisation.getSelectedIndex() == 0) {
+						dataset.discretiser_equal_width(i,Q); // par défaut utiliser amplitueds égales
+					} else {
+						dataset.discretiser_effectifs_egaux(i, Q);
+					}
 				}
 				try {
 					load_dataset_on_table_disccrete();
@@ -1163,28 +1168,37 @@ public class Application {
 		
 		label_info_classif = new JLabel("");
 		label_info_classif.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		JLabel lblNewLabel_18 = new JLabel("Matrice de confusion");
+		
+		JScrollPane scrollPane_4 = new JScrollPane();
 		GroupLayout gl_panel_11 = new GroupLayout(panel_11);
 		gl_panel_11.setHorizontalGroup(
 			gl_panel_11.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_11.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_11.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_11.createSequentialGroup()
+							.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(gl_panel_11.createSequentialGroup()
+							.addComponent(scrollPane_3, GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
+							.addContainerGap())
+						.addComponent(scrollPane_4, GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
 						.addGroup(Alignment.TRAILING, gl_panel_11.createSequentialGroup()
 							.addComponent(lblNewLabel_15)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblNewLabel_6_2_1, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
+							.addComponent(lblNewLabel_6_2_1, GroupLayout.DEFAULT_SIZE, 356, Short.MAX_VALUE)
 							.addGap(20))
 						.addGroup(Alignment.TRAILING, gl_panel_11.createSequentialGroup()
-							.addComponent(lblNewLabel_16)
-							.addContainerGap(327, Short.MAX_VALUE))
-						.addGroup(Alignment.TRAILING, gl_panel_11.createSequentialGroup()
-							.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 409, Short.MAX_VALUE)
+							.addComponent(label_info_classif, GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
 							.addContainerGap())
-						.addGroup(Alignment.TRAILING, gl_panel_11.createSequentialGroup()
-							.addGroup(gl_panel_11.createParallelGroup(Alignment.TRAILING)
-								.addComponent(scrollPane_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 407, Short.MAX_VALUE)
-								.addComponent(label_info_classif, GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
-							.addContainerGap())))
+						.addGroup(gl_panel_11.createSequentialGroup()
+							.addComponent(lblNewLabel_18)
+							.addContainerGap(317, Short.MAX_VALUE))
+						.addGroup(gl_panel_11.createSequentialGroup()
+							.addComponent(lblNewLabel_16)
+							.addContainerGap(324, Short.MAX_VALUE))))
 		);
 		gl_panel_11.setVerticalGroup(
 			gl_panel_11.createParallelGroup(Alignment.LEADING)
@@ -1194,15 +1208,22 @@ public class Application {
 						.addComponent(lblNewLabel_15)
 						.addComponent(lblNewLabel_6_2_1, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
+					.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNewLabel_16)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane_3, GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
+					.addComponent(scrollPane_3, GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblNewLabel_18)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane_4, GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(label_info_classif)
 					.addGap(10))
 		);
+		
+		table_matrice_confusion = new JTable();
+		scrollPane_4.setViewportView(table_matrice_confusion);
 
 		table_mesures_bays__moyennes = new JTable();
 		scrollPane_3.setViewportView(table_mesures_bays__moyennes);
@@ -1552,8 +1573,10 @@ public class Application {
 				Classification resultats = classifieur.tester(instances);
 				area_res_class.setText(resultats.toString());
 				Evaluations mesures = classifieur.evaluer(resultats);
+				MatriceConfusion matriceConfusion = new MatriceConfusion(resultats);
 				update_table_mesures_classif(mesures);
 				update_table_mesures_classif_moyennes(mesures);
+				update_matrice_confusion(matriceConfusion);
 			} catch (Exception e1) {
 				afficherMessage("La classification baysiénne a échoué!");
 				e1.printStackTrace();
@@ -1578,8 +1601,10 @@ public class Application {
 				Classification resultats = classifieur.tester(instances);
 				area_res_class.setText(resultats.toString());
 				Evaluations mesures = classifieur.evaluer(resultats);
+				MatriceConfusion matriceConfusion = new MatriceConfusion(resultats);
 				update_table_mesures_classif(mesures);
 				update_table_mesures_classif_moyennes(mesures);
+				update_matrice_confusion(matriceConfusion);
 			} catch (Exception e1) {
 				afficherMessage("La classification KNN a échoué!");
 				e1.printStackTrace();
@@ -1587,6 +1612,20 @@ public class Application {
 			}
 		}
 		label_info_classif.setText("temps d'execution = "+(System.currentTimeMillis() - start)+" ms");
+	}
+
+	private void update_matrice_confusion(MatriceConfusion matriceConfusion) {
+		ArrayList<String> titres = new ArrayList<>();
+		int n = matriceConfusion.classes.size();
+		titres.add(""); titres.addAll(matriceConfusion.classes);
+		DefaultTableModel model = new DefaultTableModel(titres.toArray(), matriceConfusion.classes.size());
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				model.setValueAt(matriceConfusion.classes.get(i),i, 0);
+				model.setValueAt(matriceConfusion.get(i, j), i, j+1);
+			}
+		}
+		table_matrice_confusion.setModel(model);
 	}
 
 	private void update_table_mesures_classif_moyennes(Evaluations mesures) {
