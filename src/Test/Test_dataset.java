@@ -16,6 +16,7 @@ import data.Dataset;
 import diagrammes.Diagrammes;
 import input_output_classes.FileManager;
 import input_output_classes.URLManager;
+import motifs_frequents_et_regles.AlgoMotifsFrequents;
 import motifs_frequents_et_regles.Apriori;
 import motifs_frequents_et_regles.Eclat;
 import motifs_frequents_et_regles.Itemsets;
@@ -23,7 +24,15 @@ import motifs_frequents_et_regles.Regle;
 
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
-		tester_classif_KNN();
+		Dataset dataset = FileManager.extract_dataset(null);
+		for (double k = 0.01; k < 1.0; k += 0.01) {
+			double start = System.currentTimeMillis();
+			AlgoMotifsFrequents algo = new Apriori(0.05);
+			Itemsets L = algo.run("resources/dataset_discret.txt");
+			Regle.regles_association(L, k);
+			double time  = System.currentTimeMillis() - start;
+			System.out.println(Dataset.arrondi(k)+"\t"+time);
+		}
 	}
 	
 	private static void tester_classif_KNN() throws Exception {
@@ -96,9 +105,9 @@ public class Test_dataset {
 
 	@SuppressWarnings("unused")
 	private static void test_motifs_frequents() throws FileNotFoundException {
-		Dataset dataset = FileManager.extract_dataset(null);
-		Itemsets L = test_Eclat(dataset, 0.03, "resources/Market_Basket_Optimisation.csv");
-		test_Apriori(dataset, 0.44, "resources/exemple_TD_2.txt");
+		
+		Itemsets L = test_Eclat(0.03, "resources/Market_Basket_Optimisation.csv");
+		test_Apriori(0.44, "resources/exemple_TD_2.txt");
 		//System.out.println(dataset.proba_instance(21, 2));
 		test_RegleAssociation_corr(L,0.2);
 	}
@@ -112,7 +121,7 @@ public class Test_dataset {
 		System.out.println(Regle.regles_correlation(L, min_conf).regles_corr_negatives());
 	}
 
-	private static Itemsets test_Eclat(Dataset dataset,double min_sup_pourcent, String file) {
+	private static Itemsets test_Eclat(double min_sup_pourcent, String file) {
 		try {
 			Eclat eclat = new Eclat(min_sup_pourcent);
 			Itemsets L = eclat.run(file);
@@ -124,7 +133,7 @@ public class Test_dataset {
 		return null;
 	}
 
-	private static void test_Apriori(Dataset dataset, double min_sup_pourcent, String file) {
+	private static void test_Apriori(double min_sup_pourcent, String file) {
 		try {
 			Apriori apriori = new Apriori(min_sup_pourcent);
 			System.out.println(apriori.run(file));
