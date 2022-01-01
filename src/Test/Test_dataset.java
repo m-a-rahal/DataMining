@@ -1,11 +1,17 @@
 package Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import Classification.Classifieur;
+import Classification.Classifieur.Classification;
+import Classification.Classifieur.Instance;
 import Classification.ClassifieurBaysien;
+import Classification.Classifieur_KNN;
 import data.Dataset;
 import diagrammes.Diagrammes;
 import input_output_classes.FileManager;
@@ -17,6 +23,55 @@ import motifs_frequents_et_regles.Regle;
 
 public class Test_dataset {
 	public static void main(String[] args) throws Exception {
+		Dataset dataset = FileManager.extract_dataset(null);
+		dataset.normaliser_min_max();
+		dataset.discretiser_equal_width(4);
+		int n,m;
+		n = dataset.n;
+		m = dataset.m;
+		TableModel model = model_from_table(dataset);
+		discretiser(model);
+		int taille_echantillon_apprentissage = 50;
+		Classifieur_KNN classifieur = new Classifieur_KNN(model, n, m, 5, taille_echantillon_apprentissage);
+		classifieur.utiliser_distance_manathan();
+		String tmp = "I11	I21	I32	I41	I51	I63	I72\r\n"
+				+ "I11	I22	I32	I42	I52	I63	I72\r\n"
+				+ "I11	I21	I31	I42	I51	I62	I72\r\n"
+				+ "I11	I21	I31	I42	I51	I63	I72\r\n"
+				+ "I11	I21	I32	I41	I51	I62	I71\r\n"
+				+ "I11	I21	I32	I41	I51	I64	I71\r\n"
+				+ "I11	I21	I33	I41	I51	I63	I71\r\n"
+				+ "I11	I21	I32	I41	I51	I63	I72\r\n"
+				+ "I11	I21	I32	I41	I51	I62	I71\r\n"
+				+ "I11	I21	I33	I41	I51	I62	I72\r\n"
+				+ "I11	I21	I31	I41	I51	I63	I72\r\n"
+				+ "I11	I21	I33	I41	I51	I62	I71\r\n"
+				+ "I11	I21	I33	I41	I52	I63	I71\r\n"
+				+ "I11	I21	I33	I41	I52	I63	I71\r\n"
+				+ "I12	I22	I33	I41	I52	I63	I72\r\n"
+				+ "I11	I22	I32	I42	I51	I62	I72\r\n"
+				+ "I11	I21	I34	I41	I52	I62	I71\r\n"
+				+ "I11	I21	I32	I41	I52	I63	I72\r\n"
+				+ "I11	I21	I34	I41	I52	I61	I71\r\n"
+				+ "I11	I21	I33	I41	I51	I62	I71\r\n"
+				+ "I11	I21	I33	I41	I52	I64	I71\r\n"
+				+ "I11	I21	I32	I41	I51	I62	I71\r\n"
+				+ "I11	I21	I33	I41	I52	I62	I71\r\n"
+				+ "I11	I21	I32	I41	I51	I62	I71\r\n"
+				+ "I11	I22	I33	I41	I52	I64	I72\r\n"
+				+ "I11	I21	I32	I41	I51	I62	I72\r\n"
+				+ "I11	I21	I33	I41	I51	I63	I72";
+		ArrayList<Instance> instances = Classifieur.extraire_instances(tmp);
+		List<String> classes = new ArrayList<>();
+		classes.add("1.0");classes.add("2.0");classes.add("3.0");
+		Classification classification = new Classification(classes);
+		for (int i = 0; i < instances.size(); i++) {
+			classification.ajouter(instances.get(i), classifieur.classifier(instances.get(i)));
+		}
+		System.out.println(classification);
+	}
+	
+	private static void testerClassifBays() throws Exception {
 		Dataset dataset = FileManager.extract_dataset(null);
 		dataset.normaliser_min_max();
 		dataset.discretiser_equal_width(4);

@@ -42,8 +42,11 @@ import javax.swing.table.TableModel;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
+import Classification.Classifieur;
 import Classification.Classifieur.Classification;
+import Classification.Classifieur.Instance;
 import Classification.ClassifieurBaysien;
+import Classification.Classifieur_KNN;
 import Classification.Evaluation;
 import Classification.Evaluation.Evaluations;
 import data.Dataset;
@@ -99,11 +102,15 @@ public class Application {
 	private JTextField textField_confidence;
 	private JTextArea area_regles;
 	private JLabel label_tmps_exec_regles;
-	private JTextField textField_taille_echantillion_testbays;
-	private JTextArea area_res_class_bays;
-	private JTextArea area_instances_bays;
+	private JTextField textField_taille_echantillion_test;
+	private JTextArea area_res_class;
+	private JTextArea area_instances;
 	private JTable table_mesures_bays;
 	private JTable table_mesures_bays__moyennes;
+	private JTextField textField_k;
+	private JComboBox comboBox_algorithme_classif;
+	private JCheckBox chckbxUrl;
+	private JLabel label_info_classif;
 
 	/**
 	 * Launch the application.
@@ -117,6 +124,7 @@ public class Application {
 					// Maximizer la fenêtre et l'afficher
 					window.frame.setExtendedState(window.frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
 					window.frame.setVisible(true);
+					window.charger_dataset(false);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -229,39 +237,19 @@ public class Application {
 		JLabel lblNewLabel = new JLabel("Dataset");
 
 		text_dataset_src = new JTextField();
+		text_dataset_src.setText("resources/seeds_dataset.txt");
 		text_dataset_src.setToolTipText("le chemin (ou l'url) du dataset ...");
 		text_dataset_src.setColumns(10);
 
-		JCheckBox chckbxUrl = new JCheckBox("url");
+		chckbxUrl = new JCheckBox("url");
 		chckbxUrl.setToolTipText("spécifier si vous voulez récupérer votre dataset depuis un url sur internet ou localement avec son chemin d'emplacement");
 
 		JButton btnCharger = new JButton("charger");
 		btnCharger.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(! chckbxUrl.isSelected()) {
-		            try {
-		            	text_dataset_src.setText(FileManager.ChooseFileWindow(application));
-		            	dataset = FileManager.extract_dataset(text_dataset_src.getText());
-		            	text_dataset_src.getText();
-		            } catch (NullPointerException e1) {
-		            	e1.printStackTrace();
-		            } catch (FileNotFoundException e1) {e1.printStackTrace();}
-				}else {
-					try {
-						dataset = URLManager.extract_dataset(text_dataset_src.getText());
-					} catch (IOException e1) {
-						afficherMessage("l'URL que vous avez introduit est éronné");
-					}
-				}
-				try {
-					load_dataset_on_table();
-					update_description_text();
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
+				charger_dataset(true);
 			}
-
 
 		});
 
@@ -742,8 +730,8 @@ public class Application {
 		);
 		panel_plots.setLayout(gl_panel_plots);
 
-		JPanel panel_6 = new JPanel();
-		tabbedPane.addTab("Motifs fréquents et règles", null, panel_6, null);
+		JPanel panel_motifs_freq_regles = new JPanel();
+		tabbedPane.addTab("Motifs fréquents et règles", null, panel_motifs_freq_regles, null);
 
 		JPanel panel_7 = new JPanel();
 
@@ -952,7 +940,7 @@ public class Application {
 				}
 			}
 		});
-		panel_6.setLayout(new BoxLayout(panel_6, BoxLayout.X_AXIS));
+		panel_motifs_freq_regles.setLayout(new BoxLayout(panel_motifs_freq_regles, BoxLayout.X_AXIS));
 
 		JScrollPane scrollPane = new JScrollPane((Component) null);
 
@@ -1019,17 +1007,17 @@ public class Application {
 		area_res_motifs_freq.setEditable(false);
 		scrollPane.setViewportView(area_res_motifs_freq);
 		panel_7.setLayout(gl_panel_7);
-		panel_6.add(panel_7);
-		panel_6.add(panel_8);
+		panel_motifs_freq_regles.add(panel_7);
+		panel_motifs_freq_regles.add(panel_8);
 
-		JPanel panel_9 = new JPanel();
-		tabbedPane.addTab("Classification", null, panel_9, null);
-		panel_9.setLayout(new BoxLayout(panel_9, BoxLayout.X_AXIS));
+		JPanel panel_classif = new JPanel();
+		tabbedPane.addTab("Classification", null, panel_classif, null);
+		panel_classif.setLayout(new BoxLayout(panel_classif, BoxLayout.X_AXIS));
 
 		JPanel panel_10 = new JPanel();
-		panel_9.add(panel_10);
+		panel_classif.add(panel_10);
 
-		JLabel lblNewLabel_6_2 = new JLabel("Classification Baysiénne");
+		JLabel lblNewLabel_6_2 = new JLabel("Classification");
 		lblNewLabel_6_2.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_6_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
@@ -1039,6 +1027,13 @@ public class Application {
 		btn_evaluer_instances.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				try {
+					lancer_test_bays(Classifieur.extraire_instances(area_instances.getText()));
+				} catch (Exception e2) {
+					afficherMessage("");
+					e2.printStackTrace();
+					return;
+				}
 			}
 		});
 
@@ -1046,74 +1041,8 @@ public class Application {
 		btn_tester_dataset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int nbr_instances_apprentissge;
-				try {
-					nbr_instances_apprentissge = Integer.parseInt(textField_taille_echantillion_testbays.getText());
-				} catch (Exception e2) {
-					afficherMessage("Le nombre d'instances d'appentissage est éronée (doit être un entier)");
-					return;
-				}
-				if (nbr_instances_apprentissge <= 0) {
-					afficherMessage("Le nombre d'instances d'appentissage doit être strictement positive");
-					return;
-				}
-				try {
-					TableModel model = table_dataset.getModel();
-					ClassifieurBaysien classifieur = new ClassifieurBaysien(model, dataset.n, dataset.m, nbr_instances_apprentissge);
-					Classification resultats = classifieur.tester(classifieur.instances_de_test(model));
-					area_res_class_bays.setText(resultats.toString());
-					Evaluations mesures = classifieur.evaluer(resultats);
-					update_table_mesures_bays(mesures);
-					update_table_mesures_bays_moyennes(mesures);
-				} catch (Exception e1) {
-					afficherMessage("La classification baysiénne a échoué!");
-					e1.printStackTrace();
-					return;
-				}
-			}
-
-			private void update_table_mesures_bays_moyennes(Evaluations mesures) {
-
-				DefaultTableModel model = new DefaultTableModel(new String[] {"Mesure", "Moyenne"}, 4+6); //TP+FN+... //acc+sens+spec+P+R+F
-				TableModel data = table_mesures_bays.getModel();
-				for (int i = 0; i < data.getRowCount(); i++) {
-					double moy = 0;
-					for (int j = 1; j < data.getColumnCount(); j++) {
-						try {
-							moy += Double.parseDouble(data.getValueAt(i,j).toString());
-						} catch (Exception e) {
-							continue;
-						}
-					}
-					moy /= data.getColumnCount() - 1;
-					model.setValueAt(data.getValueAt(i, 0), i, 0); // copier titre
-					model.setValueAt(moy, i, 1); // mettre valeure de la moyenne
-				}
-				table_mesures_bays__moyennes.setModel(model);
-			}
-
-			private void update_table_mesures_bays(Evaluations mesures) {
-				String [] titres = new String[mesures.size() + 1];
-				int i = 0;
-				titres[i] = "Mesure";
-				for(Evaluation e : mesures) {
-					titres[++i] = e.classe;
-				}
-				DefaultTableModel model = new DefaultTableModel(titres, 4+6); //TP+FN+... //acc+sens+spec+P+R+F
-				i = 0;
-				model.setValueAt("TP",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).TP,i,j+1); i++;
-				model.setValueAt("TN",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).TN,i,j+1); i++;
-				model.setValueAt("FP",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).FP,i,j+1); i++;
-				model.setValueAt("FN",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).FN,i,j+1); i++;
-                model.setValueAt("Accuracy",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).accuracy()),i,j+1); i++;
-                model.setValueAt("Sensitivity",i,0);   for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).sensitivity()),i,j+1); i++;
-                model.setValueAt("Specificity",i,0);   for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).specificity()),i,j+1); i++;
-                model.setValueAt("Precision",i,0);     for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).precision()),i,j+1); i++;
-                model.setValueAt("Rappel",i,0);        for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).rappel()),i,j+1); i++;
-                model.setValueAt("F-score",i,0);       for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).f_mesure()),i,j+1); i++;
-				table_mesures_bays.setModel(model);
-			}
-		});
+				lancer_test_bays(null);
+			}});
 
 		JScrollPane scrollBar = new JScrollPane();
 
@@ -1121,35 +1050,66 @@ public class Application {
 
 		JLabel lblNewLabel_14 = new JLabel("nombre instances d'apprentissage");
 
-		textField_taille_echantillion_testbays = new JTextField();
-		textField_taille_echantillion_testbays.setText("50");
-		textField_taille_echantillion_testbays.setHorizontalAlignment(SwingConstants.CENTER);
-		textField_taille_echantillion_testbays.setColumns(10);
+		textField_taille_echantillion_test = new JTextField();
+		textField_taille_echantillion_test.setText("50");
+		textField_taille_echantillion_test.setHorizontalAlignment(SwingConstants.CENTER);
+		textField_taille_echantillion_test.setColumns(10);
+		
+		textField_k = new JTextField();
+		textField_k.setEnabled(false);
+		textField_k.setText("3");
+		textField_k.setHorizontalAlignment(SwingConstants.CENTER);
+		textField_k.setColumns(10);
+		
+		JLabel lblNewLabel_17 = new JLabel("k");
+		lblNewLabel_17.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		comboBox_algorithme_classif = new JComboBox();
+		comboBox_algorithme_classif.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (comboBox_algorithme_classif.getSelectedIndex() == 0) {
+					textField_k.setEnabled(false);
+					lblNewLabel_17.setEnabled(false);
+				} else {
+					textField_k.setEnabled(true);
+					lblNewLabel_17.setEnabled(true);
+				}
+			}
+		});
+		comboBox_algorithme_classif.setModel(new DefaultComboBoxModel(new String[] {"Classification naïve Bayésienne", "Classification KNN"}));
 		GroupLayout gl_panel_10 = new GroupLayout(panel_10);
 		gl_panel_10.setHorizontalGroup(
-			gl_panel_10.createParallelGroup(Alignment.LEADING)
-				.addComponent(lblNewLabel_6_2, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
+			gl_panel_10.createParallelGroup(Alignment.TRAILING)
+				.addComponent(lblNewLabel_6_2, GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblNewLabel_13, GroupLayout.PREFERRED_SIZE, 59, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, 187, Short.MAX_VALUE)
 					.addComponent(btn_evaluer_instances)
 					.addContainerGap())
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
 					.addContainerGap())
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblNewLabel_14)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(textField_taille_echantillion_testbays, GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
-					.addGap(13)
+					.addComponent(textField_taille_echantillion_test, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lblNewLabel_17, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(textField_k, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
+				.addGroup(gl_panel_10.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(comboBox_algorithme_classif, 0, 236, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btn_tester_dataset, GroupLayout.PREFERRED_SIZE, 121, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
+					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_panel_10.setVerticalGroup(
@@ -1161,26 +1121,33 @@ public class Application {
 						.addComponent(lblNewLabel_13)
 						.addComponent(btn_evaluer_instances))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
+					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel_14)
-						.addComponent(btn_tester_dataset)
-						.addComponent(textField_taille_echantillion_testbays, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+					.addGroup(gl_panel_10.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_panel_10.createSequentialGroup()
+							.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblNewLabel_14)
+								.addComponent(textField_taille_echantillion_test, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textField_k, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblNewLabel_17))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(comboBox_algorithme_classif, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btn_tester_dataset))
+					.addGap(8)
+					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 
-		area_res_class_bays = new JTextArea();
-		scrollBar_1.setViewportView(area_res_class_bays);
+		area_res_class = new JTextArea();
+		scrollBar_1.setViewportView(area_res_class);
 
-		area_instances_bays = new JTextArea();
-		scrollBar.setViewportView(area_instances_bays);
+		area_instances = new JTextArea();
+		area_instances.setText("I12 I22 I33 I42 I52 I62 I72     1.0\r\nI12 I23 I34 I42 I53 I63 I72     1.0\r\nI12 I22 I32 I42 I52 I62 I72     1.0\r\nI12 I22 I33 I42 I52 I62 I72     1.0\r\nI12 I22 I32 I42 I52 I61 I72     1.0\r\nI12 I22 I33 I42 I52 I61 I72     1.0\r\nI12 I22 I33 I42 I53 I62 I72     1.0\r\nI12 I22 I34 I42 I53 I61 I72     1.0");
+		scrollBar.setViewportView(area_instances);
 		panel_10.setLayout(gl_panel_10);
 
 		JPanel panel_11 = new JPanel();
-		panel_9.add(panel_11);
+		panel_classif.add(panel_11);
 
 		JLabel lblNewLabel_6_2_1 = new JLabel("");
 		lblNewLabel_6_2_1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -1193,24 +1160,30 @@ public class Application {
 		JLabel lblNewLabel_16 = new JLabel("Mesures moyennes");
 
 		JScrollPane scrollPane_3 = new JScrollPane();
+		
+		label_info_classif = new JLabel("");
+		label_info_classif.setHorizontalAlignment(SwingConstants.CENTER);
 		GroupLayout gl_panel_11 = new GroupLayout(panel_11);
 		gl_panel_11.setHorizontalGroup(
 			gl_panel_11.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_11.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_11.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_11.createSequentialGroup()
+						.addGroup(Alignment.TRAILING, gl_panel_11.createSequentialGroup()
 							.addComponent(lblNewLabel_15)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblNewLabel_6_2_1, GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
+							.addComponent(lblNewLabel_6_2_1, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
 							.addGap(20))
-						.addGroup(gl_panel_11.createSequentialGroup()
+						.addGroup(Alignment.TRAILING, gl_panel_11.createSequentialGroup()
 							.addComponent(lblNewLabel_16)
-							.addContainerGap(355, Short.MAX_VALUE))
+							.addContainerGap(327, Short.MAX_VALUE))
+						.addGroup(Alignment.TRAILING, gl_panel_11.createSequentialGroup()
+							.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 409, Short.MAX_VALUE)
+							.addContainerGap())
 						.addGroup(Alignment.TRAILING, gl_panel_11.createSequentialGroup()
 							.addGroup(gl_panel_11.createParallelGroup(Alignment.TRAILING)
-								.addComponent(scrollPane_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
-								.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE))
+								.addComponent(scrollPane_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 407, Short.MAX_VALUE)
+								.addComponent(label_info_classif, GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
 							.addContainerGap())))
 		);
 		gl_panel_11.setVerticalGroup(
@@ -1225,8 +1198,10 @@ public class Application {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNewLabel_16)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane_3, GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(scrollPane_3, GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(label_info_classif)
+					.addGap(10))
 		);
 
 		table_mesures_bays__moyennes = new JTable();
@@ -1554,5 +1529,134 @@ public class Application {
 
 	public void afficherMessage(String message) {
 		JOptionPane.showMessageDialog(frame, message);
+	}
+	
+	private void lancer_test_bays(ArrayList<Instance> instances) {
+		int nbr_instances_apprentissge;
+		try {
+			nbr_instances_apprentissge = Integer.parseInt(textField_taille_echantillion_test.getText());
+		} catch (Exception e2) {
+			afficherMessage("Le nombre d'instances d'appentissage est éronée (doit être un entier)");
+			return;
+		}
+		if (nbr_instances_apprentissge <= 0) {
+			afficherMessage("Le nombre d'instances d'appentissage doit être strictement positive");
+			return;
+		}
+		double start = System.currentTimeMillis();
+		if (comboBox_algorithme_classif.getSelectedIndex() == 0) { // classif bays
+			try {
+				TableModel model = table_dataset.getModel();
+				ClassifieurBaysien classifieur = new ClassifieurBaysien(model, dataset.n, dataset.m, nbr_instances_apprentissge);
+				if (instances == null) instances = classifieur.instances_de_test(model);
+				Classification resultats = classifieur.tester(instances);
+				area_res_class.setText(resultats.toString());
+				Evaluations mesures = classifieur.evaluer(resultats);
+				update_table_mesures_classif(mesures);
+				update_table_mesures_classif_moyennes(mesures);
+			} catch (Exception e1) {
+				afficherMessage("La classification baysiénne a échoué!");
+				e1.printStackTrace();
+				return;
+			}
+		} else { // classif KNN
+			try {
+				int k;
+				try {
+					k = Integer.parseInt(textField_k.getText());
+				} catch (Exception e2) {
+					afficherMessage("La valeure de k est éronée (doit être un entier)");
+					return;
+				}
+				if (k <= 0) {
+					afficherMessage("Le nombre k doit être strictement positive");
+					return;
+				}
+				TableModel model = table_dataset.getModel();
+				Classifieur_KNN classifieur = new Classifieur_KNN(model, dataset.n, dataset.m, k, nbr_instances_apprentissge);
+				if (instances == null) instances = classifieur.instances_de_test(model);
+				Classification resultats = classifieur.tester(instances);
+				area_res_class.setText(resultats.toString());
+				Evaluations mesures = classifieur.evaluer(resultats);
+				update_table_mesures_classif(mesures);
+				update_table_mesures_classif_moyennes(mesures);
+			} catch (Exception e1) {
+				afficherMessage("La classification KNN a échoué!");
+				e1.printStackTrace();
+				return;
+			}
+		}
+		label_info_classif.setText("temps d'execution = "+(System.currentTimeMillis() - start)+" ms");
+	}
+
+	private void update_table_mesures_classif_moyennes(Evaluations mesures) {
+
+		DefaultTableModel model = new DefaultTableModel(new String[] {"Mesure", "Moyenne"}, 4+6); //TP+FN+... //acc+sens+spec+P+R+F
+		TableModel data = table_mesures_bays.getModel();
+		for (int i = 0; i < data.getRowCount(); i++) {
+			double moy = 0;
+			for (int j = 1; j < data.getColumnCount(); j++) {
+				try {
+					moy += Double.parseDouble(data.getValueAt(i,j).toString());
+				} catch (Exception e) {
+					continue;
+				}
+			}
+			moy /= data.getColumnCount() - 1;
+			model.setValueAt(data.getValueAt(i, 0), i, 0); // copier titre
+			model.setValueAt(Dataset.arrondi(moy), i, 1); // mettre valeure de la moyenne
+		}
+		table_mesures_bays__moyennes.setModel(model);
+	}
+
+	private void update_table_mesures_classif(Evaluations mesures) {
+		String [] titres = new String[mesures.size() + 1];
+		int i = 0;
+		titres[i] = "Mesure";
+		for(Evaluation e : mesures) {
+			titres[++i] = e.classe;
+		}
+		DefaultTableModel model = new DefaultTableModel(titres, 4+6); //TP+FN+... //acc+sens+spec+P+R+F
+		i = 0;
+		model.setValueAt("TP",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).TP,i,j+1); i++;
+		model.setValueAt("TN",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).TN,i,j+1); i++;
+		model.setValueAt("FP",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).FP,i,j+1); i++;
+		model.setValueAt("FN",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(mesures.get(j).FN,i,j+1); i++;
+        model.setValueAt("Accuracy",i,0);      for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).accuracy()),i,j+1); i++;
+        model.setValueAt("Sensitivity",i,0);   for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).sensitivity()),i,j+1); i++;
+        model.setValueAt("Specificity",i,0);   for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).specificity()),i,j+1); i++;
+        model.setValueAt("Precision",i,0);     for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).precision()),i,j+1); i++;
+        model.setValueAt("Rappel",i,0);        for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).rappel()),i,j+1); i++;
+        model.setValueAt("F-score",i,0);       for (int j = 0; j < mesures.size(); j++) model.setValueAt(Dataset.arrondi(mesures.get(j).f_mesure()),i,j+1); i++;
+		table_mesures_bays.setModel(model);
+	}
+	
+	private void charger_dataset(boolean show_dialog) {
+		if (!show_dialog) {
+			try {
+				dataset = FileManager.extract_dataset(text_dataset_src.getText());
+			} catch (FileNotFoundException e) {} 
+		}
+		else if(!chckbxUrl.isSelected()) {
+            try {
+            	text_dataset_src.setText(FileManager.ChooseFileWindow(application));
+            	dataset = FileManager.extract_dataset(text_dataset_src.getText());
+            	text_dataset_src.getText();
+            } catch (NullPointerException e1) {
+            	e1.printStackTrace();
+            } catch (FileNotFoundException e1) {e1.printStackTrace();}
+		}else {
+			try {
+				dataset = URLManager.extract_dataset(text_dataset_src.getText());
+			} catch (IOException e1) {
+				afficherMessage("l'URL que vous avez introduit est éronné");
+			}
+		}
+		try {
+			load_dataset_on_table();
+			update_description_text();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 	}
 }
