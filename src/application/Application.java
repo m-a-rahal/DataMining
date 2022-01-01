@@ -113,6 +113,7 @@ public class Application {
 	private JCheckBox chckbxUrl;
 	private JLabel label_info_classif;
 	private JTable table_matrice_confusion;
+	private JCheckBox chckbox_estimateur_laplace;
 
 	/**
 	 * Launch the application.
@@ -140,7 +141,7 @@ public class Application {
 	public Application() {
 		application = this; // self reference, needed later
 		frame = new JFrame();
-		frame.setBounds(100, 100, 830, 482);
+		frame.setBounds(100, 100, 957, 495);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		JPanel panel = new JPanel();
@@ -178,17 +179,17 @@ public class Application {
 				.addGroup(gl_panel_dataset.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 789, Short.MAX_VALUE)
-						.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
+						.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_panel_dataset.setVerticalGroup(
 			gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel_dataset.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
+					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 152, GroupLayout.PREFERRED_SIZE)
 					.addGap(10))
 		);
 
@@ -773,16 +774,15 @@ public class Application {
 					afficherMessage("Veuillez d'abbord extraire les motifs fréquents");
 					return;
 				}
-				Regles regles_pos, regles_neg;
+				Regles regles;
 				try {
 					double start = System.currentTimeMillis();
-					regles_pos = Regle.regles_correlation(motifs_frequents, min_conf, +1);
-					regles_neg = Regle.regles_correlation(motifs_frequents, min_conf, -1);
+					regles = Regle.regles_correlation(motifs_frequents, min_conf);
 					label_tmps_exec_regles.setText("temps d'execution = "+(System.currentTimeMillis() - start)+" ms");
 					area_regles.setText("règles de corrélation positives:\n"+
-										 regles_pos.toString()+
+										 regles.regles_corr_positives().toString("+")+
 										"\nrègles de corrélation négatives:\n"+
-										 regles_neg.toString());
+										 regles.regles_corr_negatives().toString("-"));
 
 				} catch (Exception e2) {
 					afficherMessage("L'extraction de règles de corrélation a échoué !" + e2);
@@ -1075,46 +1075,52 @@ public class Application {
 				if (comboBox_algorithme_classif.getSelectedIndex() == 0) {
 					textField_k.setEnabled(false);
 					lblNewLabel_17.setEnabled(false);
+					chckbox_estimateur_laplace.setEnabled(true);
 				} else {
 					textField_k.setEnabled(true);
 					lblNewLabel_17.setEnabled(true);
+					chckbox_estimateur_laplace.setEnabled(false);
 				}
 			}
 		});
 		comboBox_algorithme_classif.setModel(new DefaultComboBoxModel(new String[] {"Classification naïve Bayésienne", "Classification KNN"}));
+		
+		chckbox_estimateur_laplace = new JCheckBox("Estimateur de Laplace");
 		GroupLayout gl_panel_10 = new GroupLayout(panel_10);
 		gl_panel_10.setHorizontalGroup(
-			gl_panel_10.createParallelGroup(Alignment.TRAILING)
-				.addComponent(lblNewLabel_6_2, GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
+			gl_panel_10.createParallelGroup(Alignment.LEADING)
+				.addComponent(lblNewLabel_6_2, GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblNewLabel_13, GroupLayout.PREFERRED_SIZE, 59, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 187, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, 305, Short.MAX_VALUE)
 					.addComponent(btn_evaluer_instances)
 					.addContainerGap())
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
+					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
 					.addContainerGap())
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblNewLabel_14)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(textField_taille_echantillion_test, GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(lblNewLabel_17, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(textField_k, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)
+					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
 					.addContainerGap())
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(comboBox_algorithme_classif, 0, 236, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btn_tester_dataset, GroupLayout.PREFERRED_SIZE, 121, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
-				.addGroup(gl_panel_10.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
+					.addGroup(gl_panel_10.createParallelGroup(Alignment.TRAILING)
+						.addComponent(comboBox_algorithme_classif, 0, 165, Short.MAX_VALUE)
+						.addComponent(lblNewLabel_14, Alignment.LEADING))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_10.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_panel_10.createSequentialGroup()
+							.addComponent(textField_taille_echantillion_test, GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblNewLabel_17, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(textField_k, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_10.createSequentialGroup()
+							.addComponent(chckbox_estimateur_laplace, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addGap(54)
+							.addComponent(btn_tester_dataset, GroupLayout.PREFERRED_SIZE, 121, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		gl_panel_10.setVerticalGroup(
@@ -1136,10 +1142,12 @@ public class Application {
 								.addComponent(textField_k, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(lblNewLabel_17))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(comboBox_algorithme_classif, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
+								.addComponent(comboBox_algorithme_classif, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(chckbox_estimateur_laplace)))
 						.addComponent(btn_tester_dataset))
 					.addGap(8)
-					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 
@@ -1569,6 +1577,8 @@ public class Application {
 			try {
 				TableModel model = table_dataset.getModel();
 				ClassifieurBaysien classifieur = new ClassifieurBaysien(model, dataset.n, dataset.m, nbr_instances_apprentissge);
+				if(chckbox_estimateur_laplace.isSelected())
+					classifieur.utiliser_estimateur_laplace();
 				if (instances == null) instances = classifieur.instances_de_test(model);
 				Classification resultats = classifieur.tester(instances);
 				area_res_class.setText(resultats.toString());
@@ -1576,7 +1586,7 @@ public class Application {
 				MatriceConfusion matriceConfusion = new MatriceConfusion(resultats);
 				update_table_mesures_classif(mesures);
 				update_table_mesures_classif_moyennes(mesures);
-				update_matrice_confusion(matriceConfusion);
+				update_matrice_confusion(matriceConfusion, mesures);
 			} catch (Exception e1) {
 				afficherMessage("La classification baysiénne a échoué!");
 				e1.printStackTrace();
@@ -1604,7 +1614,7 @@ public class Application {
 				MatriceConfusion matriceConfusion = new MatriceConfusion(resultats);
 				update_table_mesures_classif(mesures);
 				update_table_mesures_classif_moyennes(mesures);
-				update_matrice_confusion(matriceConfusion);
+				update_matrice_confusion(matriceConfusion, mesures);
 			} catch (Exception e1) {
 				afficherMessage("La classification KNN a échoué!");
 				e1.printStackTrace();
@@ -1614,7 +1624,7 @@ public class Application {
 		label_info_classif.setText("temps d'execution = "+(System.currentTimeMillis() - start)+" ms");
 	}
 
-	private void update_matrice_confusion(MatriceConfusion matriceConfusion) {
+	private void update_matrice_confusion(MatriceConfusion matriceConfusion, Evaluations mesures) {
 		ArrayList<String> titres = new ArrayList<>();
 		int n = matriceConfusion.classes.size();
 		titres.add(""); titres.addAll(matriceConfusion.classes);
@@ -1625,14 +1635,15 @@ public class Application {
 				model.setValueAt(matriceConfusion.get(i, j), i, j+1);
 			}
 		}
+		// ajouter les matrices de confusion individuelles
 		table_matrice_confusion.setModel(model);
 	}
 
 	private void update_table_mesures_classif_moyennes(Evaluations mesures) {
 
-		DefaultTableModel model = new DefaultTableModel(new String[] {"Mesure", "Moyenne"}, 4+6); //TP+FN+... //acc+sens+spec+P+R+F
+		DefaultTableModel model = new DefaultTableModel(new String[] {"Mesure", "Moyenne"}, 6); //acc+sens+spec+P+R+F
 		TableModel data = table_mesures_bays.getModel();
-		for (int i = 0; i < data.getRowCount(); i++) {
+		for (int i = 4; i < data.getRowCount(); i++) { // commencer de 4 pour ignorer les mesures TP,TN,FP,FN
 			double moy = 0;
 			for (int j = 1; j < data.getColumnCount(); j++) {
 				try {
@@ -1642,8 +1653,8 @@ public class Application {
 				}
 			}
 			moy /= data.getColumnCount() - 1;
-			model.setValueAt(data.getValueAt(i, 0), i, 0); // copier titre
-			model.setValueAt(Dataset.arrondi(moy), i, 1); // mettre valeure de la moyenne
+			model.setValueAt(data.getValueAt(i, 0), i-4, 0); // copier titre
+			model.setValueAt(Dataset.arrondi(moy), i-4, 1); // mettre valeure de la moyenne
 		}
 		table_mesures_bays__moyennes.setModel(model);
 	}

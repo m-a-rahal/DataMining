@@ -41,9 +41,7 @@ public class Regle {
 		}
 		return regles_corr;
 	}
-	public static Regles regles_correlation(Itemsets L, double min_conf, int signe) {
-		return regles_correlation(regles_association(L, min_conf), signe);
-	}
+	
 	public static Regles regles_correlation(Itemsets L, double min_conf) {
 		return regles_correlation(regles_association(L, min_conf));
 	}
@@ -95,12 +93,42 @@ public class Regle {
 		public Regles(int nbr_totale_instances) {
 			this.nbr_totale_instances = nbr_totale_instances;
 		}
-
+		
+		public Regles regles_corr_positives() {
+			Regles regles = new Regles(nbr_totale_instances);
+			for (Regle regle : this) {
+				if(regle.lift > 1.0)
+					regles.add(regle);
+			}
+			return regles;
+		}
+		public Regles regles_corr_negatives() {
+			Regles regles = new Regles(nbr_totale_instances);
+			for (Regle regle : this) {
+				if(regle.lift < 1.0)
+					regles.add(regle);
+			}
+			return regles;
+		}
+		public Regles regles_corr_indepandantes() {
+			Regles regles = new Regles(nbr_totale_instances);
+			for (Regle regle : this) {
+				if(regle.lift == 0)
+					regles.add(regle);
+			}
+			return regles;
+		}
+		
+		
 		@Override
 		public String toString() {
+			return toString("");
+		}
+
+		public String toString(String prefix) {
 			String text = "";
 			for(Regle regle : this) {
-				text += regle.toString() + "\n";
+				text += prefix+" "+regle.toString() + "\n";
 			}
 			return text;
 		}

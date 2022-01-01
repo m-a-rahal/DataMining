@@ -12,6 +12,7 @@ import javax.swing.table.TableModel;
 
 public class ClassifieurBaysien extends Classifieur {
 	public Index index;
+	private boolean estimateur_laplace = false;
 	public ClassifieurBaysien(TableModel model, int n, int m, int taille_echantillon_apprentissage) {
 		super(n,m,taille_echantillon_apprentissage);
 		apprendre(model);
@@ -24,7 +25,11 @@ public class ClassifieurBaysien extends Classifieur {
 	public double p(Instance instance, String classe) {
 		double p = 1;
 		for(String x : instance) {
-			p *= p(x, classe);
+			if (estimateur_laplace) {
+				p *= p_laplace(x, classe);
+			} else {
+				p *= p(x, classe);
+			}
 		}
 		return p;
 	}
@@ -111,11 +116,9 @@ public class ClassifieurBaysien extends Classifieur {
 		}
 
 		public HashSet<String> get(String x) {
-			// TODO Auto-generated method stub
 			return super.get(attribut_de(x));
 		}
 		public HashSet<String> get(int attribut) {
-			// TODO Auto-generated method stub
 			return super.get(attribut);
 		}
 
@@ -131,5 +134,8 @@ public class ClassifieurBaysien extends Classifieur {
 		public Integer attribut_de(String x) {
 			return Integer.parseInt(""+x.charAt(1));
 		}
+	}
+	public void utiliser_estimateur_laplace() {
+		this.estimateur_laplace  = true;
 	}
 }

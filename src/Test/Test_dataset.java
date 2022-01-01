@@ -107,9 +107,9 @@ public class Test_dataset {
 		System.out.println("-- règles association -----------------------------------------------------------------");
 		System.out.println(Regle.regles_association(L, min_conf));
 		System.out.println("-- règles association positivement corrélées ------------------------------------------");
-		System.out.println(Regle.regles_correlation(L, min_conf, +1));
+		System.out.println(Regle.regles_correlation(L, min_conf).regles_corr_positives());
 		System.out.println("-- règles association négativement corrélées ------------------------------------------");
-		System.out.println(Regle.regles_correlation(L, min_conf, -1));
+		System.out.println(Regle.regles_correlation(L, min_conf).regles_corr_negatives());
 	}
 
 	private static Itemsets test_Eclat(Dataset dataset,double min_sup_pourcent, String file) {
