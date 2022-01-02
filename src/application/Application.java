@@ -117,6 +117,7 @@ public class Application {
 	private JComboBox comboBox_matrice_confusion;
 	private Evaluations mesures;
 	private Classification resultats_classif;
+	private JComboBox comboBox_dist_knn;
 
 	/**
 	 * Launch the application.
@@ -1075,13 +1076,15 @@ public class Application {
 		comboBox_algorithme_classif = new JComboBox();
 		comboBox_algorithme_classif.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (comboBox_algorithme_classif.getSelectedIndex() == 0) {
+				if (comboBox_algorithme_classif.getSelectedIndex() == 0) { // classif baysien
 					textField_k.setEnabled(false);
 					lblNewLabel_17.setEnabled(false);
+					comboBox_dist_knn.setEnabled(false);
 					chckbox_estimateur_laplace.setEnabled(true);
 				} else {
 					textField_k.setEnabled(true);
 					lblNewLabel_17.setEnabled(true);
+					comboBox_dist_knn.setEnabled(true);
 					chckbox_estimateur_laplace.setEnabled(false);
 				}
 			}
@@ -1089,39 +1092,45 @@ public class Application {
 		comboBox_algorithme_classif.setModel(new DefaultComboBoxModel(new String[] {"Classification naïve Bayésienne", "Classification KNN"}));
 		
 		chckbox_estimateur_laplace = new JCheckBox("Estimateur de Laplace");
+		
+		comboBox_dist_knn = new JComboBox();
+		comboBox_dist_knn.setEnabled(false);
+		comboBox_dist_knn.setModel(new DefaultComboBoxModel(new String[] {"Distance Euclidinenne", "Distance Manhattan"}));
 		GroupLayout gl_panel_10 = new GroupLayout(panel_10);
 		gl_panel_10.setHorizontalGroup(
 			gl_panel_10.createParallelGroup(Alignment.LEADING)
-				.addComponent(lblNewLabel_6_2, GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
+				.addComponent(lblNewLabel_6_2, GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblNewLabel_13, GroupLayout.PREFERRED_SIZE, 59, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 305, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, 307, Short.MAX_VALUE)
 					.addComponent(btn_evaluer_instances)
 					.addContainerGap())
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
+					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 483, Short.MAX_VALUE)
 					.addContainerGap())
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
+					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 483, Short.MAX_VALUE)
 					.addContainerGap())
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_10.createParallelGroup(Alignment.TRAILING)
-						.addComponent(comboBox_algorithme_classif, 0, 165, Short.MAX_VALUE)
+						.addComponent(comboBox_algorithme_classif, 0, 166, Short.MAX_VALUE)
 						.addComponent(lblNewLabel_14, Alignment.LEADING))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_10.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_panel_10.createSequentialGroup()
-							.addComponent(textField_taille_echantillion_test, GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(lblNewLabel_17, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(textField_k, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE))
+							.addComponent(textField_taille_echantillion_test, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(comboBox_dist_knn, 0, 152, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblNewLabel_17, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(textField_k, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel_10.createSequentialGroup()
-							.addComponent(chckbox_estimateur_laplace, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(chckbox_estimateur_laplace, GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
 							.addGap(54)
 							.addComponent(btn_tester_dataset, GroupLayout.PREFERRED_SIZE, 121, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
@@ -1135,7 +1144,7 @@ public class Application {
 						.addComponent(lblNewLabel_13)
 						.addComponent(btn_evaluer_instances))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+					.addComponent(scrollBar, GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_10.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_panel_10.createSequentialGroup()
@@ -1143,14 +1152,15 @@ public class Application {
 								.addComponent(lblNewLabel_14)
 								.addComponent(textField_taille_echantillion_test, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(textField_k, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblNewLabel_17))
+								.addComponent(lblNewLabel_17)
+								.addComponent(comboBox_dist_knn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
 								.addComponent(comboBox_algorithme_classif, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(chckbox_estimateur_laplace)))
 						.addComponent(btn_tester_dataset))
 					.addGap(8)
-					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+					.addComponent(scrollBar_1, GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 
@@ -1623,6 +1633,9 @@ public class Application {
 				}
 				TableModel model = table_dataset.getModel();
 				Classifieur_KNN classifieur = new Classifieur_KNN(model, dataset.n, dataset.m, k, nbr_instances_apprentissge);
+				if (comboBox_dist_knn.getSelectedIndex() == 1) {// distance manhattan
+					classifieur.utiliser_distance_manathan();
+				}
 				if (instances == null) instances = classifieur.instances_de_test(model);
 				resultats_classif = classifieur.tester(instances);
 				area_res_class.setText(resultats_classif.toString());
