@@ -266,7 +266,11 @@ public class Application {
 			public void actionPerformed(ActionEvent e) {
 				switch(JOptionPane.showConfirmDialog(frame, "voulez vous appliquer les changements avant de sauvegarder le dataset?")) {
 					case 0: // yes
+					try {
 						appliquer_les_changements();
+					} catch (Exception e2) {
+						e2.printStackTrace();
+					}
 						break;
 					case 1: // no
 						break;
@@ -900,6 +904,9 @@ public class Application {
 		btn_choisir_ficher_instaces_discret.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				String path = FileManager.ChooseFileWindow(application);
+				if (path != null && !path.equals(""))
+					textField_fichier_datasetdiscret.setText(path);
 			}
 		});
 

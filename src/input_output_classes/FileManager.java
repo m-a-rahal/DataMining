@@ -156,7 +156,7 @@ public class FileManager {
 		try {
 			return ChooseFileWindow();
 		} catch (Exception e) {
-			application.afficherMessage("Le fichier ou l'URL que vous avez introduit est érroné");
+			application.afficherMessage("Le chemin ou l'URL que vous avez choisi est érroné");
 			return null;
 		}
 	}
