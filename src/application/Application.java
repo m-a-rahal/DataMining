@@ -940,6 +940,19 @@ public class Application {
 					afficherMessage("La valeur du support min doit être entre 0 et 100");
 					return;
 				}
+				
+				// save dataset discret
+				dest_file = "resources/dataset_discret.txt";
+				try {
+					TableModel model = table_dataset.getModel();
+					int n = model.getRowCount();
+					int m = model.getColumnCount()-2;
+					FileManager.save_dataset(table_dataset.getModel(),n,m,  dest_file);
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+					afficherMessage("Erreure lors de la sauvegarde!\n" + e.toString());
+					return;
+				}
 
 				try {
 					double start = System.currentTimeMillis();
