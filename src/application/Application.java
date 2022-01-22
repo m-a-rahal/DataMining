@@ -80,7 +80,6 @@ public class Application {
 	private JTable table_attributs;
 	private JComboBox comboBox_attribut1;
 	private JComboBox comboBox_attribut2;
-	private JComboBox comboBox_type_diagramme;
 	private JCheckBox chckbxOutliers_disc;
 	private JTextField coeffCorel;
 	private JLabel label_info;
@@ -113,6 +112,7 @@ public class Application {
 	private Classification resultats_classif;
 	private JComboBox comboBox_dist_knn;
 	private JTextArea area_regles_negatives;
+	private int selected_diagramme = 0;
 
 	/**
 	 * Launch the application.
@@ -584,17 +584,8 @@ public class Application {
 		JPanel panel_plots = new JPanel();
 		tabbedPane.addTab("Diagrammes", null, panel_plots, null);
 
-		JLabel lblNewLabel_4 = new JLabel("Type du diagramme");
-
-		comboBox_type_diagramme = new JComboBox();
-		comboBox_type_diagramme.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				update_diagramme();
-			}
-		});
-		comboBox_type_diagramme.setModel(new DefaultComboBoxModel(new String[] {"","Histogramme", "Boite à moustache", "Q-Q Plot", "ScatterPlot", "tous les Boites à moustache"}));
-
+		
+		
 		panel_diagrammes = new ChartPanel(null);
 		panel_diagrammes.setBorder(new LineBorder(new Color(0, 0, 0)));
 
@@ -657,6 +648,46 @@ public class Application {
 
 		nbInterLabel = new JLabel("nombre d'intervales");
 		nbInterLabel.setVisible(false);
+		
+		JButton btnNewButton_4 = new JButton("Histogramme");
+		btnNewButton_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selected_diagramme = 1;
+				update_diagramme();
+			}
+		});
+		
+		JButton btnNewButton_5 = new JButton("Boite à moustache");
+		btnNewButton_5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selected_diagramme = 2;
+				update_diagramme();
+			}
+		});
+		
+		JButton btnNewButton_6 = new JButton("Q-Q Plot");
+		btnNewButton_6.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selected_diagramme = 3;
+				update_diagramme();
+			}
+		});
+		
+		JButton btnNewButton_7 = new JButton("ScatterPlot");
+		btnNewButton_7.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selected_diagramme = 4;
+				update_diagramme();
+			}
+		});
+		
+		JButton btnNewButton_8 = new JButton("tous les Boites à moustache");
+		btnNewButton_8.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selected_diagramme = 5;
+				update_diagramme();
+			}
+		});
 
 
 		GroupLayout gl_panel_plots = new GroupLayout(panel_plots);
@@ -665,51 +696,48 @@ public class Application {
 				.addGroup(gl_panel_plots.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_plots.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_diagrammes, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
 						.addGroup(gl_panel_plots.createSequentialGroup()
-							.addGroup(gl_panel_plots.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel_plots.createSequentialGroup()
-									.addComponent(lblNewLabel_4)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(comboBox_type_diagramme, 0, 281, Short.MAX_VALUE)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_panel_plots.createSequentialGroup()
-									.addComponent(label_coef_corr)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
-									.addGap(10)
-									.addComponent(label_info, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)))
+							.addComponent(label_coef_corr)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_panel_plots.createParallelGroup(Alignment.TRAILING)
-								.addGroup(gl_panel_plots.createSequentialGroup()
-									.addComponent(comboBox_attribut1, 0, 118, Short.MAX_VALUE)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(lblNewLabel_5_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(comboBox_attribut2, 0, 118, Short.MAX_VALUE)
-									.addGap(34))
-								.addGroup(gl_panel_plots.createSequentialGroup()
-									.addComponent(nbInterLabel)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(nb_intervals, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(chckbxOutliers_disc))))
-						.addComponent(panel_diagrammes, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 789, Short.MAX_VALUE))
+							.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
+							.addGap(10)
+							.addComponent(label_info, GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(nbInterLabel)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(nb_intervals, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(chckbxOutliers_disc))
+						.addGroup(gl_panel_plots.createSequentialGroup()
+							.addComponent(btnNewButton_4)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnNewButton_5)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnNewButton_6)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnNewButton_7)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnNewButton_8))
+						.addGroup(gl_panel_plots.createSequentialGroup()
+							.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(comboBox_attribut1, GroupLayout.PREFERRED_SIZE, 282, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED, 149, Short.MAX_VALUE)
+							.addComponent(lblNewLabel_5_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(comboBox_attribut2, GroupLayout.PREFERRED_SIZE, 365, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		gl_panel_plots.setVerticalGroup(
 			gl_panel_plots.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_plots.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_plots.createParallelGroup(Alignment.TRAILING, false)
-						.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
-							.addComponent(lblNewLabel_4)
-							.addComponent(comboBox_type_diagramme, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
-							.addComponent(lblNewLabel_5)
-							.addComponent(comboBox_attribut1, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lblNewLabel_5_1)
-							.addComponent(comboBox_attribut2, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)))
+					.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_5)
+						.addComponent(comboBox_attribut1, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+						.addComponent(comboBox_attribut2, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_5_1))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
 						.addComponent(chckbxOutliers_disc)
@@ -718,8 +746,15 @@ public class Application {
 						.addComponent(coeffCorel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(nb_intervals, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(nbInterLabel))
-					.addGap(6)
-					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_plots.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnNewButton_4)
+						.addComponent(btnNewButton_5)
+						.addComponent(btnNewButton_6)
+						.addComponent(btnNewButton_7)
+						.addComponent(btnNewButton_8))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_diagrammes, GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		panel_plots.setLayout(gl_panel_plots);
@@ -1222,7 +1257,7 @@ public class Application {
 		label_coef_corr.setVisible(false); // by dafault
 		nb_intervals.setVisible(false);
 		nbInterLabel.setVisible(false);
-		switch(comboBox_type_diagramme.getSelectedIndex()) {
+		switch(selected_diagramme) {
 			case 1 : // Histogramme
 				chckbxOutliers_disc.setVisible(true);
 				chckbxOutliers_disc.setEnabled(true);
