@@ -83,7 +83,7 @@ public class Regle {
 
 	@Override
 	public String toString() {
-		return gauche.toString_simple() + "\t==>\t" + droite.toString_simple() + "\t(conf="+Dataset.arrondi(confidence)+"\tlift="+Dataset.arrondi(lift)+"\tsupp="+(int)(confidence * gauche.support)+")";
+		return gauche.toString_simple() + "\t---->    " + droite.toString_simple() + "\t(conf="+Dataset.arrondi(confidence)+"\tlift="+Dataset.arrondi(lift)+"\tsupp="+(int)(confidence * gauche.support)+")";
 	}
 
 	public static class Regles extends ArrayList<Regle>{

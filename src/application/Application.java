@@ -804,7 +804,7 @@ public class Application {
 					label_tmps_exec_regles.setText("temps d'execution = "+(System.currentTimeMillis() - start)+" ms");
 					area_regles.setText("règles de corrélation positives:\n"+
 										 regles.regles_corr_positives().toString());
-					area_regles_negatives.setText("\nrègles de corrélation négatives:\n"+
+					area_regles_negatives.setText("règles de corrélation négatives:\n"+
 							 regles.regles_corr_negatives().toString());
 
 				} catch (Exception e2) {
@@ -1044,13 +1044,16 @@ public class Application {
 		area_res_motifs_freq.setEditable(false);
 		scrollPane.setViewportView(area_res_motifs_freq);
 		panel_7.setLayout(gl_panel_7);
-		panel_motifs_freq_regles.add(panel_7);
 		panel_motifs_freq_regles.add(panel_8);
+		panel_motifs_freq_regles.add(panel_7);
 
 		JPanel panel_classif = new JPanel();
 		tabbedPane.addTab("Classification", null, panel_classif, null);
 		panel_classif.setLayout(new BoxLayout(panel_classif, BoxLayout.X_AXIS));
 
+		JPanel panel_11 = new JPanel();
+		panel_classif.add(panel_11);
+		
 		JPanel panel_10 = new JPanel();
 		panel_classif.add(panel_10);
 
@@ -1145,8 +1148,7 @@ public class Application {
 		scrollBar_1.setViewportView(area_res_class);
 		panel_10.setLayout(gl_panel_10);
 
-		JPanel panel_11 = new JPanel();
-		panel_classif.add(panel_11);
+		
 
 		JLabel lblNewLabel_6_2_1 = new JLabel("");
 		lblNewLabel_6_2_1.setHorizontalAlignment(SwingConstants.CENTER);
