@@ -197,8 +197,6 @@ public class Diagrammes {
 	}
 
 	public static Color randomColor() {
-		Color[] colors = {Color.BLUE, Color.RED, Color.YELLOW, Color.MAGENTA, Color.BLACK};
-		randColorIndex = (randColorIndex+1)%colors.length;
-		return colors[randColorIndex];
+		return Color.RED;
 	}
 }

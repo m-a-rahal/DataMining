@@ -89,12 +89,9 @@ public class Application {
 	private JCheckBox chckbxTrierLesDonns;
 	private String[] col_names_with_number;
 	private JButton btn_ajouter_ligne;
-	private JCheckBox chckbox_apply_before_sort;
 	private JTextField textField_Q;
 	private JTextField textField_min;
 	private JTextField textField_max;
-	private JComboBox comboBox_type_discretisation;
-	private JComboBox comboBox_type_normalisation;
 	private JTextField textField_fichier_datasetdiscret;
 	private JTextField textField_min_sup;
 	private JTextArea area_res_motifs_freq;
@@ -110,7 +107,6 @@ public class Application {
 	private JTable table_mesures_bays__moyennes;
 	private JTextField textField_k;
 	private JComboBox comboBox_algorithme_classif;
-	private JCheckBox chckbxUrl;
 	private JLabel label_info_classif;
 	private JTable table_matrice_confusion;
 	private JCheckBox chckbox_estimateur_laplace;
@@ -180,21 +176,21 @@ public class Application {
 		GroupLayout gl_panel_dataset = new GroupLayout(panel_dataset);
 		gl_panel_dataset.setHorizontalGroup(
 			gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panel_dataset.createSequentialGroup()
+				.addGroup(Alignment.LEADING, gl_panel_dataset.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
-						.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE))
+					.addGroup(gl_panel_dataset.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_2, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
+						.addComponent(panel_1, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_panel_dataset.setVerticalGroup(
 			gl_panel_dataset.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel_dataset.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
+					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 152, GroupLayout.PREFERRED_SIZE)
-					.addGap(10))
+					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
 		);
 
 		table_dataset = add_table_to(panel_2);
@@ -248,9 +244,7 @@ public class Application {
 		text_dataset_src.setToolTipText("le chemin (ou l'url) du dataset ...");
 		text_dataset_src.setColumns(10);
 
-		chckbxUrl = new JCheckBox("url");
-		chckbxUrl.setToolTipText("spécifier si vous voulez récupérer votre dataset depuis un url sur internet ou localement avec son chemin d'emplacement");
-
+		
 		JButton btnCharger = new JButton("charger");
 		btnCharger.addActionListener(new ActionListener() {
 			@Override
@@ -264,18 +258,10 @@ public class Application {
 		btnSauvegarder.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				switch(JOptionPane.showConfirmDialog(frame, "voulez vous appliquer les changements avant de sauvegarder le dataset?")) {
-					case 0: // yes
-					try {
-						appliquer_les_changements();
-					} catch (Exception e2) {
-						e2.printStackTrace();
-					}
-						break;
-					case 1: // no
-						break;
-					case 2: // cancel
-						return;
+				try {
+					appliquer_les_changements();
+				} catch (Exception e2) {
+					e2.printStackTrace();
 				}
 				dest_file = textField_dest_file.getText();
 				if (dest_file == null || dest_file.equals("")) {
@@ -297,8 +283,6 @@ public class Application {
 
 		});
 
-		JLabel lblNewLabel_1 = new JLabel("Destination");
-
 		textField_dest_file = new JTextField();
 		textField_dest_file.setColumns(10);
 
@@ -308,7 +292,7 @@ public class Application {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					if (chckbxTrierLesDonns.isSelected()) { // apply changes before sorting?
-						if (chckbox_apply_before_sort.isSelected()) {
+						if (true) {
 							appliquer_les_changements();
 						}
 						btnSupprimerligne.setEnabled(false);
@@ -327,10 +311,9 @@ public class Application {
 			}
 		});
 
-		chckbox_apply_before_sort = new JCheckBox("appliquer les changements avant de trier");
-		chckbox_apply_before_sort.setSelected(true);
+		
 
-		JButton btnNormaliser = new JButton("Normaliser");
+		JButton btnNormaliser = new JButton("Normaliser min-max");
 		btnNormaliser.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -347,11 +330,7 @@ public class Application {
 					return;
 				}
 				for (int i = 0; i < dataset.m-1; i++) {
-					if( comboBox_type_normalisation.getSelectedIndex() == 0 ) {
-						dataset.normaliser_min_max(i,nouv_max,nouv_min);
-					} else {
-						dataset.normaliser_z_score(i);
-					}
+					dataset.normaliser_min_max(i,nouv_max,nouv_min);
 				}
 				try {
 					load_dataset_on_table();
@@ -361,7 +340,7 @@ public class Application {
 			}
 		});
 
-		JButton btnNewButton = new JButton("discretiser");
+		JButton btnNewButton = new JButton("Discretiser amplitudes égales");
 		btnNewButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -377,11 +356,11 @@ public class Application {
 					return;
 				}
 				for (int i = 0; i < dataset.m-1; i++) {
-					if(comboBox_type_discretisation.getSelectedIndex() == 0) {
+					if(true/* comboBox_type_discretisation.getSelectedIndex() == 0*/) {
 						dataset.discretiser_equal_width(i,Q); // par défaut utiliser amplitueds égales
-					} else {
+					} /*else {
 						dataset.discretiser_effectifs_egaux(i, Q);
-					}
+					}*/
 				}
 				try {
 					load_dataset_on_table_disccrete();
@@ -390,13 +369,6 @@ public class Application {
 				}
 			}
 		});
-
-		comboBox_type_discretisation = new JComboBox();
-		comboBox_type_discretisation.setModel(new DefaultComboBoxModel(new String[] {"Discrétisation en classes d'amplitudes égales", "Discrétisation d'effectifs égaux"}));
-
-		comboBox_type_normalisation = new JComboBox();
-		comboBox_type_normalisation.setModel(new DefaultComboBoxModel(new String[] {"normalisation avec Min-Max", "normalisation avec Z-score "}));
-
 		textField_Q = new JTextField();
 		textField_Q.setHorizontalAlignment(SwingConstants.CENTER);
 		textField_Q.setText("4");
@@ -423,101 +395,110 @@ public class Application {
 
 		JLabel lblMax_1 = new JLabel("max");
 		lblMax_1.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		JButton btnNewButton_discretiser_eff_egaux = new JButton("Discretiser effectifs égaux");
+		
+		JButton btn_nromaliser_zscore = new JButton("Normaliser z-score");
+		btn_nromaliser_zscore.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				double nouv_max, nouv_min;
+				try {
+					nouv_min = Double.parseDouble(textField_min.getText());
+					nouv_max = Double.parseDouble(textField_max.getText());
+				} catch (Exception e2) {
+					afficherMessage("La valeur du min ou du max est éronnée");
+					return;
+				}
+				if (nouv_max <= nouv_min) {
+					afficherMessage("La valeur du min doit être inférieure strictement à celle du max");
+					return;
+				}
+				for (int i = 0; i < dataset.m-1; i++) {
+					dataset.normaliser_z_score(i);
+				}
+				try {
+					load_dataset_on_table();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(textField_dest_file, GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
+							.addComponent(lblNewLabel)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnSauvegarder, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(btn_ajouter_ligne, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+							.addComponent(text_dataset_src, GroupLayout.PREFERRED_SIZE, 273, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnSupprimerligne, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+							.addComponent(btnCharger)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btn_appliquer_changements, GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(chckbox_apply_before_sort)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(chckbxTrierLesDonns))
+							.addComponent(btn_ajouter_ligne, GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE))
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel_1.createSequentialGroup()
-									.addComponent(lblNewLabel)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(text_dataset_src, GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
-									.addGap(22))
-								.addGroup(gl_panel_1.createSequentialGroup()
-									.addComponent(btnNewButton)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(comboBox_type_discretisation, 0, 165, Short.MAX_VALUE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(lblQ, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(textField_Q, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(btnNormaliser)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(comboBox_type_normalisation, 0, 161, Short.MAX_VALUE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(lblMax, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)))
+								.addComponent(btnNewButton)
+								.addComponent(btnNormaliser))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+								.addComponent(btnNewButton_discretiser_eff_egaux)
+								.addComponent(btn_nromaliser_zscore))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
 								.addGroup(gl_panel_1.createSequentialGroup()
-									.addComponent(textField_min, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(lblMax_1, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(textField_max, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
+									.addComponent(lblQ, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+									.addComponent(textField_Q, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_panel_1.createSequentialGroup()
-									.addComponent(chckbxUrl)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(btnCharger)))))
+									.addComponent(lblMax, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(textField_min, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblMax_1, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(textField_max, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnSupprimerligne, GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addComponent(btnSauvegarder, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
+						.addComponent(btn_appliquer_changements, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(chckbxTrierLesDonns)
 					.addContainerGap())
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel_1.createSequentialGroup()
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addContainerGap(38, Short.MAX_VALUE)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
 						.addComponent(text_dataset_src, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnCharger)
-						.addComponent(chckbxUrl))
+						.addComponent(chckbxTrierLesDonns)
+						.addComponent(btn_appliquer_changements)
+						.addComponent(btnSupprimerligne)
+						.addComponent(btn_ajouter_ligne)
+						.addComponent(btnCharger))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnNewButton)
+						.addComponent(lblQ, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
+						.addComponent(textField_Q, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnNewButton_discretiser_eff_egaux)
+						.addComponent(btnSauvegarder))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addComponent(btnNormaliser)
 						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-							.addComponent(btnNewButton)
-							.addComponent(comboBox_type_discretisation, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(textField_min, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
-							.addComponent(comboBox_type_normalisation, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lblQ, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
-							.addComponent(textField_Q, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
-							.addComponent(btnNormaliser)
-							.addComponent(lblMax, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE))
+							.addComponent(lblMax, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btn_nromaliser_zscore))
 						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 							.addComponent(textField_max, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
 							.addComponent(lblMax_1, GroupLayout.PREFERRED_SIZE, 19, GroupLayout.PREFERRED_SIZE)))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-							.addComponent(btn_ajouter_ligne)
-							.addComponent(btnSupprimerligne)
-							.addComponent(btn_appliquer_changements))
-						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-							.addComponent(chckbxTrierLesDonns)
-							.addComponent(chckbox_apply_before_sort)))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnSauvegarder)
-						.addComponent(lblNewLabel_1)
-						.addComponent(textField_dest_file, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap())
+					.addGap(31))
 		);
 		panel_1.setLayout(gl_panel_1);
 		panel_dataset.setLayout(gl_panel_dataset);
@@ -661,7 +642,7 @@ public class Application {
 		label_coef_corr = new JLabel("Coeffitient de correlation");
 
 		label_info = new JLabel(" ");
-		label_info.setForeground(Color.RED);
+		label_info.setForeground(Color.BLUE);
 
 		nb_intervals = new JTextField();
 		nb_intervals.setText("20");
@@ -1569,7 +1550,7 @@ public class Application {
 					dataset.data[i][j] = x;
 				}
 			}
-			System.out.println("loaded dataset has "+ dataset.n +" rows");
+			//System.out.println("loaded dataset has "+ dataset.n +" rows");
 			// update mesures and other stuff
 			updateMesures();
 			update_description_text();
@@ -1743,7 +1724,7 @@ public class Application {
 				dataset = FileManager.extract_dataset(text_dataset_src.getText());
 			} catch (FileNotFoundException e) {} 
 		}
-		else if(!chckbxUrl.isSelected()) {
+		else {
             try {
             	text_dataset_src.setText(FileManager.ChooseFileWindow(application));
             	dataset = FileManager.extract_dataset(text_dataset_src.getText());
@@ -1751,12 +1732,6 @@ public class Application {
             } catch (NullPointerException e1) {
             	e1.printStackTrace();
             } catch (FileNotFoundException e1) {e1.printStackTrace();}
-		}else {
-			try {
-				dataset = URLManager.extract_dataset(text_dataset_src.getText());
-			} catch (IOException e1) {
-				afficherMessage("l'URL que vous avez introduit est éronné");
-			}
 		}
 		try {
 			load_dataset_on_table();
