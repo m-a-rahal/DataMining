@@ -122,13 +122,9 @@ public class Regle {
 		
 		@Override
 		public String toString() {
-			return toString("");
-		}
-
-		public String toString(String prefix) {
 			String text = "";
 			for(Regle regle : this) {
-				text += prefix+" "+regle.toString() + "\n";
+				text += regle.toString() + "\n";
 			}
 			return text;
 		}

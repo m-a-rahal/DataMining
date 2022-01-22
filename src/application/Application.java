@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -114,6 +115,7 @@ public class Application {
 	private Evaluations mesures;
 	private Classification resultats_classif;
 	private JComboBox comboBox_dist_knn;
+	private JTextArea area_regles_negatives;
 
 	/**
 	 * Launch the application.
@@ -769,9 +771,9 @@ public class Application {
 					regles = Regle.regles_correlation(motifs_frequents, min_conf);
 					label_tmps_exec_regles.setText("temps d'execution = "+(System.currentTimeMillis() - start)+" ms");
 					area_regles.setText("règles de corrélation positives:\n"+
-										 regles.regles_corr_positives().toString("+")+
-										"\nrègles de corrélation négatives:\n"+
-										 regles.regles_corr_negatives().toString("-"));
+										 regles.regles_corr_positives().toString());
+					area_regles_negatives.setText("\nrègles de corrélation négatives:\n"+
+							 regles.regles_corr_negatives().toString());
 
 				} catch (Exception e2) {
 					afficherMessage("L'extraction de règles de corrélation a échoué !" + e2);
@@ -809,6 +811,7 @@ public class Application {
 					regles = Regle.regles_association(motifs_frequents, min_conf);
 					label_tmps_exec_regles.setText("temps d'execution = "+(System.currentTimeMillis() - start)+" ms");
 					area_regles.setText(regles.toString());
+					area_regles_negatives.setText("");
 
 				} catch (Exception e2) {
 					afficherMessage("L'extraction de règles d'accosiation a échoué !" + e2);
@@ -824,10 +827,12 @@ public class Application {
 		label_tmps_exec_regles = new JLabel("");
 		label_tmps_exec_regles.setHorizontalAlignment(SwingConstants.CENTER);
 		label_tmps_exec_regles.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		
+		JScrollPane scrollPane_5 = new JScrollPane();
 		GroupLayout gl_panel_8 = new GroupLayout(panel_8);
 		gl_panel_8.setHorizontalGroup(
 			gl_panel_8.createParallelGroup(Alignment.LEADING)
-				.addComponent(lblNewLabel_6_1, GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
+				.addComponent(lblNewLabel_6_1, GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
 				.addGroup(gl_panel_8.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblNewLabel_11)
@@ -836,17 +841,21 @@ public class Application {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNewLabel_12)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnNewButton_2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(btnNewButton_2, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
 					.addGap(10))
 				.addGroup(gl_panel_8.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(label_tmps_exec_regles, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+					.addComponent(label_tmps_exec_regles, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
 					.addContainerGap())
 				.addGroup(gl_panel_8.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+					.addContainerGap())
+				.addGroup(gl_panel_8.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(scrollPane_5, GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_panel_8.setVerticalGroup(
@@ -861,11 +870,16 @@ public class Application {
 						.addComponent(lblNewLabel_12)
 						.addComponent(btnNewButton_2))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane_5, GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(label_tmps_exec_regles, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
+		
+		area_regles_negatives = new JTextArea();
+		scrollPane_5.setViewportView(area_regles_negatives);
 
 		area_regles = new JTextArea();
 		scrollPane_1.setViewportView(area_regles);
@@ -875,21 +889,9 @@ public class Application {
 		lblNewLabel_6.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblNewLabel_6.setHorizontalAlignment(SwingConstants.CENTER);
 
-		JLabel lblNewLabel_7 = new JLabel("dataset des instances");
-
 		textField_fichier_datasetdiscret = new JTextField();
 		textField_fichier_datasetdiscret.setText("resources/dataset_discret.txt");
 		textField_fichier_datasetdiscret.setColumns(10);
-
-		JButton btn_choisir_ficher_instaces_discret = new JButton("choisir");
-		btn_choisir_ficher_instaces_discret.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String path = FileManager.ChooseFileWindow(application);
-				if (path != null && !path.equals(""))
-					textField_fichier_datasetdiscret.setText(path);
-			}
-		});
 
 		JLabel lblNewLabel_8 = new JLabel("algorithme");
 
@@ -960,20 +962,16 @@ public class Application {
 		GroupLayout gl_panel_7 = new GroupLayout(panel_7);
 		gl_panel_7.setHorizontalGroup(
 			gl_panel_7.createParallelGroup(Alignment.LEADING)
-				.addComponent(lblNewLabel_6, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
+				.addComponent(lblNewLabel_6, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
 				.addGroup(gl_panel_7.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblNewLabel_7)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textField_fichier_datasetdiscret, GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btn_choisir_ficher_instaces_discret)
+					.addGap(119)
+					//.addComponent(btn_choisir_ficher_instaces_discret)
 					.addContainerGap())
 				.addGroup(gl_panel_7.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblNewLabel_8)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(comboBox_algorithme, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(comboBox_algorithme, 0, 90, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNewLabel_9)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -985,19 +983,16 @@ public class Application {
 					.addContainerGap())
 				.addGroup(gl_panel_7.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
 					.addContainerGap())
-				.addComponent(label_tmps_exec_motifs_freq, GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
+				.addComponent(label_tmps_exec_motifs_freq, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
 		);
 		gl_panel_7.setVerticalGroup(
 			gl_panel_7.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_7.createSequentialGroup()
 					.addComponent(lblNewLabel_6, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_7.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel_7)
-						.addComponent(textField_fichier_datasetdiscret, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btn_choisir_ficher_instaces_discret))
+					//.addComponent(btn_choisir_ficher_instaces_discret)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_7.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel_8)
@@ -1007,7 +1002,7 @@ public class Application {
 						.addComponent(lblNewLabel_10)
 						.addComponent(btn_lancer_motif_freq))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(label_tmps_exec_motifs_freq, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
