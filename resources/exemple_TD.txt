@@ -1,9 +1,0 @@
-vehicleType cycle   num_wheels  2   motor   no  vehicle Bicycle
-vehicleType cycle   num_wheels  3   motor   no  vehicle Tricycle
-vehicleType cycle   num_wheels  2   motor   yes vehicle Motorcycle
-vehicleType automobile  num_wheels  2   size    small   vehicle SportsCar
-vehicleType automobile  num_doors   4   size    medium  vehicle Sedan
-vehicleType automobile  num_doors   3   size    medium  vehicle MiniVan
-vehicleType automobile  num_doors   4   size    large   vehicle Sports_Utility_Vehicle
-num_wheels  4   vehicleType cycle
-num_wheels  4   motor   yes vehicleType automobile
